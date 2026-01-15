@@ -13,10 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalHandlerException {
 
+
 	/* 공통 응답 포맷 */
 	private ResponseEntity<ResponseData<?>> createErrorResponseEntity(Exception e, HttpStatus status) {
-		ResponseData<?> error = ResponseData.failure(e.getMessage());
-		return ResponseEntity.status(status).body(error);
+		ResponseEntity<ResponseData<Object>> error = ResponseData.failure(e.getMessage(),status);
+		return null;
 	}
 	
 	// 잘못된 상태 전달시
@@ -26,5 +27,4 @@ public class GlobalHandlerException {
 		return createErrorResponseEntity(e, HttpStatus.BAD_REQUEST);
 	}
 
-	
 }

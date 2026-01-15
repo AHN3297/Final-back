@@ -1,0 +1,34 @@
+package com.kh.replay.global.auth.local.controller;
+
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.kh.replay.global.auth.local.model.dto.LocalDTO;
+import com.kh.replay.global.auth.local.model.service.LocalService;
+import com.kh.replay.global.common.ResponseData;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+@RequiredArgsConstructor
+@RestController
+@Slf4j
+@RequestMapping("/api/auth/")
+
+public class LocalController {
+	private final LocalService localService;
+	@PostMapping("signUp")
+	public ResponseEntity<ResponseData<Map<String,String>>> signUp(@Valid @RequestBody LocalDTO localDto){
+		 localService.signUp(localDto);
+		
+		
+		
+		return null;
+		
+	}
+}

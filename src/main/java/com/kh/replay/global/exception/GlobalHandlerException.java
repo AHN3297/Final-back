@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.kh.replay.global.common.ApiResponse;
+import com.kh.replay.global.common.ResponseData;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,14 +14,14 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalHandlerException {
 
 	/* 공통 응답 포맷 */
-	private ResponseEntity<ApiResponse<?>> createErrorResponseEntity(Exception e, HttpStatus status) {
-		ApiResponse<?> error = ApiResponse.failure(e.getMessage());
+	private ResponseEntity<ResponseData<?>> createErrorResponseEntity(Exception e, HttpStatus status) {
+		ResponseData<?> error = ResponseData.failure(e.getMessage());
 		return ResponseEntity.status(status).body(error);
 	}
 	
 	// 잘못된 상태 전달시
 	@ExceptionHandler(IllegalStateException.class)
-	public ResponseEntity<ApiResponse<?>> handleIllegalArgumentException(IllegalStateException e) {
+	public ResponseEntity<ResponseData<?>> handleIllegalArgumentException(IllegalStateException e) {
 		log.error("잘못된 상태 : {}", e.getMessage());
 		return createErrorResponseEntity(e, HttpStatus.BAD_REQUEST);
 	}

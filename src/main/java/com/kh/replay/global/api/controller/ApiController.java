@@ -1,4 +1,4 @@
-package com.kh.replay.api.controller;
+package com.kh.replay.global.api.controller;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kh.replay.api.model.service.ApiService;
+import com.kh.replay.global.api.model.service.ApiService;
 import com.kh.replay.global.common.ResponseData;
 
 import lombok.RequiredArgsConstructor;

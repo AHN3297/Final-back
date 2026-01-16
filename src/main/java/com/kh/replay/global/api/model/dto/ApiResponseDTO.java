@@ -1,4 +1,4 @@
-package com.kh.replay.api.model.dto;
+package com.kh.replay.global.api.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

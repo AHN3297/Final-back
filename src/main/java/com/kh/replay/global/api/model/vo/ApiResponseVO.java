@@ -1,4 +1,4 @@
-package com.kh.replay.api.model.vo;
+package com.kh.replay.global.api.model.vo;
 
 import java.util.List;
 import lombok.Data;

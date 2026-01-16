@@ -1,4 +1,4 @@
-package com.kh.replay.api.model.dao;
+package com.kh.replay.global.api.model.dao;
 
 import org.springframework.stereotype.Repository;
 

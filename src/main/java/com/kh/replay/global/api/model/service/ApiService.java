@@ -1,4 +1,4 @@
-package com.kh.replay.api.model.service;
+package com.kh.replay.global.api.model.service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.kh.replay.api.model.dao.ApiDAO;
-import com.kh.replay.api.model.dto.ApiResponseDTO;
-import com.kh.replay.api.model.vo.ApiResponseVO;
-import com.kh.replay.api.model.vo.ItemWrapper;
+import com.kh.replay.global.api.model.dao.ApiDAO;
+import com.kh.replay.global.api.model.dto.ApiResponseDTO;
+import com.kh.replay.global.api.model.vo.ApiResponseVO;
+import com.kh.replay.global.api.model.vo.ItemWrapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +45,7 @@ public class ApiService {
 
         // 2. Deezer API 이미지 매칭 및 DTO 가공
         List<ApiResponseDTO> content = itunesResults.parallelStream()
-        	    .<ApiResponseDTO>map(item -> { // <ApiResponseDTO>를 명시하여 추론 도움
+        	    .<ApiResponseDTO>map(item -> { 						// <ApiResponseDTO>를 명시
         	        String artistName = item.getArtistName();
         	        String deezerSearchUrl = deezerUrl + "/search/artist?q=" + artistName;
         	        
@@ -66,7 +66,7 @@ public class ApiService {
         	                      item.getArtworkUrl100().replace("100x100bb", "600x600bb") : "";
         	        }
 
-        	        // 정확한 DTO 클래스명(ApiResponseDTO) 사용 확인
+        	        
         	        return ApiResponseDTO.builder()
         	            .id(item.getTrackId() != 0 ? String.valueOf(item.getTrackId()) : String.valueOf(item.getArtistId()))
         	            .category(category)
@@ -79,7 +79,7 @@ public class ApiService {
         	            .build();
         	    }).collect(Collectors.toList());
 
-        // 3. 최종 응답 구조 생성 (성공 응답 명세서 준수)
+        // 3. 응답
         Map<String, Object> finalResult = new HashMap<>();
         finalResult.put("content", content);
         finalResult.put("page", page);

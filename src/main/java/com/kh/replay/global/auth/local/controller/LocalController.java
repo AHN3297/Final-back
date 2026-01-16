@@ -23,12 +23,14 @@ import lombok.extern.slf4j.Slf4j;
 public class LocalController {
 	private final LocalService localService;
 	@PostMapping("signUp")
-	public ResponseEntity<ResponseData<Map<String,String>>> signUp(@Valid @RequestBody LocalDTO localDto){
-		 localService.signUp(localDto);
+	public ResponseEntity<ResponseData<String>> signUp(@Valid @RequestBody LocalDTO localDto){
+		 
+		localService.signUp(localDto);
 		
 		
 		
-		return null;
+		return ResponseData.created("회원가입에 성공했습니다.");
 		
 	}
+	
 }

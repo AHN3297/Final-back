@@ -1,10 +1,12 @@
 package com.kh.replay.global.auth.local.model.service;
 
+import java.util.Map;
+
 import com.kh.replay.global.auth.local.model.dto.LocalDTO;
 
 
 
 public interface LocalService {
-	LocalDTO signUp(LocalDTO localDto);
+	int signUp(LocalDTO localDto);
 
 }

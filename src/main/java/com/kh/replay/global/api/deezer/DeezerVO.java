@@ -16,7 +16,7 @@ public class DeezerVO {
         private String name;
         private String picture_small;
         private String picture_medium;
-        private String picture_big;   // 우리가 원하던 고화질 이미지!
+        private String picture_big;   // 고화질 이미지
         private String picture_xl;
     }
 }

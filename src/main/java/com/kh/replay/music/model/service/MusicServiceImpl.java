@@ -10,6 +10,7 @@ import com.kh.replay.global.api.deezer.DeezerClient;
 import com.kh.replay.global.api.deezer.DeezerVO;
 import com.kh.replay.global.api.itunes.ItunesClient;
 import com.kh.replay.global.api.itunes.ItunesVO;
+import com.kh.replay.global.api.lyricsOvh.LyricsClient;
 import com.kh.replay.global.api.model.dto.ArtistDTO;
 import com.kh.replay.global.api.model.dto.MusicDTO;
 
@@ -21,6 +22,7 @@ public class MusicServiceImpl implements MusicService {
 
     private final ItunesClient itunesClient;
     private final DeezerClient deezerClient;
+    private final LyricsClient lyricsClient;
 
     @Override
     public Object searchByKeyword(String keyword, String category, int page, int size, String sort) {
@@ -34,7 +36,7 @@ public class MusicServiceImpl implements MusicService {
             return convertToMusicDtoList(rawData);
         }
     }
-
+    // 노래 목록
     private List<MusicDTO> convertToMusicDtoList(ItunesVO rawData) {
         if (rawData == null || rawData.getResults() == null) return Collections.emptyList();
 
@@ -53,7 +55,7 @@ public class MusicServiceImpl implements MusicService {
         ).collect(Collectors.toList());
     }
 
-    // 가수 목록 변환 (ItunesVO + Deezer 이미지 결합)
+    // 가수 목록 
     private List<ArtistDTO> convertToArtistDtoList(ItunesVO rawData) {
         if (rawData == null || rawData.getResults() == null) return Collections.emptyList();
 
@@ -77,11 +79,31 @@ public class MusicServiceImpl implements MusicService {
         }).collect(Collectors.toList());
     }
 
-	@Override
-	public MusicDTO musicDetail(Long trackId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public MusicDTO musicDetail(Long trackId) {
+        // 1. iTunes 데이터 조회
+        ItunesVO rawData = itunesClient.findById(String.valueOf(trackId));
+        if (rawData == null || rawData.getResults().isEmpty()) return null;
+
+        ItunesVO.ItunesItem item = rawData.getResults().get(0);
+
+        // 2. 가사 조회 (LyricsClient 호출)
+        String lyrics = lyricsClient.lyrics(item.getArtistName(), item.getTrackName());
+
+        // 3. DTO 조립
+        return MusicDTO.builder()
+                .trackId(item.getTrackId())
+                .artistId(item.getArtistId())
+                .title(item.getTrackName())
+                .artistName(item.getArtistName())
+                .album(item.getCollectionName())
+                .coverImgUrl(item.getArtworkUrl100())
+                .previewUrl(item.getPreviewUrl())
+                .releaseDate(item.getReleaseDate())
+                .genreName(item.getPrimaryGenreName())
+                .lyrics(lyrics) // 가사 주입
+                .build();
+    }
 
 	@Override
 	public ArtistDTO artistDetail(Long artistId) {

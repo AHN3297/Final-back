@@ -20,4 +20,5 @@ public class MusicDTO {
     private String previewUrl;  // PREVIEW_URL
     private String releaseDate; // RELEASE_DATE
     private String duration;    // DURATION
+    private String lyrics;
 }

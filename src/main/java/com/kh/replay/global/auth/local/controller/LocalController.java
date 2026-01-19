@@ -28,7 +28,7 @@ public class LocalController {
 		
 		
 		
-		return ResponseData.ok("회원가입에 성공했습니다.");
+		return ResponseData.created(null,"회원가입에 성공했습니다.");
 		
 	}
 	

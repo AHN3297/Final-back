@@ -1,6 +1,5 @@
 package com.kh.replay.global.auth.local.controller;
 
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +28,7 @@ public class LocalController {
 		
 		
 		
-		return ResponseData.created("회원가입에 성공했습니다.");
+		return ResponseData.ok("회원가입에 성공했습니다.");
 		
 	}
 	

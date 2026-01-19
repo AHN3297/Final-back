@@ -6,6 +6,6 @@ import com.kh.replay.global.auth.local.model.dto.LocalDTO;
 
 
 public interface LocalService {
-	LocalDTO signUp(LocalDTO localDto);
+	int signUp(LocalDTO localDto);
 
 }

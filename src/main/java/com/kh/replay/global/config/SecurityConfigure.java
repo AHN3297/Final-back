@@ -40,7 +40,7 @@ public class SecurityConfigure {
 					// 비로그인 허용
 					requests.requestMatchers(HttpMethod.GET).permitAll();
 					// 비로그인 허용(POST)
-					requests.requestMatchers(HttpMethod.POST).permitAll();
+					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp").permitAll();
 					// 로그인 필요(GET)
 					
 					requests.requestMatchers(HttpMethod.GET).authenticated();

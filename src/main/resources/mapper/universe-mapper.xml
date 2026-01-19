@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.global.universe.model.mapper.UniverseMapper">
+
+    <select id="findAllUniverse" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+        SELECT
+               u.UNIVERSE_ID as "universeId",
+               u.TITLE as "title",
+               m.NICKNAME as "nickName",
+            (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like"
+        FROM TB_UNIVERSE u
+        JOIN TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE u.STATUS = 'Y'
+        
+        <choose>
+            <when test="sort == 'latest'">
+                <if test="lastUniverseId != null">
+                    AND u.UNIVERSE_ID &lt; #{lastUniverseId}
+                </if>
+            </when>
+
+            <when test="sort == 'popular'">
+                <if test="lastLikeCount != null and lastUniverseId != null">
+                    AND (
+                        (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) &lt; #{lastLikeCount}
+                        OR 
+                        (
+                          (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) = #{lastLikeCount}
+                          AND u.UNIVERSE_ID &lt; #{lastUniverseId}
+                        )
+                    )
+                </if>
+            </when>
+        </choose>
+        
+        ORDER BY
+        <choose>
+            <when test="sort == 'popular'">
+                "like" DESC, u.UNIVERSE_ID DESC
+            </when>
+            <otherwise>
+                u.UNIVERSE_ID DESC
+            </otherwise>
+        </choose>
+        
+        FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+</mapper>

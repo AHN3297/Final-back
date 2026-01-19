@@ -1,13 +1,21 @@
 package com.kh.replay.global.auth.local.model.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.replay.global.auth.local.model.dao.LocalMapper;
 import com.kh.replay.global.auth.local.model.dto.LocalDTO;
 import com.kh.replay.global.exception.DuplicateException;
 import com.kh.replay.global.exception.MemberJoinException;
 import com.kh.replay.global.member.model.vo.MemberVO;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class LocalServiceImpl implements LocalService {
 	private final LocalMapper localMapper;
 	private final PasswordEncoder passwordEncoder;

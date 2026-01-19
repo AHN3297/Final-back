@@ -42,4 +42,14 @@ public class ItunesClient {
         String url = String.format("https://itunes.apple.com/lookup?id=%s&country=KR", id);
         return restTemplate.getForObject(url, ItunesVO.class);
     }
+    
+    /**
+     * 가수 상세보기 관려 노래
+     */
+    public ItunesVO findArtistWithSongs(Long artistId, int limit) {
+        // lookup 주소를 사용하며, 가수의 노래 목록을 함께 요청
+        String url = String.format("https://itunes.apple.com/lookup?id=%d&entity=song&limit=%d&country=KR", 
+                                    artistId, limit);
+        return restTemplate.getForObject(url, ItunesVO.class);
+    }
 }

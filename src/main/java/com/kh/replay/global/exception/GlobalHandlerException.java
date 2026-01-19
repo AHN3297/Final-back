@@ -1,6 +1,5 @@
 package com.kh.replay.global.exception;
 
-import org.apache.http.protocol.ResponseDate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,14 +15,14 @@ public class GlobalHandlerException {
 
 
 	/* 공통 응답 포맷 */
-	private ResponseEntity<ResponseData<?>> createErrorResponseEntity(Exception e, HttpStatus status) {
+	private ResponseEntity<ResponseData<Object>> createErrorResponseEntity(Exception e, HttpStatus status) {
 		ResponseEntity<ResponseData<Object>> error = ResponseData.failure(e.getMessage(),status);
 		return null;
 	}
 	
 	// 잘못된 상태 전달시
 	@ExceptionHandler(IllegalStateException.class)
-	public ResponseEntity<ResponseData<?>> handleIllegalArgumentException(IllegalStateException e) {
+	public ResponseEntity<ResponseData<Object>> handleIllegalArgumentException(IllegalStateException e) {
 		log.error("잘못된 상태 : {}", e.getMessage());
 		return createErrorResponseEntity(e, HttpStatus.BAD_REQUEST);
 	}	

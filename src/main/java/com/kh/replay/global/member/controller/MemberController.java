@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.global.member.model.dto.LocalLoginDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class MemberController {
-	@GetMapping("/info")
-	public ResponseEntity<ResponseData<Map<String,String>>> findAllInfo(){
+	@GetMapping("/login")
+	public ResponseEntity<Map<String,String>> login(LocalLoginDTO localLogin) {
+		
+		
+		
 		
 		
 		return null;
-		
 	}
 
 }

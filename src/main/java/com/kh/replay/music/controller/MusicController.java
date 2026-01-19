@@ -44,7 +44,7 @@ public class MusicController {
 
     // 가수 상세 조회
     @GetMapping("/artist/{artistId}")
-    public ResponseEntity<ResponseData<ArtistDTO>> artistDetail(@PathVariable Long artistId) {
+    public ResponseEntity<ResponseData<ArtistDTO>> artistDetail(@PathVariable(value = "artistId") Long artistId) {
         ArtistDTO result = musicService.artistDetail(artistId);
         return ResponseData.ok(result, "가수 상세 정보 조회 성공");
     }

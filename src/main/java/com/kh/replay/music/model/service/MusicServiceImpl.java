@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.kh.replay.global.api.deezer.DeezerClient;
 import com.kh.replay.global.api.deezer.DeezerVO;
@@ -23,6 +24,7 @@ public class MusicServiceImpl implements MusicService {
     private final ItunesClient itunesClient;
     private final DeezerClient deezerClient;
     private final LyricsClient lyricsClient;
+ 
 
     @Override
     public Object searchByKeyword(String keyword, String category, int page, int size, String sort) {
@@ -42,8 +44,8 @@ public class MusicServiceImpl implements MusicService {
 
         return rawData.getResults().stream().map(item -> 
             MusicDTO.builder()
-                .trackId(item.getTrackId())     // Long 타입 식별자
-                .artistId(item.getArtistId())   // Long 타입 식별자
+                .trackId(item.getTrackId())     
+                .artistId(item.getArtistId())   
                 .title(item.getTrackName())
                 .artistName(item.getArtistName())
                 .album(item.getCollectionName())
@@ -101,13 +103,55 @@ public class MusicServiceImpl implements MusicService {
                 .previewUrl(item.getPreviewUrl())
                 .releaseDate(item.getReleaseDate())
                 .genreName(item.getPrimaryGenreName())
-                .lyrics(lyrics) // 가사 주입
+                .lyrics(lyrics)
                 .build();
     }
+    @Override
+    public ArtistDTO artistDetail(Long artistId) {
+        // 1. Client를 통해 데이터 수신 (RestTemplate은 Client 안에서만 돔)
+        ItunesVO response = itunesClient.findArtistWithSongs(artistId, 11);
 
-	@Override
-	public ArtistDTO artistDetail(Long artistId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        if (response == null || response.getResults().isEmpty()) return null;
+
+        // 2. 데이터 가공 (첫 번째: 아티스트, 나머지: 노래)
+        ItunesVO.ItunesItem artistItem = response.getResults().get(0);
+
+        List<MusicDTO> topSongs = response.getResults().stream()
+                .skip(1)
+                .map(item -> MusicDTO.builder()
+                        .trackId(item.getTrackId())
+                        .artistId(item.getArtistId())
+                        .title(item.getTrackName())
+                        .artistName(item.getArtistName())
+                        .album(item.getCollectionName())
+                        .genreName(item.getPrimaryGenreName())
+                        .coverImgUrl(item.getArtworkUrl100())
+                        .previewUrl(item.getPreviewUrl())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 3. DTO 조립
+        ArtistDTO dto = ArtistDTO.builder()
+                .apiSingerId(artistItem.getArtistId())
+                .apiSingerName(artistItem.getArtistName())
+                .singerGenre(artistItem.getPrimaryGenreName())
+                .topSongs(topSongs)
+                .build();
+
+        // 4. Deezer 데이터 결합
+        try {
+            DeezerVO deezerData = deezerClient.fetchArtist(artistItem.getArtistName());
+            if (deezerData != null && !deezerData.getData().isEmpty()) {
+                dto.setSingerImgUrl(deezerData.getData().get(0).getPicture_xl());
+                dto.setDescription(artistItem.getArtistName() + "은(는) " + 
+                                   artistItem.getPrimaryGenreName() + " 장르의 인기 아티스트입니다.");
+            }
+        } catch (Exception e) {
+            dto.setDescription("상세 정보를 불러올 수 없습니다.");
+        }
+
+        return dto;
+    }
+    
+
 }

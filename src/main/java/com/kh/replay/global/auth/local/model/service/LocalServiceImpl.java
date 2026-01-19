@@ -40,7 +40,7 @@ public class LocalServiceImpl implements LocalService {
 
 		// 암호화된 비밀번호 로컬에 저장
 		localDto.setPassword(encodedPassword);
-log.info("{}",localDto.getMemberDto());
+		log.info("{}",localDto.getMemberDto());
 		MemberVO member = MemberVO.builder().memberId(localDto.getMemberDto().getMemberId())
 				.email(localDto.getMemberDto().getEmail()).name(localDto.getMemberDto().getName())
 				.nickName(localDto.getMemberDto().getNickName()).gender(localDto.getMemberDto().getGender())

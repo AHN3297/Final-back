@@ -1,6 +1,5 @@
 package com.kh.replay.global.auth.local.controller;
 
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,12 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 public class LocalController {
 	private final LocalService localService;
 	@PostMapping("signUp")
-	public ResponseEntity<ResponseData<Map<String,String>>> signUp(@Valid @RequestBody LocalDTO localDto){
-		 localService.signUp(localDto);
+	public ResponseEntity<ResponseData<String>> signUp(@Valid @RequestBody LocalDTO localDto){
+		 
+		localService.signUp(localDto);
 		
 		
 		
-		return null;
+		return ResponseData.created(null,"회원가입에 성공했습니다.");
 		
 	}
+	
 }

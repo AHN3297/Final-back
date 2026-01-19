@@ -1,0 +1,18 @@
+package com.kh.replay.global.universe.model.mapper;
+
+import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import com.kh.replay.global.universe.model.dto.UniverseDTO;
+
+@Mapper
+public interface UniverseMapper {
+
+	
+    List<UniverseDTO> findAllUniverse(
+        @Param("sort") String sort,
+        @Param("lastUniverseId") Long lastUniverseId,
+        @Param("lastLikeCount") Long lastLikeCount,
+        @Param("limit") int limit
+    );
+}

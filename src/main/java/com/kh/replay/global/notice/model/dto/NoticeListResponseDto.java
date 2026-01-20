@@ -11,7 +11,7 @@ public class NoticeListResponseDto {
 
 	private int page;
 	private int size;
-	private Long totalElements;
+	private int totalElements;
 	private int totalPages;
 	private List<NoticeItemDto> items;
 }

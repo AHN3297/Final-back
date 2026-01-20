@@ -43,7 +43,7 @@ public class NoticeServiceImpl implements NoticeService {
 		
 
 		// 5. Entity => DTO 변환
-		List<NoticeDto> noticeItems = notices.stream().map(NoticeItemDto::new).collect(Collectors.toList());
+		List<NoticeItemDto> noticeItems = notices.stream().map(NoticeItemDto::new).collect(Collectors.toList());
 		
 		// 6. 최종 결과 반환
 		return NoticeListResponseDto.builder().page(pageInfo.getCurrentPage())

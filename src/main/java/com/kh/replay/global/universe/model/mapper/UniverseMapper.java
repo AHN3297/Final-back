@@ -3,6 +3,8 @@ package com.kh.replay.global.universe.model.mapper;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import com.kh.replay.global.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.global.universe.model.dto.UniverseDTO;
 
 @Mapper
@@ -26,4 +28,6 @@ public interface UniverseMapper {
 
 	UniverseDTO findByUniverseId( 
 			@Param("universeId") Long universeId);
+
+	int insertUniverse(UniverseDTO universe);
 }

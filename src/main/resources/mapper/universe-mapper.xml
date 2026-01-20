@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kh.replay.global.universe.model.mapper.UniverseMapper">
+<mapper namespace="com.kh.replay.universe.model.mapper.UniverseMapper">
 
     <sql id="commonColumns">
         u.UNIVERSE_ID as "universeId",
@@ -40,7 +40,7 @@
         FETCH NEXT #{limit} ROWS ONLY
     </sql>
 
-    <select id="findAllUniverse" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+    <select id="findAllUniverse" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
         SELECT
             <include refid="commonColumns" />
         FROM TB_UNIVERSE u
@@ -49,7 +49,7 @@
         <include refid="cursorAndSort" />
     </select>
     
-    <select id="findByKeyword" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+    <select id="findByKeyword" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
         SELECT
             <include refid="commonColumns" />
         FROM TB_UNIVERSE u
@@ -80,7 +80,7 @@
         <include refid="cursorAndSort" />
     </select>
     
-    <select id="findByUniverseId" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+    <select id="findByUniverseId" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
         SELECT
             u.UNIVERSE_ID as "universeId",
             u.TITLE as "title",

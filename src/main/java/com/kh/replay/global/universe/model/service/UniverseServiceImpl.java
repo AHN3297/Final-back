@@ -89,7 +89,7 @@ public class UniverseServiceImpl implements UniverseService {
         return UniverseListResponse.builder()
                 .content(list)
                 .pagination(pagination)
-                .build();
+                .build();  
     }
 
 }

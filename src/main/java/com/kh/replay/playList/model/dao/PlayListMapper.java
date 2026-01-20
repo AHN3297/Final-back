@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.kh.replay.playList.model.dto.PlayListDTO;
 import com.kh.replay.playList.model.vo.PlayListVO;
 
 @Mapper

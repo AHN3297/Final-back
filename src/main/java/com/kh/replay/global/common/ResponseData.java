@@ -17,13 +17,13 @@ public class ResponseData<T> {
    // 성공 응답
    public static <T> ResponseEntity<ResponseData<T>> ok(T data) {
       return ResponseEntity.ok(
-         new ResponseData<T>(null, data, HttpStatus.OK.value(), "요청성공")
+         new ResponseData<T>(null, data, HttpStatus.OK.value(), null)
       );
    }
 
    public static <T> ResponseEntity<ResponseData<T>> ok(T data, String message) {
       return ResponseEntity.ok(
-         new ResponseData<T>(message, data, HttpStatus.OK.value(), "등록 성공")
+         new ResponseData<T>(message, data, HttpStatus.OK.value(), null)
       );
    }
 
@@ -41,6 +41,6 @@ public class ResponseData<T> {
    // 4. 생성 성공 (201 Created)
    public static <T> ResponseEntity<ResponseData<T>> created(T data) {
       return ResponseEntity.status(HttpStatus.CREATED)
-         .body(new ResponseData<T>("생성되었습니다.", data, HttpStatus.CREATED.value(), "요청 성공"));
+         .body(new ResponseData<T>("생성되었습니다.", data, HttpStatus.CREATED.value(), null));
    }
 }

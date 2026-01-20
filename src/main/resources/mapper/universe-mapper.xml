@@ -90,7 +90,7 @@
             m.MEMBER_ID as "memberId",
             m.NICKNAME as "nickName",
             (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like",
-            (SELECT COUNT(1) FROM TB_UNIVERSE_BOOKMARK b WHERE b.UNIVERSE_ID = u.UNIVERSE_ID) as "bookmark"
+            (SELECT COUNT(1) FROM TB_FAV_UNIVERSE b WHERE b.UNIVERSE_ID = u.UNIVERSE_ID) as "bookmark"
         FROM 
              TB_UNIVERSE u
         JOIN 
@@ -98,5 +98,26 @@
         WHERE 
               u.UNIVERSE_ID = #{universeId}
     </select>
-
+    
+	<insert id="insertUniverse">
+	    INSERT 
+	      INTO 
+	           TB_UNIVERSE (
+	        UNIVERSE_ID, 
+	        TITLE, 
+	        LAYOUT_DATA, 
+	        THEME_CODE, 
+	        THUMBNAIL_URL, 
+	        MEMBER_ID, 
+	        STATUS, 
+	        CREATED_AT   ) VALUES (
+	        SEQ_UNIVERSE_ID.NEXTVAL,  #{title}, 
+	        #{layoutData}, 
+	        #{themeCode}, 
+	        #{thumbnailUrl}, 
+	        #{memberId}, 
+	        'Y', 
+	        SYSDATE
+	    )
+	</insert>
 </mapper>

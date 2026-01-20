@@ -42,9 +42,19 @@ public class UniverseServiceImpl implements UniverseService {
         
         return buildResponse(list, size, sort);
     }
+    
+	/**
+	 * 3. 상세조회
+	 */
+	@Override
+	public UniverseDTO findByUniverseId(Long universeId) {
+		
+		UniverseDTO universe = universeMapper.findByUniverseId(universeId);
+		return universe;
+	}
 
     
-    // 공통로직
+    // 무한스크롤 공통로직
     private UniverseListResponse buildResponse(List<UniverseDTO> list, int size, String sort) {
         
         // 1. hasNext 확인 및 데이터 자르기
@@ -81,4 +91,5 @@ public class UniverseServiceImpl implements UniverseService {
                 .pagination(pagination)
                 .build();
     }
+
 }

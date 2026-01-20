@@ -23,4 +23,7 @@ public interface UniverseMapper {
 		@Param("lastUniverseId")	Long lastUniverseId,
 		@Param("lastLikeCount")	Long lastLikeCount, 
 		@Param("limit")	int limit);
+
+	UniverseDTO findByUniverseId( 
+			@Param("universeId") Long universeId);
 }

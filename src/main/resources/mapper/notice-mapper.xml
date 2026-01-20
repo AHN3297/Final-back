@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.replay.global.notice.model.repository.NoticeRepository">
+	
+	<resultMap id="noticeResultSet" type="com.kh.replay.global.notice.model.domain.Notice">
+		<id property="noticeNo" column="NOTICE_NO" />
+		<result property="title" column="TITLE" />
+		<result property="content" column="CONTENT" />
+		<result property="imgPath" column="IMG_PATH" />
+		<result property="viewCount" column="VIEW_COUNT" />
+		<result property="status" column="STATUS" />
+		<result property="createdAt" column="CREATED_AT" />
+		<result property="updatedAt" column="UPDATED_AT" />
+	</resultMap>
+	
+	<select id="findAll"
+			resultMap="noticeResultSet">
+		SELECT
+			   NOTICE
+			 , TITLE
+			 , CONTENT
+			 , IMG_PATH
+			 , VIEW_COUNT
+			 , STATUS
+			 , CREATED_AT
+			 , UPDATED_AT
+	      FROM
+	     	   NOTICE
+	     WHERE
+	           STATUS = #{status}
+		<if test="keyword != null and keyword != ''">
+			AND
+			    TITLE LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+		  ORDER
+		     BY
+		        NOTICE_NO
+		   DESC
+	</select>
+	
+	<select id="countAll" 
+			resultType="_int">
+		SELECT
+		       COUNT(*)
+		  FROM
+		       NOTICE
+		 WHERE
+		       STATUS = #{status}
+		<if test="keyword != null and keyword != ''">
+			AND
+			    TITLE LIKE CONCAT('%', #{keyword}, '%')
+		</if>
+	</select>
+	
+	<insert id="save"
+			parameterType="com.kh.replay.global.notice.model.domain.Notice">
+		INSERT
+		  INTO
+		       NOTICE
+		       (
+		       TITLE
+		     , CONTENT
+		     , IMG_PATH
+		     , STATUS
+		     , VIEW_COUNT
+		     , CREATED_AT
+		     , UPDATED_AT
+		       )
+	    VALUES 
+	    	   (
+	    	   #{title}
+	    	 , #{content}
+	    	 , #{imgPath}
+	    	 , 'Y'
+	    	 , 0
+	    	 , NOW()
+	    	 , NOW()  
+	    	   )
+	</insert>
+	
+	<select id="findById"
+			resultMap="noticeResultSet">
+		SELECT
+		       NOTICE
+			 , TITLE
+			 , CONTENT
+			 , IMG_PATH
+			 , VIEW_COUNT
+			 , STATUS
+			 , CREATED_AT
+			 , UPDATED_AT
+	      FROM
+	           NOTICE
+	     WHERE
+	           NOTICE_NO = #{id}
+	       AND
+	           STATUS = 'Y'
+	</select>
+	
+</mapper>

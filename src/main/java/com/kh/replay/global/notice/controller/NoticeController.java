@@ -1,13 +1,20 @@
 package com.kh.replay.global.notice.controller;
 
+import java.io.IOException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.global.notice.model.dto.NoticeListResponseDto;
+import com.kh.replay.global.notice.model.dto.NoticeRequestDto;
 import com.kh.replay.global.notice.service.NoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +40,18 @@ public class NoticeController {
 		
 		// 2. ResponseData 클래스에 만들어둔 static 메서드를 사용해 포장해서 보냄.
 		return ResponseData.ok(result, "관리자 공지사항 목록 조회 성공");
+	}
+	
+	@PostMapping
+	public ResponseEntity<ResponseData<Void>> registerNotice(
+			@ModelAttribute NoticeRequestDto requestDto, // 제목, 내용 (JSON이 아닌 Form - data 방식)
+			@RequestPart(value = "images", required = false ) MultipartFile image)
+	throws IOException {
+		
+		noticeService.registerNotice(requestDto, image);
+		
+		// ResponseData.created는 201 상태코드 반환
+		return ResponseData.created(null, "공지사항 등록 성공");
 	}
 	
 

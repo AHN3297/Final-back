@@ -3,23 +3,20 @@
 
 <mapper namespace="com.kh.replay.global.universe.model.mapper.UniverseMapper">
 
-    <select id="findAllUniverse" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
-        SELECT
-               u.UNIVERSE_ID as "universeId",
-               u.TITLE as "title",
-               m.NICKNAME as "nickName",
-            (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like"
-        FROM TB_UNIVERSE u
-        JOIN TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
-        WHERE u.STATUS = 'Y'
-        
+    <sql id="commonColumns">
+        u.UNIVERSE_ID as "universeId",
+        u.TITLE as "title",
+        m.NICKNAME as "nickName",
+        (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like"
+    </sql>
+
+    <sql id="cursorAndSort">
         <choose>
             <when test="sort == 'latest'">
                 <if test="lastUniverseId != null">
                     AND u.UNIVERSE_ID &lt; #{lastUniverseId}
                 </if>
             </when>
-
             <when test="sort == 'popular'">
                 <if test="lastLikeCount != null and lastUniverseId != null">
                     AND (
@@ -36,15 +33,70 @@
         
         ORDER BY
         <choose>
-            <when test="sort == 'popular'">
-                "like" DESC, u.UNIVERSE_ID DESC
-            </when>
-            <otherwise>
-                u.UNIVERSE_ID DESC
-            </otherwise>
+            <when test="sort == 'popular'"> "like" DESC, u.UNIVERSE_ID DESC </when>
+            <otherwise> u.UNIVERSE_ID DESC </otherwise>
         </choose>
         
         FETCH NEXT #{limit} ROWS ONLY
+    </sql>
+
+    <select id="findAllUniverse" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+        SELECT
+            <include refid="commonColumns" />
+        FROM TB_UNIVERSE u
+        JOIN TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE u.STATUS = 'Y'
+        <include refid="cursorAndSort" />
+    </select>
+    
+    <select id="findByKeyword" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+        SELECT
+            <include refid="commonColumns" />
+        FROM TB_UNIVERSE u
+        JOIN TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE u.STATUS = 'Y'
+
+        <if test="keyword != null and keyword != ''">
+            AND
+            <choose>
+                <when test="condition == 'title'">
+                    u.TITLE LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="condition == 'nickname'">
+                    m.NICKNAME LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="condition == 'memberId'">
+                    m.MEMBER_ID LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="condition == 'universeId'">
+                    u.UNIVERSE_ID = #{keyword}
+                </when>
+                <when test="condition == 'all'">
+                    (u.TITLE LIKE '%' || #{keyword} || '%' OR m.NICKNAME LIKE '%' || #{keyword} || '%')
+                </when>
+            </choose>
+        </if>
+        
+        <include refid="cursorAndSort" />
+    </select>
+    
+    <select id="findByUniverseId" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+        SELECT
+            u.UNIVERSE_ID as "universeId",
+            u.TITLE as "title",
+            u.LAYOUT_DATA as "layoutData",
+            u.THEME_CODE as "themeCode",
+            u.THUMBNAIL_URL as "thumbnailUrl",
+            m.MEMBER_ID as "memberId",
+            m.NICKNAME as "nickName",
+            (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like",
+            (SELECT COUNT(1) FROM TB_UNIVERSE_BOOKMARK b WHERE b.UNIVERSE_ID = u.UNIVERSE_ID) as "bookmark"
+        FROM 
+             TB_UNIVERSE u
+        JOIN 
+             TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE 
+              u.UNIVERSE_ID = #{universeId}
     </select>
 
 </mapper>

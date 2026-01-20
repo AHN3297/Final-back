@@ -15,4 +15,12 @@ public interface UniverseMapper {
         @Param("lastLikeCount") Long lastLikeCount,
         @Param("limit") int limit
     );
+
+	List<UniverseDTO> findByKeyword(
+		@Param("keyword") String keyword, 
+		@Param("condition")	String condition, 
+		@Param("sort")	String sort, 
+		@Param("lastUniverseId")	Long lastUniverseId,
+		@Param("lastLikeCount")	Long lastLikeCount, 
+		@Param("limit")	int limit);
 }

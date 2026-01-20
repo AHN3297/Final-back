@@ -14,8 +14,9 @@ public interface PlayListMapper {
 	int createPlayList(PlayListVO plyList);
 	
 	// 플레이리스트 목록 조회
-	List<PlayListVO> selectPlayListByMemberId(String memberId);
+	List<PlayListDTO> findAllMemberPlayLists(String memberId);
 	
 	// 플레이리스트 상세조회
 	PlayListVO selectPlayListById(int playListId);
+
 }

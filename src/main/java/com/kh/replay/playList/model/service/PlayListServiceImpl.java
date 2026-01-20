@@ -1,5 +1,7 @@
 package com.kh.replay.playList.model.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,4 +37,10 @@ public class PlayListServiceImpl implements PlayListService {
         // 4. 성공 시 생성된 시퀀스 ID만 반환
         return vo.getPlayListId(); 
     }
+
+	@Override
+	public List<PlayListDTO> findAllMemberPlayLists(String memberId) {
+		
+		return playListMapper.findAllMemberPlayLists(memberId);
+	}
 }

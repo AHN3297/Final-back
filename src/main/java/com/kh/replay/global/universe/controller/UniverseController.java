@@ -5,11 +5,13 @@ import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.global.universe.model.dto.UniverseDTO;
 import com.kh.replay.global.universe.model.dto.UniverseListResponse;
 import com.kh.replay.global.universe.model.service.UniverseService;
 
@@ -91,9 +93,6 @@ public class UniverseController {
         
         // 서비스 호출
         UniverseListResponse response = universeService.findByKeyword(keyword, condition, size, sort, lastUniverseId, lastLikeCount);
-        
-        //검색결과 대기
-        
         return ResponseData.ok(response);
     }
 
@@ -103,4 +102,23 @@ public class UniverseController {
     private boolean vaildSort(String sort) {
         return "latest".equals(sort) || "popular".equals(sort);
     }
+    
+    /**
+     * 3. 유니버스 상세 조회 
+     * @param universeId
+     * @return
+     */
+    @GetMapping("/{universeId}")
+    public ResponseEntity<ResponseData<UniverseDTO>> findByUniverseId (
+    		@PathVariable("universeId") Long universeId) {
+    	
+    	UniverseDTO response = universeService.findByUniverseId(universeId);
+    	
+    	//추후 페이지 없는경우에는 예외처리 살려야함 앞단 만들고 진행
+    	//if(response == null) {
+    	//	return ResponseData.failure("해당유니버스를 찾을수가 없습니다", HttpStatus.NOT_FOUND);
+    	//}
+        return ResponseData.ok(response);
+    }
+    
 }

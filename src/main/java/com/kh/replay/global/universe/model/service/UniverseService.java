@@ -10,5 +10,8 @@ public interface UniverseService {
 	UniverseListResponse findAllUniverse(int size, String sort, Long lastUniverseId, Long lastLikeCount);
 	
 	//키워드조회
-	UniverseListResponse findByKeyword(String keyword, String condition, int size, String sort, Long lastUniverseId, Long lastLikeCount); 
+	UniverseListResponse findByKeyword(String keyword, String condition, int size, String sort, Long lastUniverseId, Long lastLikeCount);
+	
+	//상세조회
+	UniverseDTO findByUniverseId(Long universeId); 
 }

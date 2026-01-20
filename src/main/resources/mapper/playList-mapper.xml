@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.replay.playList.model.dao.PlayListMapper">
-
+	<insert id="createPlayList">
+	    <selectKey keyProperty="playListId" resultType="int" order="BEFORE">
+	        SELECT SEQ_PLAYLIST_ID.NEXTVAL FROM DUAL
+	    </selectKey>
+	
+	    INSERT INTO TB_PLAYLIST (
+	        PLAYLIST_ID, 
+	        PLAYLIST_NAME, 
+	        MEMBER_ID, 
+	        CREATED_AT, 
+	        UPDATED_AT
+	    ) VALUES (
+	        #{playListId}, #{playListName}, 
+	        #{memberId}, 
+	        SYSDATE, 
+	        SYSDATE
+	    )
+	</insert>
+	
+	
 </mapper>

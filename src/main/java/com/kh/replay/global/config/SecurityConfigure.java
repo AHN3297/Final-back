@@ -37,10 +37,13 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
+					// 로그인필요(POST)테스트 
+					requests.requestMatchers(HttpMethod.POST,"/api/member/playList").permitAll();
 					// 비로그인 허용
 					requests.requestMatchers(HttpMethod.GET).permitAll();
 					// 비로그인 허용(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp").permitAll();
+				
 					// 로그인 필요(GET)
 					
 					requests.requestMatchers(HttpMethod.GET).authenticated();
@@ -50,6 +53,7 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.PUT).authenticated();
 					// 로그인 필요(DELETE)
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
+					
 					
 					// 관리자
 					requests.requestMatchers(HttpMethod.GET).hasAuthority("");

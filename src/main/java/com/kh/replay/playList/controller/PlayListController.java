@@ -2,14 +2,15 @@ package com.kh.replay.playList.controller;
 
 
 
-import org.springframework.http.HttpStatus;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.playList.model.dto.PlayListDTO;
@@ -39,6 +40,14 @@ public class PlayListController {
     }
 	
 	// 플레이 리스트 목록 조회
+	@GetMapping
+	public ResponseEntity<ResponseData<List<PlayListDTO>>> findAllPlaylist(
+	        @RequestParam(name = "memberId") String memberId) {
+		
+	    List<PlayListDTO> list = playListService.findAllMemberPlayLists(memberId);
+	    
+	    return ResponseData.ok(list, "내 플레이리스트 목록 조회 성공");
+	}
 	
 	// 플레이리스트 상세조회
 	

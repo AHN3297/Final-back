@@ -1,4 +1,4 @@
-package com.kh.replay.global.universe.model.entity;
+package com.kh.replay.universe.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

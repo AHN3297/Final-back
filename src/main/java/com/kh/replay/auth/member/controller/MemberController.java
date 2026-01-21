@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.controller;
+package com.kh.replay.auth.member.controller;
 
 
 import java.util.Map;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.replay.auth.local.model.dto.LocalDTO;
+import com.kh.replay.auth.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.auth.member.model.dto.MemberDTO;
+import com.kh.replay.auth.member.model.service.MemberService;
 import com.kh.replay.global.common.ResponseData;
-import com.kh.replay.global.member.model.dto.ChangePasswordDTO;
-import com.kh.replay.global.member.model.dto.MemberDTO;
-import com.kh.replay.global.member.model.service.MemberService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -6,9 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.auth.local.model.dao.LocalMapper;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
-import com.kh.replay.global.exception.DuplicateException;
+import com.kh.replay.auth.member.model.vo.MemberVO;
 import com.kh.replay.global.exception.MemberJoinException;
-import com.kh.replay.global.member.model.vo.MemberVO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,18 +23,6 @@ public class LocalServiceImpl implements LocalService {
 	@Override
 	public int signUp(LocalDTO local) {
 
-//      localDto.getMemberDto().getEmail() // 이거를 가따가 DB에 가야죠
-
-//if(localDto.equals(localDto.getMemberDto().getEmail())) {
-//throw new DuplicateException("이미 존재하는 이메일입니다.");
-//}
-//if(localDto.equals(localDto.getMemberDto().getNickName())) {
-//
-//     throw new DuplicateException("이미 존재하는 NickName입니다.");
-//  }if(localDto.equals(localDto.getMemberDto().getPhone())) {
-//
-//     throw new DuplicateException("이미 존재하는 핸드폰 번호입니다.");
-//  }
 
 		String encodedPassword = passwordEncoder.encode(local.getPassword());
 

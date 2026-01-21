@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.model.dto;
+package com.kh.replay.auth.member.model.dto;
 
 import lombok.Setter;
 import lombok.Value;

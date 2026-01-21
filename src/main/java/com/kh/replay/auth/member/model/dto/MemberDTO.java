@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.model.dto;
+package com.kh.replay.auth.member.model.dto;
 
 import java.sql.Date;
 

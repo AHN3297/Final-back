@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.model.vo;
+package com.kh.replay.auth.member.model.vo;
 
 import java.util.Collection;
 

@@ -24,18 +24,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 	    
-	    log.info("===== loadUserByUsername 호출 =====");
-	    log.info("입력받은 username: {}", username);
 	    
 	    Map<String, String> local;
 	    
 	    if(username.contains("@")) {
 	        // 로그인: email로 조회
-	        log.info("email로 조회");
 	        local = memberMapper.loadUser(username);
 	    } else {
 	        // JWT 필터: memberId로 조회
-	        log.info("memberId로 조회");
 	        local = memberMapper.loadByMemberId(username);
 	    }
 	    
@@ -46,7 +42,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	  
 	    String memberId = local.get("MEMBER_ID");
 	    if(memberId == null) {
-	        log.error("❌ MEMBER_ID가 null입니다!");
 	        throw new IllegalStateException("사용자 정보가 올바르지 않습니다.");
 	    }
 	    

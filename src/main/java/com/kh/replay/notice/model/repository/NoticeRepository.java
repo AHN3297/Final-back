@@ -3,6 +3,7 @@ package com.kh.replay.notice.model.repository;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import com.kh.replay.notice.model.domain.Notice;
@@ -12,7 +13,7 @@ import com.kh.replay.notice.model.domain.NoticeImg;
 public interface NoticeRepository {
 
 	// 공지사항 전체 목록 조회
-	List<Notice> findAll(String keyword, String status, RowBounds rowBounds);
+	List<Notice> findAll(@Param("keyword") String keyword,@Param("status") String status, RowBounds rowBounds);
 	
 	// 공지사항 상세 조회
 	Notice findById(Long id);
@@ -26,8 +27,7 @@ public interface NoticeRepository {
 	// 공지사항 삭제
 	int delete(Long id);
 	
-	// 
-	int countAll(String keyword, String status);
+	int countAll(@Param("keyword") String keyword, @Param("status") String status);
 
 	int saveImg(NoticeImg noticeImg);
 }

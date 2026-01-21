@@ -28,10 +28,10 @@ public class NoticeController {
 	
 	@GetMapping
 	public ResponseEntity<ResponseData<NoticeListResponseDto>> getNoticeList(
-			@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int size,
-			@RequestParam(required = false) String keyword,
-			@RequestParam(defaultValue = "Y") String status
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "status", defaultValue = "Y") String status
 			){
 		
 		

@@ -85,7 +85,7 @@ public class UniverseServiceImpl implements UniverseService {
         UniverseDTO universe = universeMapper.findByUniverseId(universeId);
         
         if (universe == null) {
-            // [수정] 404 예외 적용
+            // 404
             throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다.");
         }
         

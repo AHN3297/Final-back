@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<<<<<<< HEAD
 <mapper namespace="com.kh.replay.global.auth.local.model.dao.LocalMapper">
+=======
+<mapper namespace="com.kh.replay.auth.local.model.dao.LocalMapper">
+>>>>>>> e019edcb60ec81e09551da21e17b5d5b51f2e5b5
 	<insert id="insertMember"
 		parameterType="com.kh.replay.global.member.model.vo.MemberVO">
 		INSERT INTO TB_MEMBER
@@ -27,10 +31,21 @@
 		)
 	</insert>
 	<insert id="signUp"
+<<<<<<< HEAD
 		parameterType="com.kh.replay.global.auth.local.model.dto.LocalDTO">
 		INSERT INTO TB_LOCAL
 		(MEMBER_ID,PASSWORD)
 		VALUES
 		(#{memberId},#{password})
 	</insert>
+=======
+		parameterType="com.kh.replay.auth.local.model.dto.LocalDTO">
+		INSERT INTO TB_LOCAL
+		(MEMBER_ID,PASSWORD)
+		VALUES
+		(#{memberDto.memberId},#{password})
+	</insert>
+	
+	
+>>>>>>> e019edcb60ec81e09551da21e17b5d5b51f2e5b5
 </mapper>

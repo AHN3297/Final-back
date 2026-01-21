@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.kh.replay.global.universe.model.mapper.UniverseMapper">
+<mapper namespace="com.kh.replay.universe.model.mapper.UniverseMapper">
 
     <sql id="commonColumns">
         u.UNIVERSE_ID as "universeId",
@@ -40,7 +40,7 @@
         FETCH NEXT #{limit} ROWS ONLY
     </sql>
 
-    <select id="findAllUniverse" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+    <select id="findAllUniverse" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
         SELECT
             <include refid="commonColumns" />
         FROM TB_UNIVERSE u
@@ -49,7 +49,7 @@
         <include refid="cursorAndSort" />
     </select>
     
-    <select id="findByKeyword" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+    <select id="findByKeyword" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
         SELECT
             <include refid="commonColumns" />
         FROM TB_UNIVERSE u
@@ -80,7 +80,7 @@
         <include refid="cursorAndSort" />
     </select>
     
-    <select id="findByUniverseId" resultType="com.kh.replay.global.universe.model.dto.UniverseDTO">
+    <select id="findByUniverseId" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
         SELECT
             u.UNIVERSE_ID as "universeId",
             u.TITLE as "title",
@@ -90,7 +90,7 @@
             m.MEMBER_ID as "memberId",
             m.NICKNAME as "nickName",
             (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like",
-            (SELECT COUNT(1) FROM TB_UNIVERSE_BOOKMARK b WHERE b.UNIVERSE_ID = u.UNIVERSE_ID) as "bookmark"
+            (SELECT COUNT(1) FROM TB_FAV_UNIVERSE b WHERE b.UNIVERSE_ID = u.UNIVERSE_ID) as "bookmark"
         FROM 
              TB_UNIVERSE u
         JOIN 
@@ -98,5 +98,37 @@
         WHERE 
               u.UNIVERSE_ID = #{universeId}
     </select>
-
+    
+	<insert id="insertUniverse">
+	    INSERT 
+	      INTO 
+	           TB_UNIVERSE (
+	        UNIVERSE_ID, 
+	        TITLE, 
+	        LAYOUT_DATA, 
+	        THEME_CODE, 
+	        THUMBNAIL_URL, 
+	        MEMBER_ID, 
+	        STATUS, 
+	        CREATED_AT   ) VALUES (
+	        SEQ_UNIVERSE_ID.NEXTVAL,  #{title}, 
+	        #{layoutData}, 
+	        #{themeCode}, 
+	        #{thumbnailUrl}, 
+	        #{memberId}, 
+	        'Y', 
+	        SYSDATE
+	    )
+	</insert>
+	
+	<update id="updateUniverse">
+	        UPDATE TB_UNIVERSE
+	        <set>
+	            <if test="title != null">TITLE = #{title},</if>
+	            <if test="layoutData != null">LAYOUT_DATA = #{layoutData},</if>
+	            <if test="themeCode != null">THEME_CODE = #{themeCode},</if>
+	            <if test="status != null">STATUS = #{status},</if>
+	        </set>
+	        WHERE UNIVERSE_ID = #{universeId}
+	</update>
 </mapper>

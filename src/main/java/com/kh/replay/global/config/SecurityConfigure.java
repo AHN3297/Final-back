@@ -41,9 +41,6 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
-					//주영님 제발 피알좀 해주세요
-					//주영님 제발 피알좀 해주세요 
-					//주영님 제발 피알좀 해주세요 
 					requests.requestMatchers("/api/universes/**").permitAll();
 					
 					// 로그인필요(POST)테스트 
@@ -52,9 +49,10 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.GET,"/api/members").permitAll();
 					// 비로그인 허용(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
-					requests.requestMatchers(HttpMethod.DELETE,"api/members").permitAll();
+					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
 					
-
+					requests.requestMatchers(HttpMethod.PUT).permitAll();
+					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
 				
 					// 로그인 필요(GET)
 					
@@ -62,11 +60,10 @@ public class SecurityConfigure {
 					// 로그인 필요(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
 					// 로그인 필요(PUT)
-					requests.requestMatchers(HttpMethod.PUT).authenticated();
+					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
 					// 로그인 필요(DELETE)
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
 					
-					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
 					
 //					// 관리자
 //					requests.requestMatchers(HttpMethod.GET).hasAuthority("");

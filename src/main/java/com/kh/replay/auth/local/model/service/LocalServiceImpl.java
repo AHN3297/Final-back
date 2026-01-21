@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.auth.local.model.dao.LocalMapper;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
-import com.kh.replay.auth.member.model.vo.MemberVO;
 import com.kh.replay.global.exception.MemberJoinException;
+import com.kh.replay.member.model.vo.MemberVO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +19,7 @@ public class LocalServiceImpl implements LocalService {
 	private final LocalMapper localMapper;
 	private final PasswordEncoder passwordEncoder;
 
-	@Transactional // 여러 개의 디비 작업을 한번에 처리
+	@Transactional 
 	@Override
 	public int signUp(LocalDTO local) {
 

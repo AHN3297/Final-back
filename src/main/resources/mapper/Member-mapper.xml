@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kh.replay.global.member.model.dao.MemberMapper">
+<mapper namespace="com.kh.replay.member.model.dao.MemberMapper">
 
 <select id="loadUser" resultType="map">
 	SELECT
 		   TB_MEMBER.MEMBER_ID 
-		 , EMAIL 
-		 , PASSWORD 
-		 , ROLE
+		 , TB_MEMBER.EMAIL
+		 , TB_LOCAL.PASSWORD 
+		 , TB_MEMBER.ROLE
 	FROM 
 		 TB_MEMBER
 	INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
@@ -15,16 +15,16 @@
 </select>
 
 
-	<update id="changeInfo" parameterType="MemberDTO">
+	<update id="changeInfo" parameterType="com.kh.replay.member.model.dto.MemberDTO">
         UPDATE TB_MEMBER
         SET 
-            NICKNAME = #{nickName, jdbcType=VARCHAR},
-            PHONE = #{phone, jdbcType=VARCHAR},
-            GENRE = #{genre, jdbcType=VARCHAR},
-            EMAIL = #{email, jdbcType=VARCHAR},
-            MBTI = #{mbti, jdbcType=VARCHAR},
-            GENDER = #{gender, jdbcType=VARCHAR}
-        WHERE MEMBER_ID = #{memberId, jdbcType=VARCHAR}
+            NICKNAME = #{nickName},
+            PHONE = #{phone},
+            GENRE = #{genre},
+            EMAIL = #{email},
+            MBTI = #{mbti},
+            GENDER = #{gender}
+        WHERE MEMBER_ID = #{memberId}
     </update>
 	
 	

@@ -6,7 +6,7 @@
 <mapper namespace="com.kh.replay.auth.local.model.dao.LocalMapper">
 >>>>>>> e019edcb60ec81e09551da21e17b5d5b51f2e5b5
 	<insert id="insertMember"
-		parameterType="com.kh.replay.global.member.model.vo.MemberVO">
+		parameterType="com.kh.replay.member.model.vo.MemberVO">
 		INSERT INTO TB_MEMBER
 		(MEMBER_ID,
 		MBTI,

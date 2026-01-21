@@ -12,12 +12,6 @@ import com.kh.replay.member.model.dto.MemberDTO;
 @Mapper
 public interface MemberMapper {
 
-	@Select("SELECT MEMBER_ID FROM TB_MEMBER")
-	int CountMemberId(String memberId);
-	
-	@Select("SELECT PASSWORD FROM TB_LOCAL")
-	int CountPassword(String password);
-	
 	
 	//멤버 아이디로 조회
 	Map<String,String> loadUser(String memberId);

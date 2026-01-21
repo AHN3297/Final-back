@@ -34,6 +34,10 @@ public class SecurityConfigure {
 	private String instance;
 	
 	private final JwtFilter jwtFilter;
+	// ✅ OAuth2 관련 추가 (아직 만들지 않았다면 주석 처리)
+	// private final OAuth2UserProviderRouter oAuth2UserProviderRouter;
+	// private final OAuth2SuccessHandler oAuth2SuccessHandler;
+	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 		return httpSecurity
@@ -45,41 +49,32 @@ public class SecurityConfigure {
 					
 					// 로그인필요(POST)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();
-					// 로그인 필요(PATCH)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.PATCH,"/api/member/playList/**").permitAll();
-					// 로그인 필요(DELETE)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.DELETE,"/api/member/playList/**").permitAll();
-					// 로그인 필요(GET)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.GET,"/api/member/playList/**").permitAll();
 					
 					// 비로그인 허용
 					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();
-					// 비로그인 허용(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
 					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
+					
+					 // OAuth2 관련 경로 허용
+					requests.requestMatchers("/oauth2/**", "/login/**").permitAll();
 					
 					requests.requestMatchers(HttpMethod.PUT).permitAll();
 					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
 				
-					// 로그인 필요(GET)
-					
+					// 로그인 필요
 					requests.requestMatchers(HttpMethod.GET).authenticated();
-					// 로그인 필요(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
-					// 로그인 필요(PUT)
 					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
-					// 로그인 필요(DELETE)
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
-					
-					
-//					// 관리자
-//					requests.requestMatchers(HttpMethod.GET).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
-
-
 				})
+				// OAuth2 로그인 설정 추가
+//				.oauth2Login(oauth2 -> oauth2
+//						.userInfoEndpoint(userInfo -> userInfo
+//						)
+//				)
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 		        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		        .build();
@@ -106,5 +101,4 @@ public class SecurityConfigure {
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();
 	}
-	
 }

@@ -18,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TokenService {
 private final JwtUtil tokenUtil;
 private final TokenMapper tokenMapper;
-	//인증에 성공했을 때 
-	//JwtUtill에 정의 해놓은 액세스랑 리프레쉬 호루 해서 담아서 login메서드로 반환
 public Map<String,String> generateToken(String memberId){
 	
  Map<String ,String> tokens = createTokens(memberId );
@@ -46,7 +44,6 @@ saveToken(tokens.get( "refreshToken"),memberId);
 				  .expiration(new Date(System.currentTimeMillis()+3600000L*72))
 				  .createdAt(new Date())
 				  .build();		
-		log.info("이거 왔나용?: {}" , memberId);
 		tokenMapper.saveToken(token);		
 		
 	}

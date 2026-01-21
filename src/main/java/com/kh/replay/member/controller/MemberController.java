@@ -55,8 +55,7 @@ public class MemberController {
 	public ResponseEntity<ResponseData<ChangePasswordDTO>> changePassword(@RequestBody ChangePasswordDTO password){
 		log.info(" ChangePasswordDTO : {} " , password);
 		memberService.changePassword(password);
-		
-		
+		log.info("{}",password);
 		
 		return ResponseData.created(password, "비밀번호가 변경되었습니다.");
 	}

@@ -19,22 +19,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 
 public class UserDetailsServiceImpl implements UserDetailsService {
-//AuthnticaionManager가 실질적으로 사용자의 정보를 조회할 때 메소드를 호출하는 클래스
 	private final MemberMapper memberMapper;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		
-		//localDTO 타입으로 하면 안에있는 memberDTO랑 매칭이 안돼서 null들어옴 때문에 Map으로 받음 
-		//여기서 근데 반환 타입이 userDetails여서 따로 만들어서 Map에서 뽑아서 사용
 		Map<String,String> local = memberMapper.loadUser(username);
 		if(local ==null) {
 			throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 		
-		return  (UserDetails) CustomUserDetails.builder().username(local.get("MEMBERID"))
+		return  (UserDetails) CustomUserDetails.builder().username(local.get("MEMBER_ID"))
 													 	 .password(local.get("PASSWORD"))
-													 	 .memberName(local.get("MEMBERNAME"))
+													 	 .memberName(local.get("MEMBER_NAME"))
 														 .authorities(Collections.singletonList(new SimpleGrantedAuthority(local.get("ROLE"))))
 														 .build();
 	

@@ -1,6 +1,7 @@
 package com.kh.replay.universe.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import com.kh.replay.universe.model.dto.UniverseDTO;
 import com.kh.replay.universe.model.dto.UniverseListResponse;
 import com.kh.replay.universe.model.service.UniverseService;
 
+import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -119,10 +121,11 @@ public class UniverseController {
      * @return
      */
     @PatchMapping("{universeId}")
-    public ResponseEntity<ResponseData<UniverseDTO>> putMethodName(@PathVariable("universeId")  Long universeId, @RequestBody UniverseCreateRequest universe) {
+    public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(@PathVariable("universeId")  Long universeId, @RequestBody UniverseCreateRequest universe) {
         
     	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe);
         
         return ResponseData.ok(resonse, "유니버스 수정 성공");
     }
+    
 }

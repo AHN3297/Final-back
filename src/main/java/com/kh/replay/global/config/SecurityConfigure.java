@@ -16,9 +16,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import com.kh.replay.global.config.filter.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +33,7 @@ public class SecurityConfigure {
 	@Value("${instance.url}")
 	private String instance;
 	
+	private final JwtFilter jwtFilter;
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
 		return httpSecurity
@@ -38,25 +42,30 @@ public class SecurityConfigure {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
 					// 비로그인 허용
-					requests.requestMatchers(HttpMethod.GET).permitAll();
+					requests.requestMatchers(HttpMethod.GET,"/api/members").permitAll();
 					// 비로그인 허용(POST)
-					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp").permitAll();
+					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
+					requests.requestMatchers(HttpMethod.DELETE,"api/members").permitAll();
+					
 					// 로그인 필요(GET)
 					
 					requests.requestMatchers(HttpMethod.GET).authenticated();
 					// 로그인 필요(POST)
-					requests.requestMatchers(HttpMethod.POST).authenticated();
+					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
 					// 로그인 필요(PUT)
 					requests.requestMatchers(HttpMethod.PUT).authenticated();
 					// 로그인 필요(DELETE)
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
 					
-					// 관리자
-					requests.requestMatchers(HttpMethod.GET).hasAuthority("");
-					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
-					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
-					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
+					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
+					
+//					// 관리자
+//					requests.requestMatchers(HttpMethod.GET).hasAuthority("");
+//					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
+//					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
+//					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
 				})
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 		        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 		        .build();
 	}

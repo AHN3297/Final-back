@@ -1,10 +1,10 @@
-package com.kh.replay.global.auth.local.model.service;
+package com.kh.replay.auth.local.model.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.kh.replay.global.auth.local.model.dao.LocalMapper;
-import com.kh.replay.global.auth.local.model.dto.LocalDTO;
+import com.kh.replay.auth.local.model.dao.LocalMapper;
+import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.global.exception.DuplicateException;
 import com.kh.replay.global.exception.MemberJoinException;
 import com.kh.replay.global.member.model.vo.MemberVO;
@@ -21,7 +21,7 @@ public class LocalServiceImpl implements LocalService {
 
 	@Transactional // 여러 개의 디비 작업을 한번에 처리
 	@Override
-	public int signUp(LocalDTO localDto) {
+	public int signUp(LocalDTO local) {
 
 //      localDto.getMemberDto().getEmail() // 이거를 가따가 DB에 가야죠
 
@@ -36,17 +36,17 @@ public class LocalServiceImpl implements LocalService {
 //     throw new DuplicateException("이미 존재하는 핸드폰 번호입니다.");
 //  }
 
-		String encodedPassword = passwordEncoder.encode(localDto.getPassword());
+		String encodedPassword = passwordEncoder.encode(local.getPassword());
 
 		// 암호화된 비밀번호 로컬에 저장
-		localDto.setPassword(encodedPassword);
-log.info("{}",localDto.getMemberDto());
-		MemberVO member = MemberVO.builder().memberId(localDto.getMemberDto().getMemberId())
-				.email(localDto.getMemberDto().getEmail()).name(localDto.getMemberDto().getName())
-				.nickName(localDto.getMemberDto().getNickName()).gender(localDto.getMemberDto().getGender())
-				.mbti(localDto.getMemberDto().getMbti()).phone(localDto.getMemberDto().getPhone())
-				.createdAt(localDto.getMemberDto().getCreatedAt()).updatedAt(localDto.getMemberDto().getUpdatedAt())
-				.genre(localDto.getMemberDto().getGenre()).role("ROLE_USER").job(localDto.getMemberDto().getJob())
+		local.setPassword(encodedPassword);
+log.info("{}",local.getMemberDto());
+		MemberVO member = MemberVO.builder().memberId(local.getMemberDto().getMemberId())
+				.email(local.getMemberDto().getEmail()).name(local.getMemberDto().getName())
+				.nickName(local.getMemberDto().getNickName()).gender(local.getMemberDto().getGender())
+				.mbti(local.getMemberDto().getMbti()).phone(local.getMemberDto().getPhone())
+				.createdAt(local.getMemberDto().getCreatedAt()).updatedAt(local.getMemberDto().getUpdatedAt())
+				.genre(local.getMemberDto().getGenre()).role("ROLE_USER").job(local.getMemberDto().getJob())
 				.status("Y").build();
 
 		// 회원 공통 정보 insert
@@ -56,7 +56,7 @@ log.info("{}",localDto.getMemberDto());
 			throw new MemberJoinException("회원가입에 실패했습니다.");
 		}
 
-		result = localMapper.signUp(localDto);
+		result = localMapper.signUp(local);
 
 		if (result <= 0) {
 			throw new MemberJoinException("로컬 인증 정보 등록에 실패했습니다.");

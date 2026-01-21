@@ -1,7 +1,8 @@
 package com.kh.replay.auth.local.model.dto;
 
 
-import com.kh.replay.auth.member.model.dto.MemberDTO;
+
+import com.kh.replay.member.model.dto.MemberDTO;
 
 import jakarta.validation.Valid;
 import lombok.Data;

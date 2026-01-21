@@ -123,13 +123,15 @@ public class MemberServiceImpl implements MemberService{
 		
 		Map<String,String> userInfo =memberMapper.loadUser(local.getMemberDto().getMemberId());
 		
-		String userPassword =userInfo.get("password");
-		
+		String userPassword =userInfo.get("PASSWORD");
+		log.info("matches 결과: {}", passwordEncoder.matches("asdf@1234", userPassword));
+		log.info("matches 결과: {}", passwordEncoder.matches("test@1234", userPassword));
 		
 		if(!passwordEncoder.matches(local.getPassword(), userPassword)) {
+			log.info("{},{}" ,local.getPassword() , userPassword);
 			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
 		}
-		memberMapper.wirhdrawMember(memberId);
+		memberMapper.withdrawMember(memberId);
 		
 		tokenMapper.memberLogout(memberId);
 		

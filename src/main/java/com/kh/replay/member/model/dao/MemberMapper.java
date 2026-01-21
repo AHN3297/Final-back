@@ -29,8 +29,8 @@ public interface MemberMapper {
 	
 	int changeInfo(MemberDTO membermember);
 
-	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERER MEMBER_ID = #{memberId}")
-	void wirhdrawMember(String memberId);
+	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
+	void withdrawMember(String memberId);
 	
 	
 }

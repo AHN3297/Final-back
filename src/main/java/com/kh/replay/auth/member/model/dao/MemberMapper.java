@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.model.dao;
+package com.kh.replay.auth.member.model.dao;
 
 import java.util.Map;
 
@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.kh.replay.global.member.model.dto.MemberDTO;
+import com.kh.replay.auth.member.model.dto.MemberDTO;
 @Mapper
 public interface MemberMapper {
 

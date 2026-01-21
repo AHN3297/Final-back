@@ -9,9 +9,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.kh.replay.auth.member.model.service.UserDetailsServiceImpl;
+import com.kh.replay.auth.member.model.vo.CustomUserDetails;
 import com.kh.replay.auth.token.util.JwtUtil;
-import com.kh.replay.global.member.model.service.UserDetailsServiceImpl;
-import com.kh.replay.global.member.model.vo.CustomUserDetails;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

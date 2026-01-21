@@ -1,10 +1,9 @@
 package com.kh.replay.auth.local.model.dto;
 
-import com.kh.replay.global.member.model.dto.MemberDTO;
+
+import com.kh.replay.auth.member.model.dto.MemberDTO;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data

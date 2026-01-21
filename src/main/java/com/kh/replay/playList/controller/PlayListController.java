@@ -7,6 +7,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,9 +51,40 @@ public class PlayListController {
 	    return ResponseData.ok(list, "내 플레이리스트 목록 조회 성공");
 	}
 	
-	// 플레이리스트 상세조회
+
+	 
+	// 메인 플레이리스트 지정
+	@PostMapping("/main")
+	public ResponseEntity<ResponseData<Integer>> mainPlayList(
+	        @RequestParam(name="memberId") String memberId,
+	        @RequestParam(name="playListId") int playListId) {
+	    
+	    int result = playListService.updateMainPlayList(memberId, playListId);
+	    
+	    return ResponseData.ok(result, "메인 플레이리스트로 지정되었습니다.");
+	}
+	
+	// 플레이리스트 이름 변경(수정)
+	@PatchMapping("/{playListId}")
+	public ResponseEntity<ResponseData<Integer>> updatePlayListName(
+	    @PathVariable int playListId, 
+	    @RequestBody PlayListDTO playListDto) {
+		
+		int result = playListService.updatePlayListName(playListId, playListDto.getPlayListName());
+		
+		return ResponseData.ok(1, "플레이리스트 이름 수정 성공");   
+	}
+	
+	// 플레이리스트 삭제
 	
 	// 플레이리스트에 노래 추가
 	
-	// 플레이리스트 노래 조회
+	// 플레이리스트 상세 조회(노래 조회)
+	
+	// 플레이리스트 노래 순서 변경
+	
+	// 플레이리스트 노래 삭제
+	
+	
+
 }

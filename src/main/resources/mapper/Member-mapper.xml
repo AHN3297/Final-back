@@ -15,7 +15,7 @@
 </select>
 
 
-	<update id="changeInfo" parameterType="MemberDTO">
+	<update id="changeInfo" parameterType="com.kh.replay.auth.member.model.dto.MemberDTO">
         UPDATE TB_MEMBER
         SET 
             NICKNAME = #{nickName, jdbcType=VARCHAR},

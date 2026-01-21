@@ -40,7 +40,35 @@ public class PlayListServiceImpl implements PlayListService {
 
 	@Override
 	public List<PlayListDTO> findAllMemberPlayLists(String memberId) {
-		
+
 		return playListMapper.findAllMemberPlayLists(memberId);
 	}
+
+	@Override
+	public int updateMainPlayList(String memberId, int playListId) {
+		// 기존 메인플레이리스트 삭제
+		playListMapper.deleteMainPlayList(memberId);
+		// 메인플레이리스트 입력
+		int result = playListMapper.createMainPlayList(memberId, playListId);
+		return result;
+	}
+
+	@Override
+    @Transactional 
+    public int updatePlayListName(int playListId, String newName) {
+        PlayListDTO updateDto = PlayListDTO.builder()
+                .playListId(playListId)
+                .playListName(newName)
+                .build();
+
+        // Mapper 호출
+        int result = playListMapper.updatePlayList(updateDto);
+
+        // 수정 실패 시 예외 처리 (후에 변경 예정)
+        if (result <= 0) {
+            throw new RuntimeException("플레이리스트 이름 수정에 실패했습니다.");
+        }
+
+        return result;
+    }
 }

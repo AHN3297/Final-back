@@ -11,4 +11,8 @@ public interface PlayListService {
 
 	List<PlayListDTO> findAllMemberPlayLists(String memberId);
 
+	int updateMainPlayList(String memberId, int playlistId);
+
+	int updatePlayListName(int playListId, String playListName);
+
 }

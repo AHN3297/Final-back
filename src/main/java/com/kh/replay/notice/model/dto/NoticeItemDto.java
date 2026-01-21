@@ -1,8 +1,8 @@
-package com.kh.replay.global.notice.model.dto;
+package com.kh.replay.notice.model.dto;
 
 import java.time.format.DateTimeFormatter;
 
-import com.kh.replay.global.notice.model.domain.Notice;
+import com.kh.replay.notice.model.domain.Notice;
 
 import lombok.Getter;
 

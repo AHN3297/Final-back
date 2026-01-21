@@ -1,4 +1,4 @@
-package com.kh.replay.global.notice.model.dto;
+package com.kh.replay.notice.model.dto;
 
 import lombok.Getter;
 import lombok.Setter;

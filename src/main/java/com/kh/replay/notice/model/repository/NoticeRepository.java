@@ -1,12 +1,12 @@
-package com.kh.replay.global.notice.model.repository;
+package com.kh.replay.notice.model.repository;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 
-import com.kh.replay.global.notice.model.domain.Notice;
-import com.kh.replay.global.notice.model.domain.NoticeImg;
+import com.kh.replay.notice.model.domain.Notice;
+import com.kh.replay.notice.model.domain.NoticeImg;
 
 @Mapper
 public interface NoticeRepository {

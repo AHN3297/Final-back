@@ -1,6 +1,5 @@
-package com.kh.replay.global.notice.model.domain;
+package com.kh.replay.notice.model.domain;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 import lombok.AccessLevel;

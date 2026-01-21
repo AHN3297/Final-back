@@ -1,11 +1,11 @@
-package com.kh.replay.global.notice.service;
+package com.kh.replay.notice.service;
 
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kh.replay.global.notice.model.dto.NoticeListResponseDto;
-import com.kh.replay.global.notice.model.dto.NoticeRequestDto;
+import com.kh.replay.notice.model.dto.NoticeListResponseDto;
+import com.kh.replay.notice.model.dto.NoticeRequestDto;
 
 public interface NoticeService {
 

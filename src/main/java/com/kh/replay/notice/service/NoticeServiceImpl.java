@@ -1,4 +1,4 @@
-package com.kh.replay.global.notice.service;
+package com.kh.replay.notice.service;
 
 import java.io.IOException;
 import java.util.List;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kh.replay.global.notice.model.domain.Notice;
-import com.kh.replay.global.notice.model.domain.NoticeImg;
-import com.kh.replay.global.notice.model.dto.NoticeItemDto;
-import com.kh.replay.global.notice.model.dto.NoticeListResponseDto;
-import com.kh.replay.global.notice.model.dto.NoticeRequestDto;
-import com.kh.replay.global.notice.model.repository.NoticeRepository;
+import com.kh.replay.notice.model.domain.Notice;
+import com.kh.replay.notice.model.domain.NoticeImg;
+import com.kh.replay.notice.model.dto.NoticeItemDto;
+import com.kh.replay.notice.model.dto.NoticeListResponseDto;
+import com.kh.replay.notice.model.dto.NoticeRequestDto;
+import com.kh.replay.notice.model.repository.NoticeRepository;
 import com.kh.replay.global.s3.S3Service;
 import com.kh.replay.global.util.PageInfo;
 import com.kh.replay.global.util.Pagenation;
@@ -70,7 +70,7 @@ public class NoticeServiceImpl implements NoticeService {
 		Notice notice = Notice.builder()
 						.noticeTitle(requestDto.getTitle())
 						.noticeContent(requestDto.getContent())
-						.memberId("admin")
+						.memberId("user1") // currentMemberId 나중에 교체
 						.status("Y")
 						.build();
 		

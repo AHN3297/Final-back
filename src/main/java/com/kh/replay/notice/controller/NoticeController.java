@@ -1,4 +1,4 @@
-package com.kh.replay.global.notice.controller;
+package com.kh.replay.notice.controller;
 
 import java.io.IOException;
 
@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.common.ResponseData;
-import com.kh.replay.global.notice.model.dto.NoticeListResponseDto;
-import com.kh.replay.global.notice.model.dto.NoticeRequestDto;
-import com.kh.replay.global.notice.service.NoticeService;
+import com.kh.replay.notice.model.dto.NoticeListResponseDto;
+import com.kh.replay.notice.model.dto.NoticeRequestDto;
+import com.kh.replay.notice.service.NoticeService;
 
 import lombok.RequiredArgsConstructor;
 

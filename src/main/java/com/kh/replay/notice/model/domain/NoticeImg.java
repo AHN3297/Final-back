@@ -1,4 +1,4 @@
-package com.kh.replay.global.notice.model.domain;
+package com.kh.replay.notice.model.domain;
 
 import lombok.Builder;
 import lombok.Getter;

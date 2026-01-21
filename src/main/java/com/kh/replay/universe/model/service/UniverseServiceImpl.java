@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.replay.global.exception.ForbiddenException; 
+import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.s3.S3Service;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
@@ -35,8 +37,8 @@ public class UniverseServiceImpl implements UniverseService {
      */
     @Override
     public UniverseListResponse findAllUniverse(int size, String sort, Long lastUniverseId, Long lastLikeCount) {
-    	
-    	// 1) 정렬 조건 검증
+        
+        // 1) 정렬 조건 검증
         if (!isValidSort(sort)) {
             throw new IllegalArgumentException("지원하지 않는 정렬 방식입니다. (latest, popular 중 선택)");
         }
@@ -83,19 +85,19 @@ public class UniverseServiceImpl implements UniverseService {
         UniverseDTO universe = universeMapper.findByUniverseId(universeId);
         
         if (universe == null) {
-            throw new IllegalArgumentException("해당 유니버스를 찾을 수 없습니다.");
+            // [수정] 404 예외 적용
+            throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다.");
         }
         
         return universe;
     }
 
     /**
-     * 4. 생성 (반환 타입 int -> void 변경 권장)
-     * @return 
+     * 4. 생성 
      */
     @Override
     @Transactional
-    public void createUniverse(UniverseCreateRequest request, MultipartFile file) { // void로 변경
+    public void createUniverse(UniverseCreateRequest request, MultipartFile file) { 
         
         String imageUrl = null;
         
@@ -126,6 +128,46 @@ public class UniverseServiceImpl implements UniverseService {
             throw new RuntimeException("유니버스 생성에 실패했습니다.");
         }
     }
+
+    /**
+     * 5. 수정 (PATCH)
+     */
+    @Override
+    @Transactional
+    public UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest request) { // 변수명 request로 통일
+        
+        // 400 (필수값 누락)
+        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("유니버스 제목은 필수 입력 값입니다.");
+        }
+
+        // 404 (데이터 없음)
+        UniverseDTO existing = universeMapper.findByUniverseId(universeId);
+        if (existing == null) {
+           
+            throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다."); 
+        }
+
+        // 403 (권한 없음)
+        if (!existing.getMemberId().equals(request.getMemberId())) {
+            throw new ForbiddenException("해당 유니버스 접근 권한이 없습니다."); 
+        }
+        
+        UniverseDTO update = UniverseDTO.builder()
+                .universeId(universeId)
+                .title(request.getTitle())
+                .layoutData(request.getLayoutData())
+                .themeCode(request.getThemeCode()) 
+                .status(request.getStatus())
+                .build();
+        
+        universeMapper.updateUniverse(update);
+        
+        return universeMapper.findByUniverseId(universeId);
+    }
+
+    
+    // --- 내부 메서드 ---
 
     // 정렬 조건 유효성 검사
     private boolean isValidSort(String sort) {
@@ -165,39 +207,4 @@ public class UniverseServiceImpl implements UniverseService {
                 .pagination(pagination)
                 .build();  
     }
-
-
-	@Override
-    @Transactional
-	public UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest universe) {
-		
-		// 400
-        if (universe.getTitle() == null || universe.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("유니버스 제목은 필수 입력 값입니다.");
-        }
-
-        // 404
-        UniverseDTO existing = universeMapper.findByUniverseId(universeId);
-        if (existing == null) {
-            throw new IllegalArgumentException("해당 유니버스를 찾을 수 없습니다."); 
-        }
-
-        // 403
-        if (!existing.getMemberId().equals(universe.getMemberId())) {
-            throw new RuntimeException("해당 유니버스 접근 권한이 없습니다."); 
-        }
-		
-		UniverseDTO update = UniverseDTO.builder()
-                .universeId(universeId)
-                .title(universe.getTitle())
-                .layoutData(universe.getLayoutData())
-                .themeCode(universe.getThemeCode()) 
-                .status(universe.getStatus())
-                .build();
-		
-		
-		universeMapper.updateUniverse(update);
-		return universeMapper.findByUniverseId(universeId);
-
-	}
 }

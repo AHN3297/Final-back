@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import org.apache.ibatis.annotations.Param;
 import com.kh.replay.playList.model.dto.PlayListDTO;
 import com.kh.replay.playList.model.vo.PlayListVO;
 
@@ -18,5 +19,20 @@ public interface PlayListMapper {
 	
 	// 플레이리스트 상세조회
 	PlayListVO selectPlayListById(int playListId);
+
+	// 메인플레이리스트 삭제
+	int deleteMainPlayList(String memberId);
+	
+	// 메인플레이리스트 추가 
+	int createMainPlayList(@Param("memberId") String memberId, @Param("playListId") int playListId);
+
+	// 플레이리스트 이름 변경
+	int updatePlayListName(PlayListDTO updateDto);
+
+	// 플레이리스트 삭제
+	int deletePlayList(@Param("playListId") int playListId, @Param("memberId") String memberId);
+	
+	
+
 
 }

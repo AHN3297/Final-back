@@ -42,7 +42,7 @@ public class NoticeController {
 		return ResponseData.ok(result, "관리자 공지사항 목록 조회 성공");
 	}
 	
-	@PostMapping
+	@PostMapping("/register")
 	public ResponseEntity<ResponseData<Void>> registerNotice(
 			@ModelAttribute NoticeRequestDto requestDto, // 제목, 내용 (JSON이 아닌 Form - data 방식)
 			@RequestPart(value = "images", required = false ) MultipartFile image)

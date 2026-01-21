@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.RowBounds;
 
 import com.kh.replay.global.notice.model.domain.Notice;
+import com.kh.replay.global.notice.model.domain.NoticeImg;
 
 @Mapper
 public interface NoticeRepository {
@@ -27,4 +28,6 @@ public interface NoticeRepository {
 	
 	// 
 	int countAll(String keyword, String status);
+
+	int saveImg(NoticeImg noticeImg);
 }

@@ -1,7 +1,6 @@
 package com.kh.replay.global.notice.service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.notice.model.domain.Notice;
+import com.kh.replay.global.notice.model.domain.NoticeImg;
 import com.kh.replay.global.notice.model.dto.NoticeItemDto;
 import com.kh.replay.global.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.global.notice.model.dto.NoticeRequestDto;
@@ -66,24 +66,32 @@ public class NoticeServiceImpl implements NoticeService {
 	@Transactional
 	public void registerNotice(NoticeRequestDto requestDto, MultipartFile image) throws IOException {
 		
-		String imgPath =  null;
-		
-		// 1. 이미지가 있으면
-		if (image != null && !image.isEmpty()) {
-			imgPath = s3Service.uploadFile(image); // S3 업로드 후 URL 반환
-		}
-		
-		// 2. 도메인 객체 생성 (Bulider 활용)
+		// 1. 공지사항 본문(Notice) 객체 생성
 		Notice notice = Notice.builder()
-						.title(requestDto.getTitle())
-						.content(requestDto.getContent())
-						.imgPath(imgPath)
+						.noticeTitle(requestDto.getTitle())
+						.noticeContent(requestDto.getContent())
+						.memberId("admin")
 						.status("Y")
-						.viewCount(0)
-						.createdAt(LocalDateTime.now())
 						.build();
 		
+		// 2. 공지사항 저장
 		noticeRepository.save(notice);
+		
+		// 3. 이미지가 있으면 업로드 후 별도 테이블(NoticeImg)에 저장
+		if (image != null && !image.isEmpty()) {
+			// S3 업로드
+			String s3Url = s3Service.uploadFile(image); 
+			
+			// 이미지 도메인 객체 생성
+			NoticeImg noticeImg = NoticeImg.builder()
+					.originName(image.getOriginalFilename()) // 원본명
+					.changeName(s3Url)                       // S3 주소
+					.noticeNo(notice.getNoticeNo())          // 위 2번에서 생성된 번호를 가져와서 연결
+					.build();
+			
+			// 이미지 테이블에 저장
+			noticeRepository.saveImg(noticeImg);
+		}
 	}
 	
 	

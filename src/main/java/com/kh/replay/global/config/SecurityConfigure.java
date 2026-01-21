@@ -37,15 +37,17 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
+					// 공지사항 관련 모든 요청 허용 (테스트용)
+					requests.requestMatchers("/api/admin/notices/**").permitAll();
 					// 로그인필요(POST)테스트 
 					requests.requestMatchers(HttpMethod.POST,"/api/member/playList").permitAll();
 					// 비로그인 허용
 					requests.requestMatchers(HttpMethod.GET).permitAll();
 					// 비로그인 허용(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp").permitAll();
+					
 				
 					// 로그인 필요(GET)
-					
 					requests.requestMatchers(HttpMethod.GET).authenticated();
 					// 로그인 필요(POST)
 					requests.requestMatchers(HttpMethod.POST).authenticated();

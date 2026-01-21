@@ -1,5 +1,6 @@
 package com.kh.replay.global.notice.model.domain;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 import lombok.AccessLevel;
@@ -14,27 +15,17 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Notice {
 	
-	// 공지사항 번호(PK)
 	private Long noticeNo;
-	// 제목
-	private String title;
-	// 내용
-	private String content;
-	// 이미지 경로
-	private String imgPath;
-	// 생성일
+	private String noticeTitle;
+	private String noticeContent;
+	private String memberId;
 	private LocalDateTime createdAt;
-	// 수정일
 	private LocalDateTime updatedAt;
-	// 조회수
-	private int viewCount;
-	// 상태 ( Y / N 등 )
 	private String status;
 	
-	public void updateNotice(String title, String content, String imgPath) {
-		this.title = title;
-		this.content = content;
-		this.imgPath = imgPath;
+	public void updateNotice(String noticeTitle, String noticeContent) {
+		this.noticeTitle = noticeTitle;
+		this.noticeContent = noticeContent;
 		this.updatedAt = LocalDateTime.now();
 	}
 	

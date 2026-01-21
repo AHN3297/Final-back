@@ -16,7 +16,7 @@ public class NoticeItemDto {
 	
 	public NoticeItemDto(Notice notice) {
 		this.noticeNo = notice.getNoticeNo();
-		this.title = notice.getTitle();
+		this.title = notice.getNoticeTitle();
 		this.createdAt = notice.getCreatedAt() != null ? notice.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "";
 		this.status = notice.getStatus();
 	}

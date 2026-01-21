@@ -15,7 +15,7 @@ public class ResponseData<T> {
    private String error;
    
 
-   // 성공 응답
+   // 성공 응답d
    public static <T> ResponseEntity<ResponseData<T>> ok(T data) {
       return ResponseEntity.ok(
          new ResponseData<T>(null, data, HttpStatus.OK.value(), null)
@@ -24,6 +24,7 @@ public class ResponseData<T> {
 
    public static <T> ResponseEntity<ResponseData<T>> ok(T data, String message) {
       return ResponseEntity.ok(
+
          new ResponseData<T>(message, data, HttpStatus.OK.value(), null)
       );
    }

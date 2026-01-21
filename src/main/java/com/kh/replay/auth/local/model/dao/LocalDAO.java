@@ -1,4 +1,4 @@
-package com.kh.replay.global.auth.local.model.dao;
+package com.kh.replay.auth.local.model.dao;
 
 import org.springframework.stereotype.Repository;
 

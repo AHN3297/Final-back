@@ -32,6 +32,18 @@ public class GlobalHandlerException {
         return createErrorResponseEntity(e, HttpStatus.FORBIDDEN);
     }
 
+	
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<ResponseData<Object>> handlerUserNotFoundException(UserNotFoundException e) {
+		log.warn("사용자 찾기 실패: {}", e.getMessage());
+		return ResponseData.failure(e.getMessage(), HttpStatus.NOT_FOUND);
+	}
+	@ExceptionHandler(CustomAuthenticationException.class)
+	public ResponseEntity<ResponseData<Object>> handlerCustomAuthenticationException(CustomAuthenticationException e) {
+		log.warn("사용자 찾기 실패: {}", e.getMessage());
+		return ResponseData.failure(e.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
     // 400 bad request
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ResponseData<Object>> handleIllegalArgument(IllegalArgumentException e) {

@@ -46,10 +46,14 @@ public class SecurityConfigure {
 					//주영님 제발 피알좀 해주세요 
 					requests.requestMatchers("/api/universes/**").permitAll();
 					
-					// 로그인필요(POST)테스트 
+					// 로그인필요(POST)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();
-					// 로그인 필요(PATCH)테스트 
+					// 로그인 필요(PATCH)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.PATCH,"/api/member/playList/**").permitAll();
+					// 로그인 필요(DELETE)테스트 플레이 리스트
+					requests.requestMatchers(HttpMethod.DELETE,"/api/member/playList/**").permitAll();
+					// 로그인 필요(GET)테스트 플레이 리스트
+					requests.requestMatchers(HttpMethod.GET,"/api/member/playList/**").permitAll();
 					
 					// 비로그인 허용
 					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();

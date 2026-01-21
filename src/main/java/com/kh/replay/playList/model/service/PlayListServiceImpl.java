@@ -70,4 +70,11 @@ public class PlayListServiceImpl implements PlayListService {
 
 	    return result;
 	}
+
+	@Override
+	@Transactional
+	public int deletePlayList(int playListId, String memberId) {
+	    // 매퍼에 두 정보를 전달하여 본인 확인 후 삭제 진행
+	    return playListMapper.deletePlayList(playListId, memberId);
+	}
 }

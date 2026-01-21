@@ -15,4 +15,6 @@ public interface PlayListService {
 
 	int updatePlayListName(int playListId, String playListName, String newName);
 
+	int deletePlayList(int playListId, String memberId);
+
 }

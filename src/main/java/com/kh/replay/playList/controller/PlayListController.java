@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,6 +70,17 @@ public class PlayListController {
 	    return ResponseData.ok(result, "플레이리스트 이름 수정 성공");   
 	}
 	// 플레이리스트 삭제
+	@DeleteMapping("/{playListId}")
+	public ResponseEntity<ResponseData<Integer>> deletePlayList(
+	        @PathVariable(name = "playListId") int playListId,
+	        @RequestParam(name = "memberId") String memberId) {
+	    
+	    // 서비스 호출
+	    int result = playListService.deletePlayList(playListId, memberId);
+	    
+	    return ResponseData.ok(result, "플레이리스트가 성공적으로 삭제되었습니다.");
+	}
+	
 	
 	// 플레이리스트에 노래 추가
 	

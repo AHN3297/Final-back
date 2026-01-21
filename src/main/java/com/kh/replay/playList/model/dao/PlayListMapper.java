@@ -28,6 +28,9 @@ public interface PlayListMapper {
 
 	// 플레이리스트 이름 변경
 	int updatePlayListName(PlayListDTO updateDto);
+
+	// 플레이리스트 삭제
+	int deletePlayList(@Param("playListId") int playListId, @Param("memberId") String memberId);
 	
 	
 

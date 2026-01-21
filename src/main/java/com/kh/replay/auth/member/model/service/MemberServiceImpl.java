@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.model.service;
+package com.kh.replay.auth.member.model.service;
 
 
 
@@ -13,13 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.local.model.dto.LocalDTO;
+import com.kh.replay.auth.member.model.dao.MemberMapper;
+import com.kh.replay.auth.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.auth.member.model.dto.MemberDTO;
+import com.kh.replay.auth.member.model.vo.CustomUserDetails;
 import com.kh.replay.auth.token.model.dao.TokenMapper;
 import com.kh.replay.auth.token.model.service.TokenService;
 import com.kh.replay.global.exception.CustomAuthenticationException;
-import com.kh.replay.global.member.model.dao.MemberMapper;
-import com.kh.replay.global.member.model.dto.ChangePasswordDTO;
-import com.kh.replay.global.member.model.dto.MemberDTO;
-import com.kh.replay.global.member.model.vo.CustomUserDetails;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

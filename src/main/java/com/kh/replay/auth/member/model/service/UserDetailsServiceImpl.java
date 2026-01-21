@@ -1,4 +1,4 @@
-package com.kh.replay.global.member.model.service;
+package com.kh.replay.auth.member.model.service;
 
 import java.util.Collections;
 import java.util.Map;
@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.kh.replay.global.member.model.dao.MemberMapper;
-import com.kh.replay.global.member.model.vo.CustomUserDetails;
+import com.kh.replay.auth.member.model.dao.MemberMapper;
+import com.kh.replay.auth.member.model.vo.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

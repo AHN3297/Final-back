@@ -7,30 +7,80 @@
 	        SELECT SEQ_PLAYLIST_ID.NEXTVAL FROM DUAL
 	    </selectKey>
 	
-	    INSERT INTO TB_PLAYLIST (
-	        PLAYLIST_ID, 
-	        PLAYLIST_NAME, 
-	        MEMBER_ID, 
-	        CREATED_AT, 
-	        UPDATED_AT
-	    ) VALUES (
-	        #{playListId}, #{playListName}, 
-	        #{memberId}, 
-	        SYSDATE, 
-	        SYSDATE
-	    )
+	    INSERT 
+	      INTO 
+	           TB_PLAYLIST (
+	           PLAYLIST_ID, 
+	           PLAYLIST_NAME, 
+	           MEMBER_ID, 
+	           CREATED_AT, 
+	           UPDATED_AT
+	           ) 
+	    VALUES (
+	           #{playListId}, 
+	           #{playListName}, 
+	           #{memberId}, 
+	           SYSDATE, 
+	           SYSDATE
+	           )
 	</insert>
 	
 	<select id="findAllMemberPlayLists" resultType="com.kh.replay.playList.model.dto.PlayListDTO">
 	    SELECT 
-	        PLAYLIST_ID as playListId,
-	        PLAYLIST_NAME as playListName,
-	        MEMBER_ID as memberId,
-	        CREATED_AT as createdAt, -- TO_CHAR 제거
-	        UPDATED_AT as updatedAt  -- TO_CHAR 제거
-	    FROM TB_PLAYLIST
-	    WHERE MEMBER_ID = #{memberId}
-	    ORDER BY CREATED_AT DESC
+	           PLAYLIST_ID as playListId,
+	           PLAYLIST_NAME as playListName,
+	           MEMBER_ID as memberId,
+	           CREATED_AT as createdAt, -- TO_CHAR 제거
+	           UPDATED_AT as updatedAt  -- TO_CHAR 제거
+	      FROM 
+	           TB_PLAYLIST
+	     WHERE 
+	           MEMBER_ID = #{memberId}
+	     ORDER 
+	        BY 
+	           CREATED_AT DESC
 	</select>
+	
+	<delete id="deleteMainPlayList">
+		DELETE 
+		  FROM 
+		       TB_MAIN_PLAYLIST 
+    	 WHERE 
+    	       MEMBER_ID = #{memberId}
+	</delete>
+	
+	<insert id="createMainPlayList">
+		INSERT 
+		  INTO 
+		       TB_MAIN_PLAYLIST (
+		       MEMBER_ID,
+		       PLAYLIST_ID
+		       )
+	    VALUES (
+	           #{memberId},
+	           #{playListId}
+		       )
+	</insert>
+	
+	<update id="updatePlayListName">  
+	    UPDATE 
+	    	   TB_PLAYLIST
+	       SET 
+	           PLAYLIST_NAME = #{playListName}
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           MEMBER_ID = #{memberId}  
+	</update>
+	
+	<delete id="deletePlayList">
+	    DELETE 
+	      FROM 
+	           TB_PLAYLIST
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           MEMBER_ID = #{memberId}
+	</delete>
 	
 </mapper>

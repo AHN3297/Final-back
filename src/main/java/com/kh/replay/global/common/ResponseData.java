@@ -24,7 +24,7 @@ public class ResponseData<T> {
 
    public static <T> ResponseEntity<ResponseData<T>> ok(T data, String message) {
       return ResponseEntity.ok(
-         new ResponseData<T>(message, data, HttpStatus.OK.value(), "등록 성공")
+         new ResponseData<T>(message, data, HttpStatus.OK.value(),null)
       );
    }
 

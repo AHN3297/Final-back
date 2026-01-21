@@ -21,6 +21,7 @@ public class MemberDTO {
 	private String gender;
 	
 //	@NotBlank(message="mbti를 선택해주세요.")
+
 	private String mbti;
 	
 	private Date updatedAt;
@@ -47,6 +48,7 @@ public class MemberDTO {
 	
 	private String role;
 	
+
 	private String status;
 
 }

@@ -165,4 +165,39 @@ public class UniverseServiceImpl implements UniverseService {
                 .pagination(pagination)
                 .build();  
     }
+
+
+	@Override
+    @Transactional
+	public UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest universe) {
+		
+		// 400
+        if (universe.getTitle() == null || universe.getTitle().trim().isEmpty()) {
+            throw new IllegalArgumentException("유니버스 제목은 필수 입력 값입니다.");
+        }
+
+        // 404
+        UniverseDTO existing = universeMapper.findByUniverseId(universeId);
+        if (existing == null) {
+            throw new IllegalArgumentException("해당 유니버스를 찾을 수 없습니다."); 
+        }
+
+        // 403
+        if (!existing.getMemberId().equals(universe.getMemberId())) {
+            throw new RuntimeException("해당 유니버스 접근 권한이 없습니다."); 
+        }
+		
+		UniverseDTO update = UniverseDTO.builder()
+                .universeId(universeId)
+                .title(universe.getTitle())
+                .layoutData(universe.getLayoutData())
+                .themeCode(universe.getThemeCode()) 
+                .status(universe.getStatus())
+                .build();
+		
+		
+		universeMapper.updateUniverse(update);
+		return universeMapper.findByUniverseId(universeId);
+
+	}
 }

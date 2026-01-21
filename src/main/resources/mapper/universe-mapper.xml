@@ -120,4 +120,15 @@
 	        SYSDATE
 	    )
 	</insert>
+	
+	<update id="updateUniverse">
+	        UPDATE TB_UNIVERSE
+	        <set>
+	            <if test="title != null">TITLE = #{title},</if>
+	            <if test="layoutData != null">LAYOUT_DATA = #{layoutData},</if>
+	            <if test="themeCode != null">THEME_CODE = #{themeCode},</if>
+	            <if test="status != null">STATUS = #{status},</if>
+	        </set>
+	        WHERE UNIVERSE_ID = #{universeId}
+	</update>
 </mapper>

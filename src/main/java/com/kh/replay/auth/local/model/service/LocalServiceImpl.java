@@ -19,7 +19,7 @@ public class LocalServiceImpl implements LocalService {
 	private final LocalMapper localMapper;
 	private final PasswordEncoder passwordEncoder;
 
-	@Transactional // 여러 개의 디비 작업을 한번에 처리
+	@Transactional 
 	@Override
 	public int signUp(LocalDTO local) {
 

@@ -49,8 +49,6 @@ public class MemberServiceImpl implements MemberService{
 		
 	CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
 	
-//	//토큰 삭제
-//	tokenMapper.memberLogout(user.getMemberName());
 	
 	//토큰 발급
 	
@@ -67,24 +65,30 @@ public class MemberServiceImpl implements MemberService{
 	}
 	@Override
 	public void changePassword(ChangePasswordDTO password) {
-		//현재 인증된 사용자의 정보 뽑아오기
-				Authentication auth =SecurityContextHolder.getContext().getAuthentication();
-				CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
-				
-				String currentPassword = password.getCurrentPassword();
-				String encodedPassword = user.getPassword();
-				
-				log.info("현재비밀번호: {},{}",currentPassword,encodedPassword);
-				if(!passwordEncoder.matches(currentPassword,encodedPassword)) {
-					throw new CustomAuthenticationException("현재 비밀번호가 일치하지 않습니다.");
-				}
-				String newPassword = passwordEncoder.encode(password.getNewPassword());
-				
-				Map<String,String> changeRequest = Map.of("memberId",user.getUsername(),
-														  "newPassword", newPassword);
-				log.info("{},{}",encodedPassword,newPassword);
-				memberMapper.changePassword(changeRequest);
-		
+	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+	    
+	    CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+
+	    String currentPassword = password.getCurrentPassword();
+	    String encodedPassword = user.getPassword();
+
+	    
+	    if(!passwordEncoder.matches(currentPassword, encodedPassword)) {
+	        throw new CustomAuthenticationException("현재 비밀번호가 일치하지 않습니다.");
+	    }
+	    
+	    String newPassword = passwordEncoder.encode(password.getNewPassword());
+	    
+	    String username = user.getUsername();
+	    
+	    if(username == null) {
+	        throw new IllegalStateException("사용자 정보를 찾을 수 없습니다.");
+	    }
+	    
+	    Map<String, String> changeRequest = Map.of(
+	        "memberId", username,
+	        "newPassword", newPassword
+	    );
 	}
 	@Override
 	public void memberLogout(LocalDTO local) {
@@ -119,13 +123,15 @@ public class MemberServiceImpl implements MemberService{
 		
 		Map<String,String> userInfo =memberMapper.loadUser(local.getMemberDto().getMemberId());
 		
-		String userPassword =userInfo.get("password");
-		
+		String userPassword =userInfo.get("PASSWORD");
+		log.info("matches 결과: {}", passwordEncoder.matches("asdf@1234", userPassword));
+		log.info("matches 결과: {}", passwordEncoder.matches("test@1234", userPassword));
 		
 		if(!passwordEncoder.matches(local.getPassword(), userPassword)) {
+			log.info("{},{}" ,local.getPassword() , userPassword);
 			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
 		}
-		memberMapper.wirhdrawMember(memberId);
+		memberMapper.withdrawMember(memberId);
 		
 		tokenMapper.memberLogout(memberId);
 		

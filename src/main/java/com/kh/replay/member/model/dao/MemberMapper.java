@@ -21,16 +21,16 @@ public interface MemberMapper {
 	
 	Map<String,String> loadUser(String memberId);
 
-	@Update("UPDATE TB_MEMBER SET PASSWORD = #{newPassword} WHERE MEMBER_ID = #{username}")
-	int changePassword(Map<String, String> changeRequestchangeRequest);
+	@Update("UPDATE TB_MEMBER SET PASSWORD = #{newPassword} WHERE MEMBER_ID = #{memberId}")
+	int changePassword(Map<String, String> changeRequest);
 	
 	@Select("SELECT MEMBER_ID	, MBTI, MEMBER_JOB, GENDER , GENRE, MEMBER_NAME, NICKNAME, PHONE, EMAIL FROM TB_MEMBER WHERE MEMBER_ID =#{memberId}") 
 	Map<String, Object> findAllMember(String memberId);
 	
 	int changeInfo(MemberDTO membermember);
 
-	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERER MEMBER_ID = #{memberId}")
-	void wirhdrawMember(String memberId);
+	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
+	void withdrawMember(String memberId);
 	
 	
 }

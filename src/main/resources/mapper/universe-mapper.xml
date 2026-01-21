@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.universe.model.mapper.UniverseMapper">
+
+    <sql id="commonColumns">
+        u.UNIVERSE_ID as "universeId",
+        u.TITLE as "title",
+        m.NICKNAME as "nickName",
+        (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like"
+    </sql>
+
+    <sql id="cursorAndSort">
+        <choose>
+            <when test="sort == 'latest'">
+                <if test="lastUniverseId != null">
+                    AND u.UNIVERSE_ID &lt; #{lastUniverseId}
+                </if>
+            </when>
+            <when test="sort == 'popular'">
+                <if test="lastLikeCount != null and lastUniverseId != null">
+                    AND (
+                        (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) &lt; #{lastLikeCount}
+                        OR 
+                        (
+                          (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) = #{lastLikeCount}
+                          AND u.UNIVERSE_ID &lt; #{lastUniverseId}
+                        )
+                    )
+                </if>
+            </when>
+        </choose>
+        
+        ORDER BY
+        <choose>
+            <when test="sort == 'popular'"> "like" DESC, u.UNIVERSE_ID DESC </when>
+            <otherwise> u.UNIVERSE_ID DESC </otherwise>
+        </choose>
+        
+        FETCH NEXT #{limit} ROWS ONLY
+    </sql>
+
+    <select id="findAllUniverse" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
+        SELECT
+            <include refid="commonColumns" />
+        FROM TB_UNIVERSE u
+        JOIN TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE u.STATUS = 'Y'
+        <include refid="cursorAndSort" />
+    </select>
+    
+    <select id="findByKeyword" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
+        SELECT
+            <include refid="commonColumns" />
+        FROM TB_UNIVERSE u
+        JOIN TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE u.STATUS = 'Y'
+
+        <if test="keyword != null and keyword != ''">
+            AND
+            <choose>
+                <when test="condition == 'title'">
+                    u.TITLE LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="condition == 'nickname'">
+                    m.NICKNAME LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="condition == 'memberId'">
+                    m.MEMBER_ID LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test="condition == 'universeId'">
+                    u.UNIVERSE_ID = #{keyword}
+                </when>
+                <when test="condition == 'all'">
+                    (u.TITLE LIKE '%' || #{keyword} || '%' OR m.NICKNAME LIKE '%' || #{keyword} || '%')
+                </when>
+            </choose>
+        </if>
+        
+        <include refid="cursorAndSort" />
+    </select>
+    
+    <select id="findByUniverseId" resultType="com.kh.replay.universe.model.dto.UniverseDTO">
+        SELECT
+            u.UNIVERSE_ID as "universeId",
+            u.TITLE as "title",
+            u.LAYOUT_DATA as "layoutData",
+            u.THEME_CODE as "themeCode",
+            u.THUMBNAIL_URL as "thumbnailUrl",
+            m.MEMBER_ID as "memberId",
+            m.NICKNAME as "nickName",
+            (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED l WHERE l.UNIVERSE_ID = u.UNIVERSE_ID) as "like",
+            (SELECT COUNT(1) FROM TB_FAV_UNIVERSE b WHERE b.UNIVERSE_ID = u.UNIVERSE_ID) as "bookmark"
+        FROM 
+             TB_UNIVERSE u
+        JOIN 
+             TB_MEMBER m ON u.MEMBER_ID = m.MEMBER_ID
+        WHERE 
+              u.UNIVERSE_ID = #{universeId}
+    </select>
+    
+	<insert id="insertUniverse">
+	    INSERT 
+	      INTO 
+	           TB_UNIVERSE (
+	        UNIVERSE_ID, 
+	        TITLE, 
+	        LAYOUT_DATA, 
+	        THEME_CODE, 
+	        THUMBNAIL_URL, 
+	        MEMBER_ID, 
+	        STATUS, 
+	        CREATED_AT   ) VALUES (
+	        SEQ_UNIVERSE_ID.NEXTVAL,  #{title}, 
+	        #{layoutData}, 
+	        #{themeCode}, 
+	        #{thumbnailUrl}, 
+	        #{memberId}, 
+	        'Y', 
+	        SYSDATE
+	    )
+	</insert>
+	
+	<update id="updateUniverse">
+	        UPDATE TB_UNIVERSE
+	        <set>
+	            <if test="title != null">TITLE = #{title},</if>
+	            <if test="layoutData != null">LAYOUT_DATA = #{layoutData},</if>
+	            <if test="themeCode != null">THEME_CODE = #{themeCode},</if>
+	            <if test="status != null">STATUS = #{status},</if>
+	        </set>
+	        WHERE UNIVERSE_ID = #{universeId}
+	</update>
+</mapper>

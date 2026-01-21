@@ -2,6 +2,7 @@ package com.kh.replay.auth.local.model.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.auth.local.model.dao.LocalMapper;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
@@ -9,12 +10,12 @@ import com.kh.replay.global.exception.DuplicateException;
 import com.kh.replay.global.exception.MemberJoinException;
 import com.kh.replay.global.member.model.vo.MemberVO;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+@Service
 @Slf4j
 @RequiredArgsConstructor
-@Service
 public class LocalServiceImpl implements LocalService {
 	private final LocalMapper localMapper;
 	private final PasswordEncoder passwordEncoder;
@@ -39,8 +40,9 @@ public class LocalServiceImpl implements LocalService {
 		String encodedPassword = passwordEncoder.encode(local.getPassword());
 
 		// 암호화된 비밀번호 로컬에 저장
+
 		local.setPassword(encodedPassword);
-log.info("{}",local.getMemberDto());
+		log.info("{}",local.getMemberDto());
 		MemberVO member = MemberVO.builder().memberId(local.getMemberDto().getMemberId())
 				.email(local.getMemberDto().getEmail()).name(local.getMemberDto().getName())
 				.nickName(local.getMemberDto().getNickName()).gender(local.getMemberDto().getGender())

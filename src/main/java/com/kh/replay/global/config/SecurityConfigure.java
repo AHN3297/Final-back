@@ -41,12 +41,21 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
+					//주영님 제발 피알좀 해주세요
+					//주영님 제발 피알좀 해주세요 
+					//주영님 제발 피알좀 해주세요 
+					requests.requestMatchers("/api/universes/**").permitAll();
+					
+					// 로그인필요(POST)테스트 
+					requests.requestMatchers(HttpMethod.POST,"/api/member/playList").permitAll();
 					// 비로그인 허용
 					requests.requestMatchers(HttpMethod.GET,"/api/members").permitAll();
 					// 비로그인 허용(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
 					requests.requestMatchers(HttpMethod.DELETE,"api/members").permitAll();
 					
+
+				
 					// 로그인 필요(GET)
 					
 					requests.requestMatchers(HttpMethod.GET).authenticated();
@@ -64,6 +73,8 @@ public class SecurityConfigure {
 //					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
 //					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
 //					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
+
+
 				})
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 		        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

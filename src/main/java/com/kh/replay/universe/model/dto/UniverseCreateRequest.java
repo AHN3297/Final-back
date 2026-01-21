@@ -20,5 +20,6 @@ public class UniverseCreateRequest {
 	private String layoutData;
 	private String themeCode;
 	private String memberId;
+	private String status; 
 
 }

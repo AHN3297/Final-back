@@ -30,4 +30,6 @@ public interface UniverseMapper {
 			@Param("universeId") Long universeId);
 
 	int insertUniverse(UniverseDTO universe);
+
+	int updateUniverse(UniverseDTO update);
 }

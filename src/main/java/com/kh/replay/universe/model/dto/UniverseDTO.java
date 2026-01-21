@@ -20,6 +20,7 @@ public class UniverseDTO {
 	private String title;
 	private String layoutData;
 	private String themeCode;
+	private String status;
 	private String thumbnailUrl; //썸내일 
 	
 	private String memberId; //맴버태그

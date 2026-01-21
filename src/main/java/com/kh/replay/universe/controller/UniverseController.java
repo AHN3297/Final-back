@@ -1,7 +1,9 @@
 package com.kh.replay.universe.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,9 +18,16 @@ import com.kh.replay.universe.model.dto.UniverseDTO;
 import com.kh.replay.universe.model.dto.UniverseListResponse;
 import com.kh.replay.universe.model.service.UniverseService;
 
+import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+
+/**
+ * 
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -104,4 +113,19 @@ public class UniverseController {
         // 데이터는 null, 메시지만 보냄
         return ResponseData.ok(null, "유니버스 생성 성공");
     }
+    
+    /**
+     * 5.유니버스 수정
+     * @param universeId
+     * @param universe
+     * @return
+     */
+    @PatchMapping("{universeId}")
+    public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(@PathVariable("universeId")  Long universeId, @RequestBody UniverseCreateRequest universe) {
+        
+    	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe);
+        
+        return ResponseData.ok(resonse, "유니버스 수정 성공");
+    }
+    
 }

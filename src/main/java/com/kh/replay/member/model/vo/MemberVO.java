@@ -1,4 +1,4 @@
-package com.kh.replay.auth.member.model.vo;
+package com.kh.replay.member.model.vo;
 
 import java.sql.Date;
 

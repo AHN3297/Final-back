@@ -47,14 +47,18 @@ public class SecurityConfigure {
 					requests.requestMatchers("/api/universes/**").permitAll();
 					
 					// 로그인필요(POST)테스트 
-					requests.requestMatchers(HttpMethod.POST,"/api/member/playList").permitAll();
+					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();
+					// 로그인 필요(PATCH)테스트 
+					requests.requestMatchers(HttpMethod.PATCH,"/api/member/playList/**").permitAll();
+					
 					// 비로그인 허용
-					requests.requestMatchers(HttpMethod.GET,"/api/members").permitAll();
+					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();
 					// 비로그인 허용(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
-					requests.requestMatchers(HttpMethod.DELETE,"api/members").permitAll();
+					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
 					
-
+					requests.requestMatchers(HttpMethod.PUT).permitAll();
+					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
 				
 					// 로그인 필요(GET)
 					
@@ -62,11 +66,10 @@ public class SecurityConfigure {
 					// 로그인 필요(POST)
 					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
 					// 로그인 필요(PUT)
-					requests.requestMatchers(HttpMethod.PUT).authenticated();
+					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
 					// 로그인 필요(DELETE)
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
 					
-					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
 					
 //					// 관리자
 //					requests.requestMatchers(HttpMethod.GET).hasAuthority("");

@@ -13,6 +13,6 @@ public interface PlayListService {
 
 	int updateMainPlayList(String memberId, int playlistId);
 
-	int updatePlayListName(int playListId, String playListName);
+	int updatePlayListName(int playListId, String playListName, String newName);
 
 }

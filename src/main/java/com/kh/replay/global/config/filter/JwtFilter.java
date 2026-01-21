@@ -9,9 +9,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.kh.replay.auth.member.model.service.UserDetailsServiceImpl;
-import com.kh.replay.auth.member.model.vo.CustomUserDetails;
 import com.kh.replay.auth.token.util.JwtUtil;
+import com.kh.replay.member.model.service.UserDetailsServiceImpl;
+import com.kh.replay.member.model.vo.CustomUserDetails;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -65,7 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
 				response.getWriter().write("유효하지 않은 토큰입니다.");
 			}
 			
-	filterChain.doFilter(request, response);
 	}
+		filterChain.doFilter(request, response);
 
 	}}

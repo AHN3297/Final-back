@@ -62,17 +62,15 @@
 		       )
 	</insert>
 	
-	<update id="updatePlayListName">
+	<update id="updatePlayListName">  
 	    UPDATE 
-	           TB_PLAYLIST
-	    <set>
-	        <if test="playListName != null">
-				PLAYLIST_NAME = #{playListName},
-			</if>
-	            UPDATED_AT = SYSDATE 
-	    </set>
+	    	   TB_PLAYLIST
+	       SET 
+	           PLAYLIST_NAME = #{playListName}
 	     WHERE 
 	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           MEMBER_ID = #{memberId}  
 	</update>
 	
 </mapper>

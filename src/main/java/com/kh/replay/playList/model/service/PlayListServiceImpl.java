@@ -25,22 +25,18 @@ public class PlayListServiceImpl implements PlayListService {
                 .playListName(playListDto.getPlayListName())
                 .memberId(memberId)
                 .build();
-
         // 2. DB Insert 실행
-        int result = playListMapper.createPlayList(vo);
-        
+        int result = playListMapper.createPlayList(vo);       
         // 3. 예외처리
         if (result <= 0) {
             throw new RuntimeException("플레이리스트 등록에 실패했습니다.");
-        }
-        
+        }      
         // 4. 성공 시 생성된 시퀀스 ID만 반환
         return vo.getPlayListId(); 
     }
 
 	@Override
 	public List<PlayListDTO> findAllMemberPlayLists(String memberId) {
-
 		return playListMapper.findAllMemberPlayLists(memberId);
 	}
 
@@ -54,21 +50,24 @@ public class PlayListServiceImpl implements PlayListService {
 	}
 
 	@Override
-    @Transactional 
-    public int updatePlayListName(int playListId, String newName) {
-        PlayListDTO updateDto = PlayListDTO.builder()
-                .playListId(playListId)
-                .playListName(newName)
-                .build();
+	@Transactional
+	public int updatePlayListName(int playListId, String memberId, String newName) {
+	    // 1. 매퍼에 전달할 데이터를 DTO나 Map에 담습니다.
+	    // XML의 #{memberId}, #{playListId}, #{playListName}과 이름이 같아야 합니다.
+	    PlayListDTO updateDto = PlayListDTO.builder()
+	            .playListId(playListId)
+	            .memberId(memberId)
+	            .playListName(newName)
+	            .build();
 
-        // Mapper 호출
-        int result = playListMapper.updatePlayList(updateDto);
+	    // 2. Mapper를 호출하여 업데이트 수행
+	    int result = playListMapper.updatePlayListName(updateDto);
 
-        // 수정 실패 시 예외 처리 (후에 변경 예정)
-        if (result <= 0) {
-            throw new RuntimeException("플레이리스트 이름 수정에 실패했습니다.");
-        }
+	    // 3. 만약 결과가 0이라면 타인의 리스트에 접근했거나 해당 ID가 없는 경우입니다.
+	    if (result <= 0) {
+	        throw new RuntimeException("수정 권한이 없거나 존재하지 않는 플레이리스트입니다.");
+	    }
 
-        return result;
-    }
+	    return result;
+	}
 }

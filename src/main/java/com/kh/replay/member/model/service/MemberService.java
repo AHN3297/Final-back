@@ -1,10 +1,10 @@
-package com.kh.replay.auth.member.model.service;
+package com.kh.replay.member.model.service;
 
 import java.util.Map;
 
 import com.kh.replay.auth.local.model.dto.LocalDTO;
-import com.kh.replay.auth.member.model.dto.ChangePasswordDTO;
-import com.kh.replay.auth.member.model.dto.MemberDTO;
+import com.kh.replay.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.member.model.dto.MemberDTO;
 
 import jakarta.validation.Valid;
 

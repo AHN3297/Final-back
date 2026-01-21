@@ -45,36 +45,29 @@ public class PlayListController {
 	@GetMapping
 	public ResponseEntity<ResponseData<List<PlayListDTO>>> findAllPlaylist(
 	        @RequestParam(name = "memberId") String memberId) {
-		
 	    List<PlayListDTO> list = playListService.findAllMemberPlayLists(memberId);
-	    
 	    return ResponseData.ok(list, "내 플레이리스트 목록 조회 성공");
 	}
-	
-
 	 
 	// 메인 플레이리스트 지정
 	@PostMapping("/main")
 	public ResponseEntity<ResponseData<Integer>> mainPlayList(
 	        @RequestParam(name="memberId") String memberId,
-	        @RequestParam(name="playListId") int playListId) {
-	    
+	        @RequestParam(name="playListId") int playListId) {	    
 	    int result = playListService.updateMainPlayList(memberId, playListId);
-	    
 	    return ResponseData.ok(result, "메인 플레이리스트로 지정되었습니다.");
 	}
 	
-	// 플레이리스트 이름 변경(수정)
+	// 플레이리스트 이름 변경(수정)  
 	@PatchMapping("/{playListId}")
 	public ResponseEntity<ResponseData<Integer>> updatePlayListName(
-	    @PathVariable int playListId, 
+	    @PathVariable(name = "playListId") int playListId, 
+	    @RequestParam(name = "memberId") String memberId, // 후에 수정해야함
 	    @RequestBody PlayListDTO playListDto) {
-		
-		int result = playListService.updatePlayListName(playListId, playListDto.getPlayListName());
-		
-		return ResponseData.ok(1, "플레이리스트 이름 수정 성공");   
+	    
+	    int result = playListService.updatePlayListName(playListId, memberId, playListDto.getPlayListName());  
+	    return ResponseData.ok(result, "플레이리스트 이름 수정 성공");   
 	}
-	
 	// 플레이리스트 삭제
 	
 	// 플레이리스트에 노래 추가

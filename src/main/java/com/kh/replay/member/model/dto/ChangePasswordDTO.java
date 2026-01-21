@@ -1,12 +1,13 @@
-package com.kh.replay.auth.member.model.dto;
+package com.kh.replay.member.model.dto;
 
+import lombok.Data;
 import lombok.Setter;
-import lombok.Value;
 
-@Value
-@Setter
+@Data
 public class ChangePasswordDTO {
 
+	private String memberId;	
+	
 	private String currentPassword;
 	
 	private String newPassword;

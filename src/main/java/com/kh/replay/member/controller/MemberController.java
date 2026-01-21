@@ -1,4 +1,4 @@
-package com.kh.replay.auth.member.controller;
+package com.kh.replay.member.controller;
 
 
 import java.util.Map;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.replay.auth.local.model.dto.LocalDTO;
-import com.kh.replay.auth.member.model.dto.ChangePasswordDTO;
-import com.kh.replay.auth.member.model.dto.MemberDTO;
-import com.kh.replay.auth.member.model.service.MemberService;
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.member.model.dto.MemberDTO;
+import com.kh.replay.member.model.service.MemberService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +53,7 @@ public class MemberController {
 	
 	@PutMapping
 	public ResponseEntity<ResponseData<ChangePasswordDTO>> changePassword(@RequestBody ChangePasswordDTO password){
+		log.info(" ChangePasswordDTO : {} " , password);
 		memberService.changePassword(password);
 		
 		
@@ -62,7 +63,8 @@ public class MemberController {
 	
 	@GetMapping
 	public ResponseEntity<ResponseData<Map<String, Object>>> findAllMember(@RequestParam("memberId") String memberId){
-		 Map<String, Object> memberInfo =memberService.findAllMember(memberId);
+		log.info("이거왜 안옴 자꾸? 왜그럼?{}" ,memberId); 
+		Map<String, Object> memberInfo =memberService.findAllMember(memberId);
 		return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
 	}
 	
@@ -71,7 +73,7 @@ public class MemberController {
 		
 		Map<String, Object> memberInfo =memberService.changeInfo(member);
 		
-		return ResponseData.ok(memberInfo , "회원정보 수정에 성공하셨습니다.");
+		return ResponseData.ok(memberInfo,"회원정보 수정에 성공하셨습니다.");
 		
 	}
 	@DeleteMapping

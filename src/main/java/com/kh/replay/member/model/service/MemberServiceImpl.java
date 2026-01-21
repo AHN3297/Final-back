@@ -1,4 +1,4 @@
-package com.kh.replay.auth.member.model.service;
+package com.kh.replay.member.model.service;
 
 
 
@@ -13,13 +13,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.local.model.dto.LocalDTO;
-import com.kh.replay.auth.member.model.dao.MemberMapper;
-import com.kh.replay.auth.member.model.dto.ChangePasswordDTO;
-import com.kh.replay.auth.member.model.dto.MemberDTO;
-import com.kh.replay.auth.member.model.vo.CustomUserDetails;
 import com.kh.replay.auth.token.model.dao.TokenMapper;
 import com.kh.replay.auth.token.model.service.TokenService;
 import com.kh.replay.global.exception.CustomAuthenticationException;
+import com.kh.replay.member.model.dao.MemberMapper;
+import com.kh.replay.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.member.model.dto.MemberDTO;
+import com.kh.replay.member.model.vo.CustomUserDetails;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -74,14 +74,15 @@ public class MemberServiceImpl implements MemberService{
 				String currentPassword = password.getCurrentPassword();
 				String encodedPassword = user.getPassword();
 				
+				log.info("현재비밀번호: {},{}",currentPassword,encodedPassword);
 				if(!passwordEncoder.matches(currentPassword,encodedPassword)) {
-					throw new CustomAuthenticationException(encodedPassword);
+					throw new CustomAuthenticationException("현재 비밀번호가 일치하지 않습니다.");
 				}
 				String newPassword = passwordEncoder.encode(password.getNewPassword());
 				
-				Map<String,String> changeRequest = Map.of("email",user.getUsername(),
+				Map<String,String> changeRequest = Map.of("memberId",user.getUsername(),
 														  "newPassword", newPassword);
-				
+				log.info("{},{}",encodedPassword,newPassword);
 				memberMapper.changePassword(changeRequest);
 		
 	}

@@ -34,7 +34,6 @@ public class SecurityConfigure {
 	private String instance;
 	
 	private final JwtFilter jwtFilter;
-	// ✅ OAuth2 관련 추가 (아직 만들지 않았다면 주석 처리)
 	// private final OAuth2UserProviderRouter oAuth2UserProviderRouter;
 	// private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	
@@ -59,7 +58,7 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
 					
 					 // OAuth2 관련 경로 허용
-					requests.requestMatchers("/oauth2/**", "/login/**").permitAll();
+					requests.requestMatchers("/oauth2/**", "/login/**","/oauth/**").permitAll();
 					
 					requests.requestMatchers(HttpMethod.PUT).permitAll();
 					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
@@ -70,14 +69,12 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
 				})
-				// OAuth2 로그인 설정 추가
-//				.oauth2Login(oauth2 -> oauth2
-//						.userInfoEndpoint(userInfo -> userInfo
-//						)
-//				)
+			
+				
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-		        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-		        .build();
+				.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.build();
+
 	}
 	
 	@Bean

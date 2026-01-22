@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.kh.replay.member.model.dto.MemberDTO;
+import com.kh.replay.member.model.vo.MemberVO;
 
 @Mapper
 public interface MemberMapper {
@@ -19,7 +20,7 @@ public interface MemberMapper {
 	//멤버 이메일로 로그인
 	Map<String,String> loadByMemberId(String email);
 
-	@Update("UPDATE TB_MEMBER SET PASSWORD = #{newPassword} WHERE MEMBER_ID = #{memberId}")
+	@Update("UPDATE TB_LOCAL SET PASSWORD = #{newPassword} WHERE MEMBER_ID = #{memberId}")
 	int changePassword(Map<String, String> changeRequest);
 	
 	@Select("SELECT MEMBER_ID	, MBTI, MEMBER_JOB, GENDER , GENRE, MEMBER_NAME, NICKNAME, PHONE, EMAIL FROM TB_MEMBER WHERE MEMBER_ID =#{memberId}") 
@@ -29,6 +30,11 @@ public interface MemberMapper {
 
 	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
 	void withdrawMember(String memberId);
+
+	int socialUpdate(MemberVO updateVo);
+	@Select("SELECT MEMBER_ID, MBTI, MEMBER_JOB, GENDER , GENRE, MEMBER_NAME, NICKNAME, PHONE, EMAIL FROM TB_MEMBER WHERE MEMBER_ID =#{memberId}") 
+	MemberVO findById(String memberId);
+
 	
 	
 }

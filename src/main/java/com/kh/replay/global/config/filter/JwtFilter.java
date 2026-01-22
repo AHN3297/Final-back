@@ -22,49 +22,64 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @RequiredArgsConstructor
 @Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-	private final JwtUtil jwtUtil;
-	private final UserDetailsServiceImpl userDetailsService;
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		
-		String uri = request.getRequestURI();
-		if(uri.equals("/api/members/login" ) || uri.equals("/api/auth/signUp")) {
-			filterChain.doFilter(request, response);
-			return;
-		}
-		//토큰검증
-		String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-		
-		if(authorization != null && authorization.startsWith("Bearer ")) {
-			String token = authorization.substring(7);
-			try {
-				
-			Claims claims =jwtUtil.parseJwt(token);
-			String username =  claims.getSubject();
-			
-			CustomUserDetails user = (CustomUserDetails)userDetailsService.loadUserByUsername(username);
-			
-			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
-			authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-			
-			SecurityContextHolder.getContext().setAuthentication(authentication);
-			
-			} catch(ExpiredJwtException e) { log.info("토큰의 유효기간 만료");
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			return;}
-			
-			catch(JwtException e) {
-				log.info("서버에서 만들어진 토큰이 아님");
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				response.getWriter().write("유효하지 않은 토큰입니다.");
-			}
-			
-	}
-		filterChain.doFilter(request, response);
 
-	}}
+    private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
+
+    // (OAuth2/로그인 경로 스킵)
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        return uri.startsWith("/oauth2/")
+            || uri.startsWith("/login/")
+            || uri.startsWith("/oauth/")
+            || uri.equals("/api/members/login")
+            || uri.equals("/api/auth/signUp")
+            || uri.equals("/error");
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+    	log.info("JwtFilter uri={}, authHeader={}", request.getRequestURI(), request.getHeader(HttpHeaders.AUTHORIZATION));
+        // 토큰검증
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            String token = authorization.substring(7);
+
+            try {
+                Claims claims = jwtUtil.parseJwt(token);
+                String username = claims.getSubject();
+
+                CustomUserDetails user =
+                        (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            } catch (ExpiredJwtException e) {
+                log.info("토큰의 유효기간 만료");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+
+            } catch (JwtException e) {
+                log.info("유효하지 않은 토큰");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("유효하지 않은 토큰입니다.");
+                return; 
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}

@@ -79,4 +79,9 @@ public class GlobalHandlerException {
         
         return createErrorResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    public ResponseEntity<ResponseData<Object>> handleOAuth2AuthenticationException(OAuth2AuthenticationException e) {
+        log.error("지원하지 않는 소셜 로그인입니다:{}", e.getMessage());
+        
+        return createErrorResponseEntity(e, HttpStatus.BAD_REQUEST);
 }
+    }

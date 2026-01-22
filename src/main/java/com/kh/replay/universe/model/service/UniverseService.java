@@ -24,5 +24,5 @@ public interface UniverseService {
 	UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest universe);
 	
 	//유니버스 삭제
-	UniverseDTO deleteUniverse(Long universeId); 
+	UniverseDTO deleteUniverse(Long universeId, String userId); 
 }

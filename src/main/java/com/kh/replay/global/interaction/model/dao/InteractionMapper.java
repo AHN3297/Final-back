@@ -11,6 +11,7 @@ public interface InteractionMapper {
     int insertLike(@Param("universeId") Long universeId, @Param("memberId") String memberId);
     
     int deleteLike(@Param("universeId") Long universeId, @Param("memberId") String memberId);
+    
     int countLikes(Long universeId);
     
 

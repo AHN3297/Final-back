@@ -79,4 +79,10 @@ public class GlobalHandlerException {
         
         return createErrorResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ResponseData<Object>> handleFileUpload(FileUploadException e) {
+        log.error("파일 업로드 실패(500): {}", e.getMessage(), e);
+        return ResponseData.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

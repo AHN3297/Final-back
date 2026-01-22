@@ -4,20 +4,20 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.ibatis.session.RowBounds;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.replay.global.exception.FileUploadException;
+import com.kh.replay.global.s3.S3Service;
+import com.kh.replay.global.util.PageInfo;
+import com.kh.replay.global.util.Pagenation;
 import com.kh.replay.notice.model.domain.Notice;
 import com.kh.replay.notice.model.domain.NoticeImg;
 import com.kh.replay.notice.model.dto.NoticeItemDto;
 import com.kh.replay.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.notice.model.dto.NoticeRequestDto;
 import com.kh.replay.notice.model.repository.NoticeRepository;
-import com.kh.replay.global.s3.S3Service;
-import com.kh.replay.global.util.PageInfo;
-import com.kh.replay.global.util.Pagenation;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,10 +44,10 @@ public class NoticeServiceImpl implements NoticeService {
 		
 		// 3. MaBatis RowBounds 생성
 		int offset = (pageInfo.getCurrentPage() - 1) * pageInfo.getBoardLimit();
-		RowBounds rowBounds = new RowBounds(offset, size);
+		int limit = pageInfo.getBoardLimit();
 		
 		// 4. DB 목록 조회
-		List<Notice> notices = noticeRepository.findAll(keyword, status, rowBounds);
+		List<Notice> notices = noticeRepository.findAll(keyword, status, offset, limit);
 		
 
 		// 5. Entity => DTO 변환
@@ -64,7 +64,7 @@ public class NoticeServiceImpl implements NoticeService {
 	
 	@Override
 	@Transactional
-	public void registerNotice(NoticeRequestDto requestDto, MultipartFile image) throws IOException {
+	public void registerNotice(NoticeRequestDto requestDto, MultipartFile image) {
 		
 		// 1. 공지사항 본문(Notice) 객체 생성
 		Notice notice = Notice.builder()
@@ -79,6 +79,8 @@ public class NoticeServiceImpl implements NoticeService {
 		
 		// 3. 이미지가 있으면 업로드 후 별도 테이블(NoticeImg)에 저장
 		if (image != null && !image.isEmpty()) {
+			
+			try {
 			// S3 업로드
 			String s3Url = s3Service.uploadFile(image); 
 			
@@ -91,6 +93,10 @@ public class NoticeServiceImpl implements NoticeService {
 			
 			// 이미지 테이블에 저장
 			noticeRepository.saveImg(noticeImg);
+			
+			} catch (Exception e) {
+				throw new FileUploadException("이미지 업로드에 실패했습니다.", e);
+			}
 		}
 	}
 	

@@ -12,6 +12,6 @@ public interface NoticeService {
 	// 공지사항 목록 조회
 	NoticeListResponseDto getNoticeList(int page, int size, String keyword, String status);
 
-	void registerNotice(NoticeRequestDto requestDto, MultipartFile image) throws IOException;
+	void registerNotice(NoticeRequestDto requestDto, MultipartFile image);
 
 }

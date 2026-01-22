@@ -35,57 +35,52 @@ public class SecurityConfigure {
 	
 	private final JwtFilter jwtFilter;
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-		return httpSecurity
-				.formLogin(AbstractHttpConfigurer::disable)
-				.csrf(AbstractHttpConfigurer::disable)
-				.cors(Customizer.withDefaults())
-				.authorizeHttpRequests(requests -> {
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	    return httpSecurity
+	            .formLogin(AbstractHttpConfigurer::disable)
+	            .csrf(AbstractHttpConfigurer::disable)
+	            .cors(Customizer.withDefaults())
+	            .authorizeHttpRequests(requests -> {
 
-					// 공지사항 관련 모든 요청 허용 (테스트용)
-					requests.requestMatchers("/api/admin/notices/**").permitAll();
-					requests.requestMatchers("/api/universes/**").permitAll();
-					
-					// 로그인필요(POST)테스트 플레이 리스트
-					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();
-					// 로그인 필요(PATCH)테스트 플레이 리스트
-					requests.requestMatchers(HttpMethod.PATCH,"/api/member/playList/**").permitAll();
-					// 로그인 필요(DELETE)테스트 플레이 리스트
-					requests.requestMatchers(HttpMethod.DELETE,"/api/member/playList/**").permitAll();
-					// 로그인 필요(GET)테스트 플레이 리스트
-					requests.requestMatchers(HttpMethod.GET,"/api/member/playList/**").permitAll();
-					
-					// 비로그인 허용
-					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();
-					// 비로그인 허용(POST)
-					
-					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
-					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
-					
-					requests.requestMatchers(HttpMethod.PUT).permitAll();
-					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
-				
-					// 로그인 필요(GET)
-					requests.requestMatchers(HttpMethod.GET).authenticated();
-					// 로그인 필요(POST)
-					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
-					// 로그인 필요(PUT)
-					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
-					// 로그인 필요(DELETE)
-					requests.requestMatchers(HttpMethod.DELETE).authenticated();
-					
-					
-//					// 관리자
-//					requests.requestMatchers(HttpMethod.GET).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
+	                // 공지사항 조회 (관리자만 접근)
+	                requests.requestMatchers(HttpMethod.GET, "/api/admin/notices/**").hasRole("ADMIN");
+	                // 공지사항 등록 (관리자만 접근)
+	                requests.requestMatchers(HttpMethod.POST, "/api/admin/notices/**").hasRole("ADMIN");
 
+	                // 비로그인 허용
+	                requests.requestMatchers("/api/universes/**").permitAll();
 
-				})
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-		        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-		        .build();
+	                // 로그인필요(POST)테스트 플레이 리스트
+	                requests.requestMatchers(HttpMethod.POST, "/api/member/playList/**").permitAll();
+	                // 로그인 필요(PATCH)테스트 플레이 리스트
+	                requests.requestMatchers(HttpMethod.PATCH, "/api/member/playList/**").permitAll();
+	                // 로그인 필요(DELETE)테스트 플레이 리스트
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/member/playList/**").permitAll();
+	                // 로그인 필요(GET)테스트 플레이 리스트
+	                requests.requestMatchers(HttpMethod.GET, "/api/member/playList/**").permitAll();
+
+	                // 비로그인 허용
+	                requests.requestMatchers(HttpMethod.GET, "/api/members", "/api/search").permitAll();
+	                // 비로그인 허용(POST)
+	                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll();
+
+	                // 로그인 필요(GET)
+	                requests.requestMatchers(HttpMethod.GET).authenticated();
+	                // 로그인 필요(POST)
+	                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
+	                // 로그인 필요(PUT)
+	                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+	                // 로그인 필요(DELETE)
+	                requests.requestMatchers(HttpMethod.DELETE).authenticated();
+
+	                // 반드시 맨 마지막
+	                requests.anyRequest().authenticated();
+	            })
+	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+	            .sessionManagement(manager ->
+	                    manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	            .build();
 	}
 	
 	@Bean

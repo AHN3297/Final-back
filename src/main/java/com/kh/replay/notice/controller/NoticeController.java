@@ -1,7 +1,5 @@
 package com.kh.replay.notice.controller;
 
-import java.io.IOException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -42,11 +40,11 @@ public class NoticeController {
 		return ResponseData.ok(result, "관리자 공지사항 목록 조회 성공");
 	}
 	
-	@PostMapping("/register")
+	@PostMapping
 	public ResponseEntity<ResponseData<Void>> registerNotice(
 			@ModelAttribute NoticeRequestDto requestDto, // 제목, 내용 (JSON이 아닌 Form - data 방식)
 			@RequestPart(value = "images", required = false ) MultipartFile image)
-	throws IOException {
+	{
 		
 		noticeService.registerNotice(requestDto, image);
 		

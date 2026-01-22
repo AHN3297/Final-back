@@ -17,23 +17,28 @@
 
 	<select id="findAll" resultMap="noticeResultSet">
 		SELECT
-			   NOTICE_NO
-			 , NOTICE_TITLE
-			 , NOTICE_CONTENT
-			 , MEMBER_ID
-			 , STATUS
-			 , CREATED_AT
-			 , UPDATED_AT
-	      FROM
-	     	   TB_NOTICE
-	     WHERE
-	           STATUS = #{status}
-		<if test="keyword != null and keyword != ''">
-			AND
-			    NOTICE_TITLE LIKE '%' || #{keyword} || '%'
-		</if>
-		  ORDER BY
-		        NOTICE_NO DESC
+		       *
+		  FROM
+		       (     
+				SELECT
+					   NOTICE_NO
+					 , NOTICE_TITLE
+					 , NOTICE_CONTENT
+					 , MEMBER_ID
+					 , STATUS
+					 , CREATED_AT
+					 , UPDATED_AT
+			      FROM
+			     	   TB_NOTICE
+			     WHERE
+			           STATUS = #{status}
+				<if test="keyword != null and keyword != ''">
+					AND
+					    NOTICE_TITLE LIKE '%' || #{keyword} || '%'
+				</if>
+				  ORDER BY NOTICE_NO DESC
+				)
+		OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY		
 	</select>
 
 	<select id="countAll" resultType="_int">

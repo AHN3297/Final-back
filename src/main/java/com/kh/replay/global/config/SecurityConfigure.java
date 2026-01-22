@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -38,43 +40,49 @@ public class SecurityConfigure {
 	// private final OAuth2SuccessHandler oAuth2SuccessHandler;
 	
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-		return httpSecurity
-				.formLogin(AbstractHttpConfigurer::disable)
-				.csrf(AbstractHttpConfigurer::disable)
-				.cors(Customizer.withDefaults())
-				.authorizeHttpRequests(requests -> {
-					requests.requestMatchers("/api/universes/**").permitAll();
-					
-					// 로그인필요(POST)테스트 플레이 리스트
-					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();
-					requests.requestMatchers(HttpMethod.PATCH,"/api/member/playList/**").permitAll();
-					requests.requestMatchers(HttpMethod.DELETE,"/api/member/playList/**").permitAll();
-					requests.requestMatchers(HttpMethod.GET,"/api/member/playList/**").permitAll();
-					
-					// 비로그인 허용
-					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();
-					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
-					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
-					
-					 // OAuth2 관련 경로 허용
-					requests.requestMatchers("/oauth2/**", "/login/**","/oauth/**").permitAll();
-					
-					requests.requestMatchers(HttpMethod.PUT).permitAll();
-					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
-				
-					// 로그인 필요
-					requests.requestMatchers(HttpMethod.GET).authenticated();
-					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
-					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
-					requests.requestMatchers(HttpMethod.DELETE).authenticated();
-				})
-			
-				
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-				.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.build();
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+	    return httpSecurity
+	            .formLogin(AbstractHttpConfigurer::disable)
+	            .csrf(AbstractHttpConfigurer::disable)
+	            .cors(Customizer.withDefaults())
+//	            oAuth2LoginSuccessHandler
+	            .oauth2Login(oauth -> oauth.successHandler(null))
+	            
+	            .authorizeHttpRequests(requests -> {
+	                requests.requestMatchers("/api/universes/**").permitAll();
 
+	                requests.requestMatchers(HttpMethod.POST, "/api/member/playList/**").permitAll();
+	                requests.requestMatchers(HttpMethod.PATCH, "/api/member/playList/**").permitAll();
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/member/playList/**").permitAll();
+	                requests.requestMatchers(HttpMethod.GET, "/api/member/playList/**").permitAll();
+
+	                requests.requestMatchers(HttpMethod.GET, "/api/members", "/api/search").permitAll();
+	                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll();
+	                requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
+
+	                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
+	                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+
+	                requests.requestMatchers(HttpMethod.PUT).permitAll(); 
+	                
+	                requests.requestMatchers(HttpMethod.GET).authenticated();
+	                
+	                requests.requestMatchers(HttpMethod.DELETE).authenticated();
+	                
+	            })
+
+	            .exceptionHandling(ex -> 
+	                ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+	            )
+
+	            .sessionManagement(manager -> 
+	                manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+	            )
+
+	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
+	            .build();
 	}
 	
 	@Bean

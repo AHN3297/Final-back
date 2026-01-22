@@ -31,18 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
-    // (OAuth2/로그인 경로 스킵)
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String uri = request.getRequestURI();
 
-        return uri.startsWith("/oauth2/")
-            || uri.startsWith("/login/")
-            || uri.startsWith("/oauth/")
-            || uri.equals("/api/members/login")
-            || uri.equals("/api/auth/signUp")
-            || uri.equals("/error");
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

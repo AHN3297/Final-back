@@ -37,4 +37,5 @@ public interface MemberMapper {
 	void withdrawMember(String memberId);
 	
 	
+	
 }

@@ -32,4 +32,6 @@ public interface UniverseMapper {
 	int insertUniverse(UniverseDTO universe);
 
 	int updateUniverse(UniverseDTO update);
+
+	void deleteUniverse(Long universeId);
 }

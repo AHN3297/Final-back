@@ -41,7 +41,9 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
-					requests.requestMatchers("/api/universes/**").permitAll();
+					
+					requests.requestMatchers(HttpMethod.GET, "/api/universes/**").permitAll();
+                    requests.requestMatchers("/api/universes/**").authenticated(); 
 					
 					// 로그인필요(POST)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();

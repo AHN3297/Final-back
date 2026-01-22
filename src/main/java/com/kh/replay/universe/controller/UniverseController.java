@@ -1,11 +1,13 @@
 package com.kh.replay.universe.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -13,16 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.member.model.vo.CustomUserDetails;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
 import com.kh.replay.universe.model.dto.UniverseListResponse;
 import com.kh.replay.universe.model.service.UniverseService;
 
-import lombok.Delegate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 /**
@@ -105,10 +105,11 @@ public class UniverseController {
     @PostMapping
     public ResponseEntity<ResponseData<Void>> createUniverse(
             @RequestPart(value = "request") UniverseCreateRequest request, 
-            @RequestPart(value = "file", required = false) MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails user 
     ) {
         
-        universeService.createUniverse(request, file);
+        universeService.createUniverse(request, file, user.getUsername());
         
         // 데이터는 null, 메시지만 보냄
         return ResponseData.ok(null, "유니버스 생성 성공");
@@ -121,11 +122,33 @@ public class UniverseController {
      * @return
      */
     @PatchMapping("{universeId}")
-    public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(@PathVariable("universeId")  Long universeId, @RequestBody UniverseCreateRequest universe) {
+    public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(
+    		@PathVariable("universeId")  Long universeId, 
+    		@RequestBody UniverseCreateRequest universe,
+    		@AuthenticationPrincipal CustomUserDetails user 
+    		) {
         
-    	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe);
+    	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe, user.getUsername());
         
         return ResponseData.ok(resonse, "유니버스 수정 성공");
+    }
+    
+
+    /**
+     * 6. 유니버스 삭제 
+     * @param universeId
+     * @param user
+     * @return
+     */
+    @DeleteMapping("/{universeId}")
+    public ResponseEntity<ResponseData<UniverseDTO>> deleteUniverse(
+            @PathVariable("universeId") Long universeId,
+            @AuthenticationPrincipal CustomUserDetails user 
+            ) {
+        
+        UniverseDTO response = universeService.deleteUniverse(universeId, user.getUsername());
+        
+        return ResponseData.ok(response, "유니버스 삭제 성공");
     }
     
 }

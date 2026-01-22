@@ -3,6 +3,7 @@ package com.kh.replay.notice.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.notice.model.dto.NoticeDetailResponseDto;
 import com.kh.replay.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.notice.model.dto.NoticeRequestDto;
 import com.kh.replay.notice.service.NoticeService;
@@ -24,6 +26,14 @@ public class NoticeController {
 	
 	private final NoticeService noticeService;
 	
+	/**
+	 * 공지사항 전체 조회
+	 * @param page
+	 * @param size
+	 * @param keyword
+	 * @param status
+	 * @return
+	 */
 	@GetMapping
 	public ResponseEntity<ResponseData<NoticeListResponseDto>> getNoticeList(
 			@RequestParam(value = "page", defaultValue = "1") int page,
@@ -40,6 +50,12 @@ public class NoticeController {
 		return ResponseData.ok(result, "관리자 공지사항 목록 조회 성공");
 	}
 	
+	/**
+	 * 공지사항 등록
+	 * @param requestDto
+	 * @param image
+	 * @return
+	 */
 	@PostMapping
 	public ResponseEntity<ResponseData<Void>> registerNotice(
 			@ModelAttribute NoticeRequestDto requestDto, // 제목, 내용 (JSON이 아닌 Form - data 방식)
@@ -52,5 +68,16 @@ public class NoticeController {
 		return ResponseData.created(null, "공지사항 등록 성공");
 	}
 	
+	/**
+	 * 공지사항 상세조회
+	 * @param noticeNo
+	 * @return
+	 */
+	@GetMapping("/{noticeNo}")
+	public ResponseEntity<ResponseData<NoticeDetailResponseDto>> getNoticeDetail(@PathVariable("noticeNo") Long noticeNo){
+		
+		NoticeDetailResponseDto result = noticeService.getNoticeDetail(noticeNo);
+		return ResponseData.ok(result, "공지사항 상세 조회 성공");
+	}
 
 }

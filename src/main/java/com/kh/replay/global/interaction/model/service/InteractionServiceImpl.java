@@ -17,33 +17,45 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class InteractionServiceImpl implements InteractionService {
 
-    private final UniverseMapper universeMapper;
     private final InteractionMapper interactionMapper;
     private final UniverseValidator validator;
     private final UniverseLikeManager likeManager; 
 
+    //좋아요 추가 
     @Override
-    public LikeResponse toggleLike(Long universeId, String memberId) {
-        
-    	//유니버스 조회
+    public LikeResponse likeUniverse(Long universeId, String memberId) {
         validator.validateExisting(universeId);
-
-        //좋아요 상태값 확인
-        boolean isLiked = likeManager.executeToggle(universeId, memberId);
         
-        //좋아요 갯수 조회
+        likeManager.createLike(universeId, memberId); 
+        
         int totalLikes = countLikes(universeId);
         
-        //반환값 생성
         return LikeResponse.builder()
                 .targetId(universeId)
-                .isLiked(isLiked)
+                .isLiked(true) // 무조건 true
+                .likeCount(totalLikes)
+                .build();
+    }
+
+    // 좋아요 취소 
+    @Override
+    public LikeResponse unlikeUniverse(Long universeId, String memberId) {
+        validator.validateExisting(universeId);
+        
+        
+        likeManager.deleteLike(universeId, memberId);
+        
+        int totalLikes = countLikes(universeId);
+        
+        return LikeResponse.builder()
+                .targetId(universeId)
+                .isLiked(false) // 무조건 false
                 .likeCount(totalLikes)
                 .build();
     }
     
     
-    //좋아요 갯수 조회용 메소드
+    //좋아요 갯수 조회용 메소드 추후 여러군대 사용가능성
     private int countLikes(Long universeId) {
     	
     	int totalLikes = interactionMapper.countLikes(universeId);

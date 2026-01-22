@@ -156,21 +156,31 @@ public class UniverseController {
     }
     
     /**
-     * 7. 유니버스 좋아요
-     * @param entity
-     * @return
+     * 7. 유니버스 좋아요 (생성)
      */
     @PostMapping("/{universeId}/like")
-    public ResponseEntity<ResponseData<LikeResponse>> universeLike(
-    		@PathVariable("universeId") Long universeId,
-    		@AuthenticationPrincipal CustomUserDetails user 
-    		) {
-       
-    	LikeResponse response = interactionService.toggleLike(universeId, user.getUsername());
-    	
-    	String message = response.isLiked() ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
-    	
-        return ResponseData.ok(response, message);
+    public ResponseEntity<ResponseData<LikeResponse>> likeUniverse(
+            @PathVariable("universeId") Long universeId,
+            @AuthenticationPrincipal CustomUserDetails user 
+    ) {
+        // 추가 서비스 
+        LikeResponse response = interactionService.likeUniverse(universeId, user.getUsername());
+        
+        return ResponseData.ok(response, "좋아요를 눌렀습니다.");
+    }
+
+    /**
+     * 8. 유니버스 좋아요 취소 (삭제)
+     */
+    @DeleteMapping("/{universeId}/like")
+    public ResponseEntity<ResponseData<LikeResponse>> unlikeUniverse(
+            @PathVariable("universeId") Long universeId,
+            @AuthenticationPrincipal CustomUserDetails user 
+    ) {
+        //삭제서비스
+        LikeResponse response = interactionService.unlikeUniverse(universeId, user.getUsername());
+        
+        return ResponseData.ok(response, "좋아요를 취소했습니다.");
     }
     
 }

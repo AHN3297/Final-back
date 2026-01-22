@@ -9,21 +9,17 @@ import lombok.RequiredArgsConstructor;
 public class UniverseLikeManager {
 
     private final InteractionMapper interactionMapper;
-
-    /**
-     * 좋아요 토글 실행 
-     * @return true: 좋아요 추가, false: 좋아요 취소
-     */
-    public boolean executeToggle(Long universeId, String memberId) {
-        // 1. 좋아요 상태확인
-        if (interactionMapper.checkLike(universeId, memberId) > 0) {
-            // 있으면 삭제 (취소)
-            interactionMapper.deleteLike(universeId, memberId);
-            return false;
-        } else {
-            // 없으면 추가 (등록)
+    
+    public void createLike(Long universeId, String memberId) {
+        if (interactionMapper.checkLike(universeId, memberId) == 0) {
             interactionMapper.insertLike(universeId, memberId);
-            return true;
+        }
+    }
+
+    // 무조건 삭제 (없으면 무시)
+    public void deleteLike(Long universeId, String memberId) {
+        if (interactionMapper.checkLike(universeId, memberId) > 0) {
+            interactionMapper.deleteLike(universeId, memberId);
         }
     }
 }

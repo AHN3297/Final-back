@@ -1,0 +1,17 @@
+package com.kh.replay.notice.model.dto;
+
+import java.util.List;
+
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class NoticeListResponseDto {
+
+	private int page;
+	private int size;
+	private int totalElements;
+	private int totalPages;
+	private List<NoticeItemDto> items;
+}

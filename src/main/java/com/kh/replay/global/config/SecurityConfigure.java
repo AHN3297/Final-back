@@ -43,8 +43,30 @@ public class SecurityConfigure {
 				.authorizeHttpRequests(requests -> {
 
 					
+<<<<<<< HEAD
 					// Test용
 					requests.requestMatchers("/api/universes/**", "/api/member/playList/**", "api/music/**").permitAll();
+=======
+					 // 공지 조회(전체)
+	                requests.requestMatchers(HttpMethod.GET,  "/api/admin/notices/**").permitAll();
+	                
+	                // 관리자 공지 등록/수정/삭제(ADMIN)
+	                requests.requestMatchers(HttpMethod.POST, "/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.PUT,  "/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.PATCH,"/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.DELETE,"/api/admin/notices/**").hasRole("ADMIN");
+					
+					
+	                // 유니버스 조회는 전체 허용
+	                requests.requestMatchers(HttpMethod.GET, "/api/universes/**").permitAll();
+
+	                // 유니버스 수정/등록/삭제만 로그인 필요
+	                requests.requestMatchers(HttpMethod.POST,   "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.PUT,    "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.PATCH,  "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/universes/**").authenticated();
+
+>>>>>>> 4ef4502556aa71ff16701e0e1f4bac4f0dac1517
 					
 					
 					// 비로그인 허용

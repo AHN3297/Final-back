@@ -21,5 +21,8 @@ public interface UniverseService {
 	void createUniverse(UniverseCreateRequest request, MultipartFile file);
 	
 	//유니버스 수정
-	UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest universe); 
+	UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest universe);
+	
+	//유니버스 삭제
+	UniverseDTO deleteUniverse(Long universeId); 
 }

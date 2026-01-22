@@ -128,4 +128,15 @@ public class UniverseController {
         return ResponseData.ok(resonse, "유니버스 수정 성공");
     }
     
+    @DeleteMapping("/{universeId}")
+    public ResponseEntity<ResponseData<UniverseDTO>> deleteUniverse(@PathVariable("universeId") Long universeId) {
+        
+        // ▼▼▼ 이 로그가 안 뜨면, URL이나 Postman 설정(GET/DELETE)이 틀린 겁니다.
+        log.info("============== 삭제 컨트롤러 도착! ID: {} ==============", universeId);
+        
+        UniverseDTO response = universeService.deleteUniverse(universeId);
+        
+        return ResponseData.ok(response, "유니버스 삭제 성공");
+    }
+    
 }

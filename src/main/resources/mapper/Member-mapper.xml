@@ -14,7 +14,6 @@
 	WHERE TB_MEMBER.MEMBER_ID = #{username}	
 </select>
 
-
 	<update id="changeInfo" parameterType="com.kh.replay.member.model.dto.MemberDTO">
         UPDATE TB_MEMBER
         SET 

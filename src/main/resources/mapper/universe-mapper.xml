@@ -131,4 +131,9 @@
 	        </set>
 	        WHERE UNIVERSE_ID = #{universeId}
 	</update>
+	
+	<delete id="deleteUniverse" parameterType="long">
+        DELETE FROM TB_UNIVERSE
+        WHERE UNIVERSE_ID = #{universeId}
+    </delete>
 </mapper>

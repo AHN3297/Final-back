@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class UniverseServiceImpl implements UniverseService {
 
     private final UniverseMapper universeMapper;
@@ -82,13 +82,9 @@ public class UniverseServiceImpl implements UniverseService {
      */
     @Override
     public UniverseDTO findByUniverseId(Long universeId) {
+    	
         UniverseDTO universe = universeMapper.findByUniverseId(universeId);
-        
-        if (universe == null) {
-            // 404
-            throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다.");
-        }
-        
+ 
         return universe;
     }
 
@@ -143,8 +139,7 @@ public class UniverseServiceImpl implements UniverseService {
 
         // 404 (데이터 없음)
         UniverseDTO existing = universeMapper.findByUniverseId(universeId);
-        if (existing == null) {
-           
+        if (existing == null) {  
             throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다."); 
         }
 
@@ -165,6 +160,33 @@ public class UniverseServiceImpl implements UniverseService {
         
         return universeMapper.findByUniverseId(universeId);
     }
+    
+    
+    /**
+     *6. 삭제 (DELETE)
+     */
+    @Override
+    @Transactional
+    public UniverseDTO deleteUniverse(Long universeId) {
+        
+        // 1. 조회
+        UniverseDTO existing = universeMapper.findByUniverseId(universeId);
+        
+        // ▼▼▼ [로그 수정] 중괄호 안을 비워야({}) 변수가 들어갑니다.
+        log.info(">>> 조회 결과(null이면 데이터 없는것): {}", existing); 
+        
+        // 2. 데이터 없으면 예외 발생
+        if (existing == null) {  
+            log.info(">>> 데이터가 없습니다. ResourceNotFoundException 발생!");
+            throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다."); 
+        }
+
+        // 3. 삭제 진행
+        universeMapper.deleteUniverse(universeId);
+        log.info(">>> 삭제 완료. ID: {}", universeId);
+        
+        return existing;
+    }
 
     
     // --- 내부 메서드 ---
@@ -173,7 +195,20 @@ public class UniverseServiceImpl implements UniverseService {
     private boolean isValidSort(String sort) {
         return "latest".equals(sort) || "popular".equals(sort);
     }
-
+    
+    
+    // 조회 검사 
+    private UniverseDTO searchExisting(Long universeId) {
+    	
+    	UniverseDTO existing = universeMapper.findByUniverseId(universeId);
+    	
+        if (existing == null) {  
+            throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다."); 
+        }
+    	return existing;
+    } 
+    
+  
     // 무한스크롤 응답 빌더
     private UniverseListResponse buildResponse(List<UniverseDTO> list, int size, String sort) {
         
@@ -207,4 +242,5 @@ public class UniverseServiceImpl implements UniverseService {
                 .pagination(pagination)
                 .build();  
     }
+
 }

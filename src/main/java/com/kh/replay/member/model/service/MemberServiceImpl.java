@@ -52,10 +52,9 @@ public class MemberServiceImpl implements MemberService{
 	
 	//토큰 발급
 	
-	Map<String,String> loginResponse =tokenService.generateToken(user.getMemberName());
+	Map<String,String> loginResponse =tokenService.generateToken(user.getUsername());
 	
-	loginResponse.put("email",user.getUsername());
-	loginResponse.put("memberId",user.getMemberName());
+	loginResponse.put("memberId",user.getUsername());
 	loginResponse.put("password", user.getPassword());
 	loginResponse.put("role", user.getAuthorities().toString());
 	
@@ -109,9 +108,6 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public Map<String, Object> changeInfo(MemberDTO member) {
 		int result = memberMapper.changeInfo(member);
-//		if(result ==0) {
-//			throw new 
-//		}
 		 Map<String, Object> updateMember =memberMapper.findAllMember(member.getMemberId());
 		return  updateMember;
 		
@@ -121,11 +117,9 @@ public class MemberServiceImpl implements MemberService{
 	public void withdrawMember(LocalDTO local) {
 		String memberId = local.getMemberDto().getMemberId();
 		
-		Map<String,String> userInfo =memberMapper.loadUser(local.getMemberDto().getMemberId());
+		Map<String,String> userInfo =memberMapper.loadUser(local.getMemberDto().getEmail());
 		
 		String userPassword =userInfo.get("PASSWORD");
-		log.info("matches 결과: {}", passwordEncoder.matches("asdf@1234", userPassword));
-		log.info("matches 결과: {}", passwordEncoder.matches("test@1234", userPassword));
 		
 		if(!passwordEncoder.matches(local.getPassword(), userPassword)) {
 			log.info("{},{}" ,local.getPassword() , userPassword);

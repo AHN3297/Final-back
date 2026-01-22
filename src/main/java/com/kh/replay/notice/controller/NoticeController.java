@@ -1,10 +1,12 @@
 package com.kh.replay.notice.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -15,6 +17,7 @@ import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.notice.model.dto.NoticeDetailResponseDto;
 import com.kh.replay.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.notice.model.dto.NoticeRequestDto;
+import com.kh.replay.notice.model.dto.NoticeUpdateRequestDto;
 import com.kh.replay.notice.service.NoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -78,6 +81,24 @@ public class NoticeController {
 		
 		NoticeDetailResponseDto result = noticeService.getNoticeDetail(noticeNo);
 		return ResponseData.ok(result, "공지사항 상세 조회 성공");
+	}
+	
+	/**
+	 * 공지사항 수정
+	 * @param noticeNo
+	 * @param requestDto
+	 * @return
+	 */
+	@PutMapping(value="/{noticeNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ResponseData<Void>> updateNotice(
+				@PathVariable("noticeNo") Long noticeNo,
+				@ModelAttribute NoticeUpdateRequestDto requestDto
+			){
+		
+		noticeService.updateNotice(noticeNo, requestDto);
+		
+		return ResponseData.ok(null, "공지사항 수정 성공");
+		
 	}
 
 }

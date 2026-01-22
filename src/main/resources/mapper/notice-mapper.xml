@@ -123,7 +123,7 @@
 			   NOTICE_NO AS noticeNo
 			 , NOTICE_TITLE AS noticeTitle
 			 , NOTICE_CONTENT AS noticeContent
-			 , MEMBER_ID AS memberID
+			 , MEMBER_ID AS memberId
 			 , STATUS AS status
 		  FROM
 		       TB_NOTICE
@@ -145,5 +145,49 @@
 		    BY
 		       IMG_ID ASC 		
 	</select>
+	
+	<update id="updateNotice">
+		UPDATE
+		       TB_NOTICE
+		   SET
+		       NOTICE_TITLE = #{req.noticeTitle}
+		     , NOTICE_CONTENT = #{req.noticeContent}
+		     , UPDATED_AT = SYSDATE
+		 WHERE
+		       NOTICE_NO = #{noticeNo}
+	</update>
+	
+	<update id="deleteNoticeImages">
+		UPDATE
+		       TB_NOTICE_IMG
+		   SET
+		       STATUS = 'N'
+		 WHERE
+		       IMG_ID IN
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+	</update>
+	
+	<insert id="insertNoticeImage">
+		INSERT
+		  INTO
+		       TB_NOTICE_IMG
+		       (
+		       IMG_ID
+		     , ORIGIN_NAME
+		     , CHANGE_NAME
+		     , STATUS
+		     , NOTICE_NO
+		       )
+	    VALUES
+	   		   (
+	   		   SEQ_IMG_ID.NEXTVAL
+	   		 , #{originName}
+	   		 , #{changeName}
+	   		 , 'Y'
+	   		 , #{noticeNo}
+	   		   )
+	</insert>
 	
 </mapper>

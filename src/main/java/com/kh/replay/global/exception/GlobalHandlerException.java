@@ -90,4 +90,10 @@ public class GlobalHandlerException {
         log.error("예상치 못한 서버 에러(500): ", e); 
         return createErrorResponseEntity("서버 내부 오류가 발생했습니다. 관리자에게 문의하세요.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
+    @ExceptionHandler(FileUploadException.class)
+    public ResponseEntity<ResponseData<Object>> handleFileUpload(FileUploadException e) {
+        log.error("파일 업로드 실패(500): {}", e.getMessage(), e);
+        return ResponseData.failure(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

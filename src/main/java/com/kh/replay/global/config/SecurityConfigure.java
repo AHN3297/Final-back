@@ -42,8 +42,20 @@ public class SecurityConfigure {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
 					
-					requests.requestMatchers(HttpMethod.GET, "/api/universes/**").permitAll();
-                    requests.requestMatchers("/api/universes/**").authenticated(); 
+					 // 공지사항: 조회는 전체 허용 / 등록은 ADMIN만
+	                requests.requestMatchers(HttpMethod.GET,  "/api/admin/notices/**").permitAll();
+	                requests.requestMatchers(HttpMethod.POST, "/api/admin/notices/**").hasRole("ADMIN");
+					
+					
+	                // 유니버스 조회는 전체 허용
+	                requests.requestMatchers(HttpMethod.GET, "/api/universes/**").permitAll();
+
+	                // 유니버스 수정/등록/삭제만 로그인 필요
+	                requests.requestMatchers(HttpMethod.POST,   "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.PUT,    "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.PATCH,  "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/universes/**").authenticated();
+
 					
 					// 로그인필요(POST)테스트 플레이 리스트
 					requests.requestMatchers(HttpMethod.POST,"/api/member/playList/**").permitAll();

@@ -15,6 +15,8 @@ public interface NoticeRepository {
 	// 공지사항 전체 목록 조회
 	List<Notice> findAll(@Param("keyword") String keyword,@Param("status") String status,@Param("offset") int offset, @Param("limit")int limit);
 	
+	int countAll(@Param("keyword") String keyword, @Param("status") String status);
+
 	// 공지사항 상세 조회
 	Notice findByNoticeNo(Long noticeNo);
 	
@@ -23,13 +25,21 @@ public interface NoticeRepository {
 	// 공지사항 작성
 	int save(Notice notice);
 	
+	int saveImg(NoticeImg noticeImg);
+
 	// 공지사항 수정
-	int update(Notice notice);
+	int updateNotice(@Param("noticeNo") Long noticeNo,
+					 @Param("noticeTitle") String noticeTitle,
+					 @Param("noticeContent") String noticeContent);
+	
+	int deleteNoticeImages(@Param("imgIds") List<Long> imgIds);
+	
+	int insertNoticeImage(@Param("noticeNo") Long noticeNo,
+						  @Param("originName") String originName,
+						  @Param("changeName") String changeName);
 	
 	// 공지사항 삭제
 	int delete(Long id);
 	
-	int countAll(@Param("keyword") String keyword, @Param("status") String status);
 
-	int saveImg(NoticeImg noticeImg);
 }

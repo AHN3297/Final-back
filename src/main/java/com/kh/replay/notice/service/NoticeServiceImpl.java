@@ -1,5 +1,7 @@
 package com.kh.replay.notice.service;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -131,5 +133,40 @@ public class NoticeServiceImpl implements NoticeService {
 					.build();
 	}
 	
+	@Transactional
+	public void updateNotice(Long noticeNo, String title, String content, String deleteImgIds, List<MultipartFile> files) {
+		
+		// 1. 공지사항 확인
+		Notice origin = noticeRepository.findByNoticeNo(noticeNo);
+		if(origin == null) throw new ResourceNotFoundException("공지사항을 찾을수 없습니다. noticeNo=" + noticeNo);
+		
+		// 2. 본문 수정
+		noticeRepository.updateNotice(noticeNo, title, content);
+		
+		// 3. 이미지 삭제(status 'Y' => 'N')
+		if(deleteImgIds != null && !deleteImgIds.isBlank()) {
+			List<Long> ids = Arrays.stream(deleteImgIds.split(","))
+						.map(String::trim)
+						.filter(s -> !s.isEmpty())
+						.map(Long::valueOf)
+						.toList();
+			if(!ids.isEmpty()) noticeRepository.deleteNoticeImages(ids); 
+		}
+		
+		// 4. 새 이미지 추가
+		if(files != null && !files.isEmpty()) {
+	        for(MultipartFile file : files) {
+	            if(file == null || file.isEmpty()) continue;
+	            
+	            try {
+	            	String url = s3Service.uploadFile(file);
+	            	noticeRepository.insertNoticeImage(noticeNo, file.getOriginalFilename(), url);
+	        
+	            } catch (IOException e) {
+	            	throw new FileUploadException("이미지 업로드에 실패했습니다.", e);
+	            }
+	        }
+	    }
+	}
 
 }

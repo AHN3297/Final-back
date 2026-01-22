@@ -16,9 +16,9 @@ public interface NoticeRepository {
 	List<Notice> findAll(@Param("keyword") String keyword,@Param("status") String status,@Param("offset") int offset, @Param("limit")int limit);
 	
 	// 공지사항 상세 조회
-	Notice findByNoticeNo(@Param("noticeNo") Long noticeNo);
+	Notice findByNoticeNo(Long noticeNo);
 	
-	List<String> findImageUrlsByNoticeNo(@Param("noticeNo") Long noticeNo);
+	List<String> findImageUrlsByNoticeNo(Long noticeNo);
 	
 	// 공지사항 작성
 	int save(Notice notice);

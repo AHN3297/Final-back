@@ -42,6 +42,7 @@ public class ResponseData<T> {
 
    // 4. 생성 성공 (201 Created)
    public static <T> ResponseEntity<ResponseData<T>> created(T data ,String message) {
-      return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseData<T>("생성되었습니다.", data, HttpStatus.CREATED.value(), null));
+      return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseData<T>(message, data, HttpStatus.CREATED.value(), null));
+
    }
 }

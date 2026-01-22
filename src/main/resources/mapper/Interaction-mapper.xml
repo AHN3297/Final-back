@@ -4,19 +4,37 @@
 <mapper namespace="com.kh.replay.global.interaction.model.dao.InteractionMapper">
 
     <select id="checkLike" resultType="int">
-        SELECT COUNT(1) FROM TB_UNIVERSE_LIKED WHERE UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+        SELECT 
+               COUNT(1) 
+          FROM 
+               TB_UNIVERSE_LIKED 
+         WHERE 
+               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
     </select>
     
     <insert id="insertLike">
-        INSERT INTO TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) VALUES (#{universeId}, #{memberId})
+        INSERT 
+          INTO 
+               TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) 
+        VALUES 
+               (#{universeId}, #{memberId})
     </insert>
     
     <delete id="deleteLike">
-        DELETE FROM TB_UNIVERSE_LIKED WHERE UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+        DELETE 
+          FROM 
+               TB_UNIVERSE_LIKED 
+         WHERE 
+               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
     </delete>
     
     <select id="countLikes" resultType="int">
-        SELECT COUNT(1) FROM TB_UNIVERSE_LIKED WHERE UNIVERSE_ID = #{universeId}
+        SELECT 
+               COUNT(1) 
+          FROM 
+               TB_UNIVERSE_LIKED 
+         WHERE 
+               UNIVERSE_ID = #{universeId}
     </select>
 
 </mapper>

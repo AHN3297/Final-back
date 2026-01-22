@@ -20,36 +20,35 @@ public class InteractionServiceImpl implements InteractionService {
     private final UniverseMapper universeMapper;
     private final InteractionMapper interactionMapper;
     private final UniverseValidator validator;
+    private final UniverseLikeManager likeManager; 
 
-    /**
-     * 7. 좋아요 토글
-     */
     @Override
     public LikeResponse toggleLike(Long universeId, String memberId) {
         
-        // 1. 유니버스 존재 확인
+    	//유니버스 조회
         validator.validateExisting(universeId);
 
-        // 2. 좋아요 여부 확인 & 토글
-        int count = interactionMapper.checkLike(universeId, memberId);
-        boolean isLiked;
-
-        if (count > 0) {
-        	interactionMapper.deleteLike(universeId, memberId);
-            isLiked = false;
-        } else {
-        	interactionMapper.insertLike(universeId, memberId);
-            isLiked = true;
-        }
-
-        // 3. 갱신된 총 좋아요 수 조회
-        int totalLikes = interactionMapper.countLikes(universeId);
-
+        //좋아요 상태값 확인
+        boolean isLiked = likeManager.executeToggle(universeId, memberId);
+        
+        //좋아요 갯수 조회
+        int totalLikes = countLikes(universeId);
+        
+        //반환값 생성
         return LikeResponse.builder()
                 .targetId(universeId)
                 .isLiked(isLiked)
                 .likeCount(totalLikes)
                 .build();
+    }
+    
+    
+    //좋아요 갯수 조회용 메소드
+    private int countLikes(Long universeId) {
+    	
+    	int totalLikes = interactionMapper.countLikes(universeId);
+    	
+    	return totalLikes;
     }
 
 }

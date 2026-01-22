@@ -168,10 +168,9 @@ public class UniverseController {
        
     	LikeResponse response = interactionService.toggleLike(universeId, user.getUsername());
     	
-        return ResponseData.ok(response, "좋아요 처리가 완료되었습니다");
+    	String message = response.isLiked() ? "좋아요를 눌렀습니다." : "좋아요를 취소했습니다.";
+    	
+        return ResponseData.ok(response, message);
     }
-    
-    
-    
     
 }

@@ -2,6 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.replay.playList.model.dao.PlayListMapper">
 	
+	<select id="checkPlayListOwnership" resultType="_int">
+        SELECT 
+               COUNT(*)
+          FROM 
+               TB_PLAYLIST
+         WHERE 
+               PLAYLIST_ID = #{playListId}
+           AND 
+               MEMBER_ID = #{memberId}
+    </select>
+	
 	<insert id="createPlayList">
 	    <selectKey keyProperty="playListId" resultType="int" order="BEFORE">
 	        SELECT SEQ_PLAYLIST_ID.NEXTVAL FROM DUAL
@@ -83,36 +94,40 @@
 	           MEMBER_ID = #{memberId}
 	</delete>
 	
-	<insert id="createTrack" useGeneratedKeys="true" keyProperty="trackId" keyColumn="SONG_NO">
+	<insert id="createTrack">
+	    <selectKey keyProperty="songNo" resultType="long" order="BEFORE">
+	        SELECT SEQ_SONG_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	
 	    INSERT 
 	      INTO 
 	           TB_PLAYLIST_TRACK 
 	           (
-	            SONG_NO
-	          , ARTIST_ID
-	          , TRACK_ID
-	          , ALBUM
-	          , DURATION
-	          , PREVIEW_URL
-	          , RELEASE_DATE
-	          , COVERIMG_URL
-	          , TITLE
-	          , ARTIST_NAME
-	          , GENRE_NAME
-	            ) 
+	             SONG_NO
+	           , ARTIST_ID 
+	           , TRACK_ID 
+	           , ALBUM 
+	           , DURATION 
+	           , PREVIEW_URL 
+	           , RELEASE_DATE 
+	           , COVERIMG_URL 
+	           , TITLE
+	           , ARTIST_NAME
+	           , GENRE_NAME
+	           ) 
 	    VALUES (
-	            SEQ_SONG_NO.NEXTVAL
-	          , #{artistId}
-	          , #{trackId}
-	          , #{album}
-	          , #{duration}
-	          , #{previewUrl}
-	          , #{releaseDate}
-	          , #{coverImgUrl}
-	          , #{title}
-	          , #{artistName}
-	          , #{genreName}
-	            )
+	             #{songNo} 
+	           , #{artistId}
+	           , #{trackId}
+	           , #{album}
+	           , #{duration}
+	           , #{previewUrl}
+	           , #{releaseDate}
+	           , #{coverImgUrl}
+	           , #{title}
+	           , #{artistName}
+	           , #{genreName}
+	           )
 	</insert>
 	
 	<insert id="insertPlaylistSong">
@@ -125,11 +140,12 @@
 	         , SONG_ID
 	         , TRACK_ORDER
 	           ) 
-	   VALUES (
+	   VALUES  
+	           (
 	           SEQ_PL_SONG_NO.NEXTVAL
 	         , #{playListId}
-	         , #{songNo}
-	         , #{trackOrder}
+	         , #{trackId}    
+	         , #{nextOrder}  
 	           )
 	</insert>
 	
@@ -141,5 +157,60 @@
 	     WHERE 
 	           PLAYLIST_ID = #{playListId}
 	</select>
+	
+	<select id="getNewSongNo" resultType="long">
+	    SELECT 
+	           SEQ_SONG_NO.NEXTVAL 
+	      FROM 
+	           DUAL
+	</select>
+	
+	<select id="selectPlaylistTracks" resultType="com.kh.replay.playList.model.vo.PlayListTrackVO">
+	    SELECT 
+	           T.SONG_NO
+	         , T.TRACK_ID
+	         , T.ARTIST_ID
+	         , T.TITLE
+	         , T.ARTIST_NAME
+	         , T.ALBUM
+	         , T.DURATION
+	         , T.COVERIMG_URL
+	         , T.PREVIEW_URL
+	         , T.GENRE_NAME  
+	         , T.RELEASE_DATE
+	         , L.TRACK_ORDER
+	      FROM 
+	           TB_PLAYLIST_SONG_LIST L
+	      JOIN 
+	           TB_PLAYLIST P ON L.PLAYLIST_ID = P.PLAYLIST_ID
+	      JOIN 
+	           TB_PLAYLIST_TRACK T ON L.SONG_ID = T.SONG_NO
+	     WHERE 
+	           L.PLAYLIST_ID = #{playListId}
+	       AND 
+	           P.MEMBER_ID = #{memberId}
+	     ORDER BY 
+	           L.TRACK_ORDER ASC
+	</select>
+	
+	<update id="updateTrackOrder">
+	    UPDATE 
+	           TB_PLAYLIST_SONG_LIST
+	       SET 
+	           TRACK_ORDER = #{item.trackOrder},
+	           UPDATE_AT = SYSDATE
+	     WHERE 
+	           PLAYLIST_SONG_NO = #{item.playlistSongNo}
+	</update>
+	
+		<delete id="deletePlaylistTracks">
+	    DELETE 
+	      FROM 
+	           TB_PLAYLIST_SONG_LIST
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           SONG_ID = #{songId}
+		</delete>
 	
 </mapper>

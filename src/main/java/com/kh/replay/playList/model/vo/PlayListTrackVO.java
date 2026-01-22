@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class PlayListTrackVO {
+	private Long songNo;
 	private Long trackId;       // TRACK_ID 
     private Long artistId;      // ARTIST_ID 
     private String title;       // TITLE

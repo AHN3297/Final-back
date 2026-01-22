@@ -41,9 +41,10 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
+
 					
 					// Test용
-					requests.requestMatchers("/api/universes/**", "/api/member/playList/**").permitAll();
+					requests.requestMatchers("/api/universes/**", "/api/member/playList/**", "api/music/**").permitAll();
 					
 					
 					// 비로그인 허용

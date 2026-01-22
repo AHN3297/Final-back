@@ -28,13 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtFilter extends OncePerRequestFilter {
 	private final JwtUtil jwtUtil;
 	private final UserDetailsServiceImpl userDetailsService;
-	//필터의 주요 로직을 구현하는 메서드 , 요청이 들어올때마다 호출됨
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		
 		String uri = request.getRequestURI();
-		if(uri.equals("/api/auth/members/login" ) || uri.equals("/api/auth/signUp")) {
+		if(uri.equals("/api/members/login" ) || uri.equals("/api/auth/signUp")) {
 			filterChain.doFilter(request, response);
 			return;
 		}

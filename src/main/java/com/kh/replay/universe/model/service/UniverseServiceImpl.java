@@ -172,9 +172,6 @@ public class UniverseServiceImpl implements UniverseService {
         // 1. 조회
         UniverseDTO existing = universeMapper.findByUniverseId(universeId);
         
-        // ▼▼▼ [로그 수정] 중괄호 안을 비워야({}) 변수가 들어갑니다.
-        log.info(">>> 조회 결과(null이면 데이터 없는것): {}", existing); 
-        
         // 2. 데이터 없으면 예외 발생
         if (existing == null) {  
             log.info(">>> 데이터가 없습니다. ResourceNotFoundException 발생!");

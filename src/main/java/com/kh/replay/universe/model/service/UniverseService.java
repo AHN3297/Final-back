@@ -18,10 +18,10 @@ public interface UniverseService {
 	UniverseDTO findByUniverseId(Long universeId);
 	
 	//유니버스 생성
-	void createUniverse(UniverseCreateRequest request, MultipartFile file);
+	void createUniverse(UniverseCreateRequest request, MultipartFile file, String userId);
 	
 	//유니버스 수정
-	UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest universe);
+	UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest request, String userId);
 	
 	//유니버스 삭제
 	UniverseDTO deleteUniverse(Long universeId, String userId); 

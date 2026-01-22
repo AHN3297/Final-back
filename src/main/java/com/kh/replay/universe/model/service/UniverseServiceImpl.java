@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.kh.replay.global.exception.ForbiddenException;
 import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.s3.S3Service;
+import com.kh.replay.member.model.vo.CustomUserDetails;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
 import com.kh.replay.universe.model.dto.UniverseListResponse;
@@ -85,7 +86,7 @@ public class UniverseServiceImpl implements UniverseService {
      * 4. 생성 
      */
     @Override
-    public void createUniverse(UniverseCreateRequest request, MultipartFile file) { 
+    public void createUniverse(UniverseCreateRequest request, MultipartFile file, String userId) { 
         
         String imageUrl = null;
         
@@ -103,7 +104,7 @@ public class UniverseServiceImpl implements UniverseService {
                 .title(request.getTitle())
                 .layoutData(request.getLayoutData())
                 .themeCode(request.getThemeCode())
-                .memberId(request.getMemberId())
+                .memberId(userId)
                 .thumbnailUrl(imageUrl)
                 .build();
         
@@ -114,24 +115,26 @@ public class UniverseServiceImpl implements UniverseService {
         }
     }
 
+
     /**
-     * 5. 수정 (PATCH)
+     * 5. 수정 (PATCH) 
      */
     @Override
-    public UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest request) {
+    public UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest request, String userId) {
         
+    	UniverseDTO existing = searchExisting(universeId);
+    	
+    	// 1.권한 확인
+        if (!existing.getMemberId().equals(userId)) { 
+            throw new ForbiddenException("해당 유니버스 접근 권한이 없습니다."); 
+        }
+        
+        // 2. 필수값 확인
         if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("유니버스 제목은 필수 입력 값입니다.");
         }
 
-        // 1. 존재 여부 확인 
-        UniverseDTO existing = searchExisting(universeId);
-
-        // 2. 권한 확인
-        if (!existing.getMemberId().equals(request.getMemberId())) {
-            throw new ForbiddenException("해당 유니버스 접근 권한이 없습니다."); 
-        }
-        
+ 
         // 3. 수정 진행
         UniverseDTO update = UniverseDTO.builder()
                 .universeId(universeId)
@@ -139,6 +142,7 @@ public class UniverseServiceImpl implements UniverseService {
                 .layoutData(request.getLayoutData())
                 .themeCode(request.getThemeCode()) 
                 .status(request.getStatus())
+                // .memberId(userId) <-- 수정 시 주인은 바뀌면 안 되므로 넣지 않음 (보통)
                 .build();
         
         universeMapper.updateUniverse(update);

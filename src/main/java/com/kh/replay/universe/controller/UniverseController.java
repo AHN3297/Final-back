@@ -105,10 +105,11 @@ public class UniverseController {
     @PostMapping
     public ResponseEntity<ResponseData<Void>> createUniverse(
             @RequestPart(value = "request") UniverseCreateRequest request, 
-            @RequestPart(value = "file", required = false) MultipartFile file
+            @RequestPart(value = "file", required = false) MultipartFile file,
+            @AuthenticationPrincipal CustomUserDetails user 
     ) {
         
-        universeService.createUniverse(request, file);
+        universeService.createUniverse(request, file, user.getUsername());
         
         // 데이터는 null, 메시지만 보냄
         return ResponseData.ok(null, "유니버스 생성 성공");
@@ -121,9 +122,13 @@ public class UniverseController {
      * @return
      */
     @PatchMapping("{universeId}")
-    public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(@PathVariable("universeId")  Long universeId, @RequestBody UniverseCreateRequest universe) {
+    public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(
+    		@PathVariable("universeId")  Long universeId, 
+    		@RequestBody UniverseCreateRequest universe,
+    		@AuthenticationPrincipal CustomUserDetails user 
+    		) {
         
-    	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe);
+    	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe, user.getUsername());
         
         return ResponseData.ok(resonse, "유니버스 수정 성공");
     }

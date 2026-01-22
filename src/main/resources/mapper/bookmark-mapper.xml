@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.global.bookmark.model.dao.BookmarkMapper">
+
+    <select id="checkBookmark" resultType="int">
+        SELECT 
+               COUNT(1) 
+          FROM 
+               TB_FAV_UNIVERSE 
+         WHERE 
+               UNIVERSE_ID = #{universeId} 
+           AND MEMBER_ID = #{memberId}
+    </select>
+    
+    <insert id="insertBookmark">
+        INSERT 
+          INTO 
+               TB_FAV_UNIVERSE (
+                   FAV_UNIVERSE_NO, 
+                   UNIVERSE_ID, 
+                   MEMBER_ID, 
+                   CREATED_AT, 
+                   UPDATED_AT
+               ) 
+        VALUES (
+               SEQ_FAV_UNIVERSE_NO.NEXTVAL, 
+               #{universeId}, 
+               #{memberId}, 
+               SYSDATE, 
+               SYSDATE
+               )
+    </insert>
+    
+    
+    <select id="countBookmark" resultType="int">
+        SELECT 
+               COUNT(1) 
+          FROM 
+               TB_FAV_UNIVERSE 
+         WHERE 
+               UNIVERSE_ID = #{universeId}
+    </select>
+
+</mapper>

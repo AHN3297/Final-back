@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.replay.global.bookmark.model.dto.BookmarkResponse;
+import com.kh.replay.global.bookmark.model.service.BookmarkService;
 import com.kh.replay.global.common.ResponseData;
-import com.kh.replay.global.interaction.model.dto.LikeResponse;
-import com.kh.replay.global.interaction.model.service.InteractionService;
+import com.kh.replay.global.like.model.dto.LikeResponse;
+import com.kh.replay.global.like.model.service.LikeService;
 import com.kh.replay.member.model.vo.CustomUserDetails;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
@@ -37,7 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UniverseController {
     
     private final UniverseService universeService;
-    private final InteractionService interactionService;
+    private final LikeService likeService;
+    private final BookmarkService bookmarkService;
     
 
     /**
@@ -164,7 +167,7 @@ public class UniverseController {
             @AuthenticationPrincipal CustomUserDetails user 
     ) {
         // 추가 서비스 
-        LikeResponse response = interactionService.likeUniverse(universeId, user.getUsername());
+        LikeResponse response = likeService.likeUniverse(universeId, user.getUsername());
         
         return ResponseData.ok(response, "좋아요를 눌렀습니다.");
     }
@@ -178,9 +181,25 @@ public class UniverseController {
             @AuthenticationPrincipal CustomUserDetails user 
     ) {
         //삭제서비스
-        LikeResponse response = interactionService.unlikeUniverse(universeId, user.getUsername());
+        LikeResponse response = likeService.unlikeUniverse(universeId, user.getUsername());
         
         return ResponseData.ok(response, "좋아요를 취소했습니다.");
     }
+    
+    /**
+     * 7. 유니버스 북마크 (생성)
+     */
+    @PostMapping("/{universeId}/bookmark")
+    public ResponseEntity<ResponseData<BookmarkResponse>> bookmarkUniverse(
+            @PathVariable("universeId") Long universeId,
+            @AuthenticationPrincipal CustomUserDetails user 
+    ) {
+        // 추가 서비스 
+    	BookmarkResponse response = bookmarkService.bookmarkUniverse(universeId, user.getUsername());
+        
+        return ResponseData.ok(response, "좋아요를 눌렀습니다.");
+    }
+    
+    
     
 }

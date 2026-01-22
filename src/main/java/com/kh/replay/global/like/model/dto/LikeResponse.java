@@ -1,4 +1,4 @@
-package com.kh.replay.global.interaction.model.dto;
+package com.kh.replay.global.like.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

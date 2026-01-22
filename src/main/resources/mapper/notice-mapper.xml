@@ -117,4 +117,33 @@
 	           NOTICE_NO = #{id}
 	</select>
 	
+	<select id="findByNoticeNo"
+			resultType="com.kh.replay.notice.model.domain.Notice">
+		SELECT
+			   NOTICE_NO AS noticeNo
+			 , NOTICE_TITLE AS noticeTitle
+			 , NOTICE_CONTENT AS noticeContent
+			 , MEMBER_ID AS memberID
+			 , STATUS AS status
+		  FROM
+		       TB_NOTICE
+		 WHERE
+		       NOTICE_NO = #{noticeNo}
+	</select>
+	
+	<select id="findImageUrlsByNoticeNo"
+			resultType="string">
+		SELECT
+		       CHANGE_NAME
+		  FROM
+		       TB_NOTICE_IMG
+		 WHERE
+		       NOTICE_NO = #{noticeNo}
+		   AND
+		       STATUS = 'Y'
+		 ORDER
+		    BY
+		       IMG_ID ASC 		
+	</select>
+	
 </mapper>

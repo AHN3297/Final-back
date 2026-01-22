@@ -42,9 +42,14 @@ public class SecurityConfigure {
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
 					
-					 // 공지사항: 조회는 전체 허용 / 등록은 ADMIN만
+					 // 공지 조회(전체)
 	                requests.requestMatchers(HttpMethod.GET,  "/api/admin/notices/**").permitAll();
+	                
+	                // 관리자 공지 등록/수정/삭제(ADMIN)
 	                requests.requestMatchers(HttpMethod.POST, "/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.PUT,  "/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.PATCH,"/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.DELETE,"/api/admin/notices/**").hasRole("ADMIN");
 					
 					
 	                // 유니버스 조회는 전체 허용

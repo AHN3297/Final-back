@@ -1,6 +1,5 @@
 package com.kh.replay.notice.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.exception.FileUploadException;
+import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.s3.S3Service;
 import com.kh.replay.global.util.PageInfo;
 import com.kh.replay.global.util.Pagenation;
 import com.kh.replay.notice.model.domain.Notice;
 import com.kh.replay.notice.model.domain.NoticeImg;
+import com.kh.replay.notice.model.dto.NoticeDetailResponseDto;
 import com.kh.replay.notice.model.dto.NoticeItemDto;
 import com.kh.replay.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.notice.model.dto.NoticeRequestDto;
@@ -100,6 +101,35 @@ public class NoticeServiceImpl implements NoticeService {
 		}
 	}
 	
+	@Override
+	@Transactional(readOnly = true)
+	public NoticeDetailResponseDto getNoticeDetail(Long noticeNo) {
+		
+		// 1. 본문 조회
+		Notice notice = noticeRepository.findByNoticeNo(noticeNo);
+		
+		if (notice == null) {
+			throw new ResourceNotFoundException("공지사항을 찾을수 업습니다. noticeNo=" + noticeNo);
+		}
+		
+		// Status "Y"만 노출
+		if (!"Y".equals(notice.getStatus())) {
+			throw new ResourceNotFoundException("비활성화된 공지사항입니다. notice=" + noticeNo);
+		}
+		
+		// 2. 이미지 조회
+		List<String> images = noticeRepository.findImageUrlsByNoticeNo(noticeNo);
+		
+		// 3. DTO 조립
+		return NoticeDetailResponseDto.builder()
+					.noticeNo(notice.getNoticeNo())
+					.title(notice.getNoticeTitle())
+					.content(notice.getNoticeContent())
+					.memberId(notice.getMemberId())
+					.status(notice.getStatus())
+					.images(images)
+					.build();
+	}
 	
 
 }

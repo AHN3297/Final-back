@@ -20,6 +20,7 @@ import com.kh.replay.notice.model.dto.NoticeDetailResponseDto;
 import com.kh.replay.notice.model.dto.NoticeItemDto;
 import com.kh.replay.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.notice.model.dto.NoticeRequestDto;
+import com.kh.replay.notice.model.dto.NoticeUpdateRequestDto;
 import com.kh.replay.notice.model.repository.NoticeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -134,16 +135,23 @@ public class NoticeServiceImpl implements NoticeService {
 	}
 	
 	@Transactional
-	public void updateNotice(Long noticeNo, String title, String content, String deleteImgIds, List<MultipartFile> files) {
+	public void updateNotice(Long noticeNo, NoticeUpdateRequestDto requestDto) {
 		
 		// 1. 공지사항 확인
 		Notice origin = noticeRepository.findByNoticeNo(noticeNo);
 		if(origin == null) throw new ResourceNotFoundException("공지사항을 찾을수 없습니다. noticeNo=" + noticeNo);
 		
-		// 2. 본문 수정
+		
+		// 2. Dto 값 꺼내기
+		String title = requestDto.getNoticeTitle();
+	    String content = requestDto.getNoticeContent();
+	    String deleteImgIds = requestDto.getDeleteImgIds();
+	    List<MultipartFile> files = requestDto.getFiles();
+	    
+		// 3. 본문 수정
 		noticeRepository.updateNotice(noticeNo, title, content);
 		
-		// 3. 이미지 삭제(status 'Y' => 'N')
+		// 4. 이미지 삭제(status 'Y' => 'N')
 		if(deleteImgIds != null && !deleteImgIds.isBlank()) {
 			List<Long> ids = Arrays.stream(deleteImgIds.split(","))
 						.map(String::trim)
@@ -153,7 +161,7 @@ public class NoticeServiceImpl implements NoticeService {
 			if(!ids.isEmpty()) noticeRepository.deleteNoticeImages(ids); 
 		}
 		
-		// 4. 새 이미지 추가
+		// 5. 새 이미지 추가
 		if(files != null && !files.isEmpty()) {
 	        for(MultipartFile file : files) {
 	            if(file == null || file.isEmpty()) continue;

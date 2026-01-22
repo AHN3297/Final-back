@@ -1,8 +1,8 @@
 package com.kh.replay.notice.controller;
 
-import java.util.List;
 import java.util.Map;
 
+import org.apache.http.protocol.ResponseDate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +20,7 @@ import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.notice.model.dto.NoticeDetailResponseDto;
 import com.kh.replay.notice.model.dto.NoticeListResponseDto;
 import com.kh.replay.notice.model.dto.NoticeRequestDto;
+import com.kh.replay.notice.model.dto.NoticeUpdateRequestDto;
 import com.kh.replay.notice.service.NoticeService;
 
 import lombok.RequiredArgsConstructor;
@@ -86,17 +87,14 @@ public class NoticeController {
 	}
 	
 	@PutMapping(value="/{noticeNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> updateNotice(
+	public ResponseEntity<ResponseData<Void>> updateNotice(
 				@PathVariable("noticeNo") Long noticeNo,
-				@RequestParam("noticeTitle") String noticeTitle,
-				@RequestParam("noticeContent") String noticeContent,
-				@RequestParam(value= "deleteImgIds", required = false) String deleteImgIds,
-				@RequestParam(value= "files", required = false) List<MultipartFile> files
+				@ModelAttribute NoticeUpdateRequestDto requestDto
 			){
 		
-		noticeService.updateNotice(noticeNo, noticeTitle, noticeContent, deleteImgIds, files);
+		noticeService.updateNotice(noticeNo, requestDto);
 		
-		return ResponseEntity.ok().body(Map.of("message", "공지사항 수정 성공"));
+		return ResponseData.ok(null, "공지사항 수정 성공");
 		
 	}
 

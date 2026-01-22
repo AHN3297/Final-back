@@ -13,7 +13,7 @@ import com.kh.replay.notice.model.domain.NoticeImg;
 public interface NoticeRepository {
 
 	// 공지사항 전체 목록 조회
-	List<Notice> findAll(@Param("keyword") String keyword,@Param("status") String status, int offset, int limit);
+	List<Notice> findAll(@Param("keyword") String keyword,@Param("status") String status,@Param("offset") int offset, @Param("limit")int limit);
 	
 	// 공지사항 상세 조회
 	Notice findById(Long id);

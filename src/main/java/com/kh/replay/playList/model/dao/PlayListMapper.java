@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import org.apache.ibatis.annotations.Param;
 import com.kh.replay.playList.model.dto.PlayListDTO;
+import com.kh.replay.playList.model.vo.PlayListTrackVO;
 import com.kh.replay.playList.model.vo.PlayListVO;
 
 @Mapper
@@ -31,6 +32,12 @@ public interface PlayListMapper {
 
 	// 플레이리스트 삭제
 	int deletePlayList(@Param("playListId") int playListId, @Param("memberId") String memberId);
+
+	int createTrack(PlayListTrackVO trackVo);
+
+	int insertPlaylistSong(int playListId, Long trackId, int nextOrder);
+
+	int getNextTrackOrder(int playListId);
 	
 	
 

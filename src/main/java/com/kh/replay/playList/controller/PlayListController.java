@@ -5,6 +5,7 @@ package com.kh.replay.playList.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.kh.replay.global.api.model.dto.MusicDTO;
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.member.model.vo.CustomUserDetails;
 import com.kh.replay.playList.model.dto.PlayListDTO;
 import com.kh.replay.playList.model.service.PlayListService;
 
@@ -33,7 +36,7 @@ public class PlayListController {
     public ResponseEntity<ResponseData<Integer>> createPlayList(
             @RequestBody PlayListDTO playListDto,
             //@SessionAttribute(name="loginUser") String memberId) {
-            @RequestParam(name="memberId") String memberId){
+            @PathVariable(name="memberId") String memberId){
         
         // 서비스에서 실패 시 예외를 던지므로 성공 데이터(ID)만 받으면 됨
         int playListId = playListService.createPlayList(playListDto, memberId);
@@ -45,7 +48,7 @@ public class PlayListController {
 	// 플레이 리스트 목록 조회
 	@GetMapping
 	public ResponseEntity<ResponseData<List<PlayListDTO>>> findAllPlaylist(
-	        @RequestParam(name = "memberId") String memberId) {
+	        @PathVariable(name = "memberId") String memberId) {
 	    List<PlayListDTO> list = playListService.findAllMemberPlayLists(memberId);
 	    return ResponseData.ok(list, "내 플레이리스트 목록 조회 성공");
 	}
@@ -53,8 +56,8 @@ public class PlayListController {
 	// 메인 플레이리스트 지정
 	@PostMapping("/main")
 	public ResponseEntity<ResponseData<Integer>> mainPlayList(
-	        @RequestParam(name="memberId") String memberId,
-	        @RequestParam(name="playListId") int playListId) {	    
+	        @PathVariable(name="memberId") String memberId,
+	        @PathVariable(name="playListId") int playListId) {	    
 	    int result = playListService.updateMainPlayList(memberId, playListId);
 	    return ResponseData.ok(result, "메인 플레이리스트로 지정되었습니다.");
 	}
@@ -63,7 +66,7 @@ public class PlayListController {
 	@PatchMapping("/{playListId}")
 	public ResponseEntity<ResponseData<Integer>> updatePlayListName(
 	    @PathVariable(name = "playListId") int playListId, 
-	    @RequestParam(name = "memberId") String memberId, // 후에 수정해야함
+	    @PathVariable(name = "memberId") String memberId, // 후에 수정해야함
 	    @RequestBody PlayListDTO playListDto) {
 	    
 	    int result = playListService.updatePlayListName(playListId, memberId, playListDto.getPlayListName());  
@@ -73,7 +76,7 @@ public class PlayListController {
 	@DeleteMapping("/{playListId}")
 	public ResponseEntity<ResponseData<Integer>> deletePlayList(
 	        @PathVariable(name = "playListId") int playListId,
-	        @RequestParam(name = "memberId") String memberId) {
+	        @PathVariable(name = "memberId") String memberId) {
 	    
 	    // 서비스 호출
 	    int result = playListService.deletePlayList(playListId, memberId);
@@ -83,6 +86,18 @@ public class PlayListController {
 	
 	
 	// 플레이리스트에 노래 추가
+	@PostMapping("/{playListId}/tracks")
+	public ResponseEntity<ResponseData<Integer>> createPlayListSong(
+			@RequestBody MusicDTO musicDto,
+			@PathVariable(name = "playListId") int playListId,
+			@AuthenticationPrincipal CustomUserDetails user){
+		
+		String memberId = user.getUsername();
+		
+		int result = playListService.createPlayListSong(musicDto, playListId);
+		
+		return ResponseData.created(result, "플레이리스트에 곡이 추가 되었습니다.");
+	}
 	
 	// 플레이리스트 상세 조회(노래 조회)
 	

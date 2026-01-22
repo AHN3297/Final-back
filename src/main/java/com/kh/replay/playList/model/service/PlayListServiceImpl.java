@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.kh.replay.global.api.model.dto.MusicDTO;
 import com.kh.replay.playList.model.dao.PlayListMapper;
 import com.kh.replay.playList.model.dto.PlayListDTO;
+import com.kh.replay.playList.model.vo.PlayListTrackVO;
 import com.kh.replay.playList.model.vo.PlayListVO;
 
 import lombok.RequiredArgsConstructor;
@@ -77,4 +79,40 @@ public class PlayListServiceImpl implements PlayListService {
         }
         return result;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int createPlayListSong(MusicDTO musicDto, int playListId) {
+        // 1. MusicDTO를 PlayListTrackVO로 변환 (빌더 패턴 활용)
+        PlayListTrackVO trackVo = PlayListTrackVO.builder()
+                .artistId(musicDto.getArtistId())
+                .title(musicDto.getTitle())
+                .artistName(musicDto.getArtistName())
+                .album(musicDto.getAlbum())
+                .genreName(musicDto.getGenreName())
+                .coverImgUrl(musicDto.getCoverImgUrl())
+                .previewUrl(musicDto.getPreviewUrl())
+                .releaseDate(musicDto.getReleaseDate())
+                .duration(musicDto.getDuration())
+                .build();
+
+        // 2. 곡 정보 저장 (TB_PLAYLIST_TRACK)
+        playListMapper.createTrack(trackVo);
+
+        // 3. ★ 핵심: 다음 트랙 번호 가져오기
+        // 
+        int nextOrder = playListMapper.getNextTrackOrder(playListId);
+
+        // 4. 중간 테이블 삽입 (TB_PLAYLIST_SONG_LIST)
+        // 파라미터로 nextOrder를 넘겨줍니다.
+        int result = playListMapper.insertPlaylistSong(playListId, trackVo.getTrackId(), nextOrder);
+
+        if (result <= 0) {
+            throw new RuntimeException("플레이리스트 곡 등록 실패");
+        }
+
+        return result;
+    }
+    
+    
 }

@@ -2,6 +2,7 @@ package com.kh.replay.playList.model.service;
 
 import java.util.List;
 
+import com.kh.replay.global.api.model.dto.MusicDTO;
 import com.kh.replay.playList.model.dto.PlayListDTO;
 
 
@@ -16,5 +17,7 @@ public interface PlayListService {
 	int updatePlayListName(int playListId, String playListName, String newName);
 
 	int deletePlayList(int playListId, String memberId);
+
+	int createPlayListSong(MusicDTO musicDto, int playListId);
 
 }

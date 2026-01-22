@@ -83,4 +83,63 @@
 	           MEMBER_ID = #{memberId}
 	</delete>
 	
+	<insert id="createTrack" useGeneratedKeys="true" keyProperty="trackId" keyColumn="SONG_NO">
+	    INSERT 
+	      INTO 
+	           TB_PLAYLIST_TRACK 
+	           (
+	            SONG_NO
+	          , ARTIST_ID
+	          , TRACK_ID
+	          , ALBUM
+	          , DURATION
+	          , PREVIEW_URL
+	          , RELEASE_DATE
+	          , COVERIMG_URL
+	          , TITLE
+	          , ARTIST_NAME
+	          , GENRE_NAME
+	            ) 
+	    VALUES (
+	            SEQ_SONG_NO.NEXTVAL
+	          , #{artistId}
+	          , #{trackId}
+	          , #{album}
+	          , #{duration}
+	          , #{previewUrl}
+	          , #{releaseDate}
+	          , #{coverImgUrl}
+	          , #{title}
+	          , #{artistName}
+	          , #{genreName}
+	            )
+	</insert>
+	
+	<insert id="insertPlaylistSong">
+	    INSERT 
+	      INTO 
+	           TB_PLAYLIST_SONG_LIST 
+	           (
+	           PLAYLIST_SONG_NO
+	         , PLAYLIST_ID
+	         , SONG_ID
+	         , TRACK_ORDER
+	           ) 
+	   VALUES (
+	           SEQ_PL_SONG_NO.NEXTVAL
+	         , #{playListId}
+	         , #{songNo}
+	         , #{trackOrder}
+	           )
+	</insert>
+	
+	<select id="getNextTrackOrder" resultType="_int">
+	    SELECT 
+	           NVL(MAX(TRACK_ORDER), 0) + 1
+	      FROM 
+	           TB_PLAYLIST_SONG_LIST
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	</select>
+	
 </mapper>

@@ -8,6 +8,7 @@ import org.apache.ibatis.session.RowBounds;
 
 import com.kh.replay.notice.model.domain.Notice;
 import com.kh.replay.notice.model.domain.NoticeImg;
+import com.kh.replay.notice.model.dto.NoticeUpdateRequestDto;
 
 @Mapper
 public interface NoticeRepository {
@@ -29,10 +30,9 @@ public interface NoticeRepository {
 
 	// 공지사항 수정
 	int updateNotice(@Param("noticeNo") Long noticeNo,
-					 @Param("noticeTitle") String noticeTitle,
-					 @Param("noticeContent") String noticeContent);
+					 @Param("req") NoticeUpdateRequestDto req);
 	
-	int deleteNoticeImages(@Param("imgIds") List<Long> imgIds);
+	int deleteNoticeImages(List<Long> imgIds);
 	
 	int insertNoticeImage(@Param("noticeNo") Long noticeNo,
 						  @Param("originName") String originName,

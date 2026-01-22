@@ -141,17 +141,12 @@ public class NoticeServiceImpl implements NoticeService {
 		Notice origin = noticeRepository.findByNoticeNo(noticeNo);
 		if(origin == null) throw new ResourceNotFoundException("공지사항을 찾을수 없습니다. noticeNo=" + noticeNo);
 		
+		 
+		// 2. 본문 수정
+		noticeRepository.updateNotice(noticeNo, requestDto);
 		
-		// 2. Dto 값 꺼내기
-		String title = requestDto.getNoticeTitle();
-	    String content = requestDto.getNoticeContent();
-	    String deleteImgIds = requestDto.getDeleteImgIds();
-	    List<MultipartFile> files = requestDto.getFiles();
-	    
-		// 3. 본문 수정
-		noticeRepository.updateNotice(noticeNo, title, content);
-		
-		// 4. 이미지 삭제(status 'Y' => 'N')
+		// 3. 이미지 삭제(status 'Y' => 'N')
+		String deleteImgIds = requestDto.getDeleteImgIds();
 		if(deleteImgIds != null && !deleteImgIds.isBlank()) {
 			List<Long> ids = Arrays.stream(deleteImgIds.split(","))
 						.map(String::trim)
@@ -161,7 +156,8 @@ public class NoticeServiceImpl implements NoticeService {
 			if(!ids.isEmpty()) noticeRepository.deleteNoticeImages(ids); 
 		}
 		
-		// 5. 새 이미지 추가
+		// 4. 새 이미지 추가
+		List<MultipartFile> files = requestDto.getFiles();
 		if(files != null && !files.isEmpty()) {
 	        for(MultipartFile file : files) {
 	            if(file == null || file.isEmpty()) continue;

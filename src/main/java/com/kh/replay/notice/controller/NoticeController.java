@@ -1,8 +1,5 @@
 package com.kh.replay.notice.controller;
 
-import java.util.Map;
-
-import org.apache.http.protocol.ResponseDate;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,6 +83,12 @@ public class NoticeController {
 		return ResponseData.ok(result, "공지사항 상세 조회 성공");
 	}
 	
+	/**
+	 * 공지사항 수정
+	 * @param noticeNo
+	 * @param requestDto
+	 * @return
+	 */
 	@PutMapping(value="/{noticeNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseData<Void>> updateNotice(
 				@PathVariable("noticeNo") Long noticeNo,

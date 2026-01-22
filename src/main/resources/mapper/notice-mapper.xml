@@ -123,7 +123,7 @@
 			   NOTICE_NO AS noticeNo
 			 , NOTICE_TITLE AS noticeTitle
 			 , NOTICE_CONTENT AS noticeContent
-			 , MEMBER_ID AS memberID
+			 , MEMBER_ID AS memberId
 			 , STATUS AS status
 		  FROM
 		       TB_NOTICE
@@ -150,8 +150,8 @@
 		UPDATE
 		       TB_NOTICE
 		   SET
-		       NOTICE_TITLE = #{noticeTitle}
-		     , NOTICE_CONTENT = #{noticeContent}
+		       NOTICE_TITLE = #{req.noticeTitle}
+		     , NOTICE_CONTENT = #{req.noticeContent}
 		     , UPDATED_AT = SYSDATE
 		 WHERE
 		       NOTICE_NO = #{noticeNo}
@@ -164,7 +164,7 @@
 		       STATUS = 'N'
 		 WHERE
 		       IMG_ID IN
-		<foreach collection="imgIds" item="id" open="(" close=")" separator=",">
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
 			#{id}
 		</foreach>
 	</update>

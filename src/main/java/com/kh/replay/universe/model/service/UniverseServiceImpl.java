@@ -8,14 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kh.replay.global.exception.ForbiddenException;
-import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.s3.S3Service;
-import com.kh.replay.member.model.vo.CustomUserDetails;
+import com.kh.replay.universe.model.dao.UniverseMapper;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
 import com.kh.replay.universe.model.dto.UniverseListResponse;
-import com.kh.replay.universe.model.mapper.UniverseMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +25,7 @@ public class UniverseServiceImpl implements UniverseService {
 
     private final UniverseMapper universeMapper;
     private final S3Service s3Service;
+    private final UniverseValidator validator; // 검증컴포넌트
 
     // 검색 허용 조건
     private static final Set<String> ALLOWED_CONDITIONS = Set.of(
@@ -40,7 +38,9 @@ public class UniverseServiceImpl implements UniverseService {
     @Override
     @Transactional(readOnly = true)
     public UniverseListResponse findAllUniverse(int size, String sort, Long lastUniverseId, Long lastLikeCount) {
-        validateSort(sort);
+        
+    	//검색조건 검증
+        validator.validateSort(sort); 
 
         int limit = size + 1;
         List<UniverseDTO> list = universeMapper.findAllUniverse(sort, lastUniverseId, lastLikeCount, limit);
@@ -56,7 +56,8 @@ public class UniverseServiceImpl implements UniverseService {
     public UniverseListResponse findByKeyword(String keyword, String condition, int size, String sort,
             Long lastUniverseId, Long lastLikeCount) {
         
-        validateSort(sort);
+    	//검색조건 검증
+        validator.validateSort(sort);
         
         if (!ALLOWED_CONDITIONS.contains(condition)) {
              throw new IllegalArgumentException("지원하지 않는 검색 조건입니다.");
@@ -78,8 +79,9 @@ public class UniverseServiceImpl implements UniverseService {
     @Override
     @Transactional(readOnly = true)
     public UniverseDTO findByUniverseId(Long universeId) {
-        // 공통 조회 메서드 활용
-        return searchExisting(universeId);
+        
+    	//존재 확인
+        return validator.validateExisting(universeId);
     }
 
     /**
@@ -122,33 +124,30 @@ public class UniverseServiceImpl implements UniverseService {
     @Override
     public UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest request, String userId) {
         
-    	UniverseDTO existing = searchExisting(universeId);
-    	
-    	// 1.권한 확인
-        if (!existing.getMemberId().equals(userId)) { 
-            throw new ForbiddenException("해당 유니버스 접근 권한이 없습니다."); 
-        }
+        // 1. 존재 확인 
+        UniverseDTO existing = validator.validateExisting(universeId);
         
-        // 2. 필수값 확인
+        // 2. 권한 확인 
+        validator.validateOwner(existing, userId);
+        
+        // 3. 필수값 확인
         if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("유니버스 제목은 필수 입력 값입니다.");
         }
 
- 
-        // 3. 수정 진행
+        // 4. 수정
         UniverseDTO update = UniverseDTO.builder()
                 .universeId(universeId)
                 .title(request.getTitle())
                 .layoutData(request.getLayoutData())
                 .themeCode(request.getThemeCode()) 
                 .status(request.getStatus())
-                // .memberId(userId) <-- 수정 시 주인은 바뀌면 안 되므로 넣지 않음 (보통)
                 .build();
         
         universeMapper.updateUniverse(update);
         
-        // 4. 수정된 결과 반환
-        return searchExisting(universeId);
+        // 5. 수정된 결과 반환
+        return validator.validateExisting(universeId);
     }
     
     /**
@@ -157,15 +156,13 @@ public class UniverseServiceImpl implements UniverseService {
     @Override
     public UniverseDTO deleteUniverse(Long universeId, String userId) {
         
-        // 1. 존재 여부 확인 
-        UniverseDTO existing = searchExisting(universeId);
+        // 1. 존재 확인
+        UniverseDTO existing = validator.validateExisting(universeId);
         
-        // 2. 권한 확인
-        if (!existing.getMemberId().equals(userId)) {
-            throw new ForbiddenException("삭제 권한이 없습니다. (본인의 유니버스만 삭제 가능)");
-        }
+        // 2. 권한 확인 
+        validator.validateOwner(existing, userId);
 
-        // 2. 삭제 진행
+        // 3. 삭제 진행
         universeMapper.deleteUniverse(universeId);
         log.info(">>> 유니버스 삭제 완료. ID: {}", universeId);
         
@@ -173,24 +170,8 @@ public class UniverseServiceImpl implements UniverseService {
     }
 
     
-    // ***내부 메서드***
+    // --- 내부 유틸 메서드 (응답 변환용은 여기서만 쓰므로 유지) ---
 
-    // 정렬 조건 유효성 검사
-    private void validateSort(String sort) {
-        if (!("latest".equals(sort) || "popular".equals(sort))) {
-            throw new IllegalArgumentException("지원하지 않는 정렬 방식입니다. (latest, popular 중 선택)");
-        }
-    }
-    
-    // 유니버스 존재 여부 확인 (없으면 404 예외 던짐)
-    private UniverseDTO searchExisting(Long universeId) {
-        UniverseDTO existing = universeMapper.findByUniverseId(universeId);
-        if (existing == null) {  
-            throw new ResourceNotFoundException("해당 유니버스를 찾을 수 없습니다."); 
-        }
-        return existing;
-    } 
-    
     // 무한스크롤 응답 빌더
     private UniverseListResponse buildResponse(List<UniverseDTO> list, int size, String sort) {
         

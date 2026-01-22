@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.global.interaction.model.dto.LikeResponse;
+import com.kh.replay.global.interaction.model.service.InteractionService;
 import com.kh.replay.member.model.vo.CustomUserDetails;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
@@ -35,6 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 public class UniverseController {
     
     private final UniverseService universeService;
+    private final InteractionService interactionService;
+    
 
     /**
      * 1. 유니버스 목록 조회 (전체)
@@ -150,5 +154,24 @@ public class UniverseController {
         
         return ResponseData.ok(response, "유니버스 삭제 성공");
     }
+    
+    /**
+     * 7. 유니버스 좋아요
+     * @param entity
+     * @return
+     */
+    @PostMapping("/{universeId}/like")
+    public ResponseEntity<ResponseData<LikeResponse>> universeLike(
+    		@PathVariable("universeId") Long universeId,
+    		@AuthenticationPrincipal CustomUserDetails user 
+    		) {
+       
+    	LikeResponse response = interactionService.toggleLike(universeId, user.getUsername());
+    	
+        return ResponseData.ok(response, "좋아요 처리가 완료되었습니다");
+    }
+    
+    
+    
     
 }

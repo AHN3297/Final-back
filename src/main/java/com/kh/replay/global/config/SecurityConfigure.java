@@ -43,10 +43,7 @@ public class SecurityConfigure {
 				.authorizeHttpRequests(requests -> {
 
 					
-<<<<<<< HEAD
-					// Test용
-					requests.requestMatchers("/api/universes/**", "/api/member/playList/**", "api/music/**").permitAll();
-=======
+
 					 // 공지 조회(전체)
 	                requests.requestMatchers(HttpMethod.GET,  "/api/admin/notices/**").permitAll();
 	                
@@ -66,7 +63,6 @@ public class SecurityConfigure {
 	                requests.requestMatchers(HttpMethod.PATCH,  "/api/universes/**").authenticated();
 	                requests.requestMatchers(HttpMethod.DELETE, "/api/universes/**").authenticated();
 
->>>>>>> 4ef4502556aa71ff16701e0e1f4bac4f0dac1517
 					
 					
 					// 비로그인 허용

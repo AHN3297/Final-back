@@ -46,7 +46,7 @@ public class SecurityConfigure {
 					.formLogin(AbstractHttpConfigurer::disable)
 					.csrf(AbstractHttpConfigurer::disable)
 					.cors(Customizer.withDefaults())
-					// OAuth2 설정 유지 (팀원 작업분)
+					// 팀원이 추가한 OAuth2 소셜 로그인 설정 통합
 					.oauth2Login(oauth -> oauth
 							.userInfoEndpoint(userInfo -> userInfo
 									.userService(oAuth2UserService)
@@ -54,28 +54,28 @@ public class SecurityConfigure {
 							.successHandler(oAuth2SuccessHandler)
 					)
 					.authorizeHttpRequests(requests -> {
-						// 1. 공통 비로그인 허용 경로
+						// 1. 공통 비로그인 허용 경로 (유니버스, 소셜로그인, 검색)
 						requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
 						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
 						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
 						
-						// 2. 플레이리스트 관련 허용 (팀원 작업분)
+						// 2. 플레이리스트 관련 허용 (팀원 작업분 반영)
 						requests.requestMatchers("/api/member/playList/**").permitAll();
-
-						// 3. 좋아요(Likes) 관련 설정 (사용자님 작업분 - 인증 필요)
-						// POST, DELETE 등 모든 /api/likes/** 요청은 인증된 사용자만 가능
+						
+						// 3. 좋아요(Likes) 관련 설정 (사용자님 작업분 - 인증 필수)
+						// 이 설정이 있어야 Postman 테스트 시 토큰 인증이 정상 작동합니다.
 						requests.requestMatchers("/api/likes/**").authenticated();
 
-						// 4. 회원 관련 설정
-						requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll(); // 회원탈퇴 등
+						// 4. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
+						requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll(); 
 						requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
 						requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
 						
-						// 5. 로그인 필수 경로
+						// 5. 명시적 인증 필요 경로 (로그아웃, 내 정보 수정)
 						requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 						requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
 						
-						// 6. 기타 기본 설정
+						// 6. 기타 기본 보안 정책
 						requests.requestMatchers(HttpMethod.GET).authenticated();
 						requests.requestMatchers(HttpMethod.DELETE).authenticated();
 						requests.requestMatchers(HttpMethod.PUT).permitAll();
@@ -89,12 +89,13 @@ public class SecurityConfigure {
 					.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 					.build();
 		}
+		
 	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList(instance));
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-type"));
 		configuration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

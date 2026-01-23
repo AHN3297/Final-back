@@ -5,10 +5,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.Map;
+
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import com.kh.replay.global.api.model.dto.ArtistDTO;
 import com.kh.replay.global.common.ResponseData;
@@ -16,14 +21,18 @@ import com.kh.replay.global.like.model.dto.LikeResponse;
 import com.kh.replay.global.like.model.service.LikeService;
 import com.kh.replay.member.model.vo.CustomUserDetails;
 
+import com.kh.replay.global.like.model.service.GenreLikeService;
+
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/likes")
+@RequestMapping("/api/favorite")
 public class LikeController {
 	
 	private final LikeService likeService;
+	private final GenreLikeService genreLikeService;
 
 	// 좋아하는 가수 추가
     @PostMapping("/artists")
@@ -35,12 +44,13 @@ public class LikeController {
         LikeResponse response = likeService.likeArtist(artistDto, user.getUsername());
         return ResponseData.ok(response, "아티스트 좋아요 성공");
     }
-
+    /**
     // 좋아하는 가수 조회
     @GetMapping("/artists")
     public ResponseEntity<ResponseData<LikeResponse>> findAllLikeArtist(){
     	
     }
+    **/
     
     
     // 좋아하는 가수 삭제
@@ -61,7 +71,19 @@ public class LikeController {
 	
 	
 	// 좋아하는 장르 추가
+    @PostMapping("/genre")
+	public ResponseEntity<ResponseData<LikeResponse>> likeGenre(
+			@AuthenticationPrincipal CustomUserDetails authenticatedUser,
+			@RequestBody Map<String, String> request
+			){
+		LikeResponse result = genreLikeService.likeGenre(
+		        authenticatedUser.getUsername(),
+		        request.get("genreName")
+		    );
+		return ResponseData.created(result, "선호하는 장르가 추가되었습니다.");
+	}
 	// 좋아하는 장르 조회
 	// 좋아하는 장르 삭제
+
 
 }

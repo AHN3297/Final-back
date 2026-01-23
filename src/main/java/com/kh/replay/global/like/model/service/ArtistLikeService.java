@@ -28,7 +28,7 @@ public class ArtistLikeService {
                 .build();
 
         Integer singerNo = likeMapper.findSingerNoByApiId(vo.getApiSingerId());
-        if (singerNo == null) {
+        if (singerNo == null) {  
             likeMapper.insertArtistApiInfo(vo); // useGeneratedKeys로 vo에 singerNo 채워짐
             singerNo = vo.getSingerNo();
         }

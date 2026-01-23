@@ -45,7 +45,6 @@ public class SecurityConfigure {
 	            .formLogin(AbstractHttpConfigurer::disable)
 	            .csrf(AbstractHttpConfigurer::disable)
 	            .cors(Customizer.withDefaults())
-//	            oAuth2LoginSuccessHandler
 	            .oauth2Login(oauth -> oauth.successHandler(null))
 	            
 	            .authorizeHttpRequests(requests -> {
@@ -63,6 +62,61 @@ public class SecurityConfigure {
 
 	                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 	                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+		return httpSecurity
+				.formLogin(AbstractHttpConfigurer::disable)
+				.csrf(AbstractHttpConfigurer::disable)
+				.cors(Customizer.withDefaults())
+				.authorizeHttpRequests(requests -> {
+
+					
+
+					 // 공지 조회(전체)
+	                requests.requestMatchers(HttpMethod.GET,  "/api/admin/notices/**").permitAll();
+	                
+	                // 관리자 공지 등록/수정/삭제(ADMIN)
+	                requests.requestMatchers(HttpMethod.POST, "/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.PUT,  "/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.PATCH,"/api/admin/notices/**").hasRole("ADMIN");
+	                requests.requestMatchers(HttpMethod.DELETE,"/api/admin/notices/**").hasRole("ADMIN");
+					
+					
+	                // 유니버스 조회는 전체 허용
+	                requests.requestMatchers(HttpMethod.GET, "/api/universes/**").permitAll();
+
+	                // 유니버스 수정/등록/삭제만 로그인 필요
+	                requests.requestMatchers(HttpMethod.POST,   "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.PUT,    "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.PATCH,  "/api/universes/**").authenticated();
+	                requests.requestMatchers(HttpMethod.DELETE, "/api/universes/**").authenticated();
+
+					
+					
+					// 비로그인 허용
+					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();
+					// 비로그인 허용(POST)
+					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
+					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
+					
+					requests.requestMatchers(HttpMethod.PUT).permitAll();
+					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
+				
+					// 로그인 필요(GET)
+					
+					requests.requestMatchers(HttpMethod.GET).authenticated();
+					// 로그인 필요(POST)
+					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
+					// 로그인 필요(PUT)
+					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
+					// 로그인 필요(DELETE)
+					requests.requestMatchers(HttpMethod.DELETE).authenticated();
+					
+					
+//					// 관리자
+//					requests.requestMatchers(HttpMethod.GET).hasAuthority("");
+//					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
+//					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
+//					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
 
 	                requests.requestMatchers(HttpMethod.PUT).permitAll(); 
 	                
@@ -106,4 +160,5 @@ public class SecurityConfigure {
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();
 	}
+	
 }

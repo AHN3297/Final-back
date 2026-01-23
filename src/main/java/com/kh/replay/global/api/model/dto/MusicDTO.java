@@ -1,5 +1,7 @@
 package com.kh.replay.global.api.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +21,7 @@ public class MusicDTO {
     private String coverImgUrl; // COVERIMG_URL
     private String previewUrl;  // PREVIEW_URL
     private String releaseDate; // RELEASE_DATE
-    private String duration;    // DURATION
+    @JsonProperty("trackTimeMillis")
+    private Long duration;    // DURATION
     private String lyrics;
 }

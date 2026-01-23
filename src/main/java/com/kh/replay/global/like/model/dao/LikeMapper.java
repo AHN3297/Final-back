@@ -1,10 +1,10 @@
-package com.kh.replay.global.interaction.model.dao; 
+package com.kh.replay.global.like.model.dao; 
 
 import org.apache.ibatis.annotations.Mapper; 
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface InteractionMapper {
+public interface LikeMapper {
 
     int checkLike(@Param("universeId") Long universeId, @Param("memberId") String memberId);
     

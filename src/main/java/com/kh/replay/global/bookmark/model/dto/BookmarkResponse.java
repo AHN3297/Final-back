@@ -1,4 +1,4 @@
-package com.kh.replay.global.interaction.model.dto;
+package com.kh.replay.global.bookmark.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LikeResponse {
+public class BookmarkResponse {
 
 	private Long targetId;
-	private String type;
-	private boolean isLiked;
-	private int likeCount;
+	private boolean isBookmark;
+	private int bookmarkCount;
 
 }

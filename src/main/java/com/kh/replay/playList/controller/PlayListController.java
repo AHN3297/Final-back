@@ -53,10 +53,8 @@ public class PlayListController {
 	    List<PlayListDTO> list = playListService.findAllMemberPlayLists(user.getUsername());
 	    
 	    // 플레이리스트가없어도 빈 리스트를 보여주고(ResponseData.ok), 추가해달라고 해야한다.
-	    if (list == null || list.isEmpty()) {
-	    	return ResponseData.ok(list, "플레이리스트가 없습니다. 플레이리스트를 추가해 보세요!");
-	    }
-	    return ResponseData.ok(list, "내 플레이리스트 목록 조회 성공");
+	    String message = list.isEmpty() ? "플레이리스트를 추가해 보세요!" : "플레이리스트 곡 목록 조회 성공";
+	    return ResponseData.ok(list, message);
 	}
 	 
 	// 메인 플레이리스트 지정
@@ -113,10 +111,9 @@ public class PlayListController {
 	    
 	    List<PlayListTrackVO> list = playListService.getPlaylistTracks(playListId, user.getUsername());
 	    // 노래가 없어도 빈 리스트를 보여주고(ResponseData.ok), 노래를 추가해달라고 메시지를 보내야한다.) 
-	    if (list == null || list.isEmpty()) {
-	    	return ResponseData.ok(list, "노래를 추가해 보세요!");
-	    }
-	    return ResponseData.ok(list, "플레이리스트 곡 목록 조회 성공");
+
+	    String message = list.isEmpty() ? "노래를추가해보세요": "플레이리스트 곡 목록 조회 성공";
+	    return ResponseData.ok(list, message);
 	}
 	
 	// 플레이리스트 노래 순서 변경

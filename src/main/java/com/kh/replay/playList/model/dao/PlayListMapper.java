@@ -49,7 +49,7 @@ public interface PlayListMapper {
 	List<PlayListTrackVO> selectPlaylistTracks(@Param("playListId") int playListId, @Param("memberId") String memberId);
 	
 	// 곡순서 조정
-	int updateTrackOrder(@Param("item") UpdateOrderDTO dto);
+	int updateTrackOrder(UpdateOrderDTO dto);
 	
 	// 곡 삭제
 	int deletePlaylistTracks(@Param("playListId") int playListId, @Param("songId") int songId,@Param("memberId") String memberId);

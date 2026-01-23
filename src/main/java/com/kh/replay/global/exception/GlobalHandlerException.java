@@ -81,6 +81,28 @@ public class GlobalHandlerException {
         log.warn("사용자 찾기 실패(404): {}", e.getMessage());
         return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+    
+    // 플레이리스트 없음
+    @ExceptionHandler(NotFoundPlayListException.class)
+    public ResponseEntity<ResponseData<Object>> handerNotFoundPlayListException(NotFoundPlayListException e){
+    	log.warn("플레이리스트 찾기 실패: {}", e.getMessage());
+    	return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    
+    // 노래 없음
+    @ExceptionHandler(NotFoundPlayListException.class)
+    public ResponseEntity<ResponseData<Object>> handlerNotFoundPlayListException(NotFoundPlayListException e){
+    	log.warn("플레이리스트 찾기 실패: {}", e.getMessage());
+    	return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    
+    // 순서 정보 없음
+    @ExceptionHandler(NotFoundOrderListException.class)
+    public ResponseEntity<ResponseData<Object>> handlerNotFoundOrderListException(NotFoundOrderListException e){
+    	log.warn("순서 정보 찾기 실패: {}", e.getMessage());
+    	return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    
 
     //*******************500 Internal Server Error*******************
 

@@ -20,29 +20,30 @@
 	
 	    INSERT 
 	      INTO 
-	           TB_PLAYLIST (
-	           PLAYLIST_ID, 
-	           PLAYLIST_NAME, 
-	           MEMBER_ID, 
-	           CREATED_AT, 
-	           UPDATED_AT
+	           TB_PLAYLIST 
+	           (
+	           PLAYLIST_ID 
+	         , PLAYLIST_NAME 
+	         , MEMBER_ID 
+	         , CREATED_AT 
+	         , UPDATED_AT
 	           ) 
 	    VALUES (
-	           #{playListId}, 
-	           #{playListName}, 
-	           #{memberId}, 
-	           SYSDATE, 
-	           SYSDATE
+	         , #{playListId}
+	         , #{playListName}
+	         , #{memberId}
+	         , SYSDATE
+	         , SYSDATE
 	           )
 	</insert>
 	
 	<select id="findAllMemberPlayLists" resultType="com.kh.replay.playList.model.dto.PlayListDTO">
 	    SELECT 
-	           PLAYLIST_ID as playListId,
-	           PLAYLIST_NAME as playListName,
-	           MEMBER_ID as memberId,
-	           CREATED_AT as createdAt, -- TO_CHAR 제거
-	           UPDATED_AT as updatedAt  -- TO_CHAR 제거
+	         , PLAYLIST_ID as playListId
+	         , PLAYLIST_NAME as playListName
+	         , MEMBER_ID as memberId
+	         , CREATED_AT as createdAt
+	         , UPDATED_AT as updatedAt 
 	      FROM 
 	           TB_PLAYLIST
 	     WHERE 
@@ -63,13 +64,14 @@
 	<insert id="createMainPlayList">
 		INSERT 
 		  INTO 
-		       TB_MAIN_PLAYLIST (
-		       MEMBER_ID,
-		       PLAYLIST_ID
+		       TB_MAIN_PLAYLIST 
+		       (
+		       MEMBER_ID
+		     , PLAYLIST_ID
 		       )
 	    VALUES (
-	           #{memberId},
-	           #{playListId}
+	           #{memberId}
+	         , #{playListId}
 		       )
 	</insert>
 	

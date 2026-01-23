@@ -51,6 +51,11 @@ public class PlayListController {
 	public ResponseEntity<ResponseData<List<PlayListDTO>>> findAllPlaylist(
 			@AuthenticationPrincipal CustomUserDetails user) {
 	    List<PlayListDTO> list = playListService.findAllMemberPlayLists(user.getUsername());
+	    
+	    // 플레이리스트가없어도 빈 리스트를 보여주고(ResponseData.ok), 추가해달라고 해야한다.
+	    if (list == null || list.isEmpty()) {
+	    	return ResponseData.ok(list, "플레이리스트가 없습니다. 플레이리스트를 추가해 보세요!");
+	    }
 	    return ResponseData.ok(list, "내 플레이리스트 목록 조회 성공");
 	}
 	 
@@ -67,12 +72,13 @@ public class PlayListController {
 	@PatchMapping("/{playListId}")
 	public ResponseEntity<ResponseData<Integer>> updatePlayListName(
 	    @PathVariable(name = "playListId") int playListId, 
-	    @AuthenticationPrincipal CustomUserDetails user, // 후에 수정해야함
+	    @AuthenticationPrincipal CustomUserDetails user, 
 	    @RequestBody PlayListDTO playListDto) {
 	    
 	    int result = playListService.updatePlayListName(playListId, user.getUsername(), playListDto.getPlayListName());  
 	    return ResponseData.ok(result, "플레이리스트 이름 수정 성공");   
 	}
+	
 	// 플레이리스트 삭제
 	@DeleteMapping("/{playListId}")
 	public ResponseEntity<ResponseData<Integer>> deletePlayList(
@@ -84,7 +90,6 @@ public class PlayListController {
 	    
 	    return ResponseData.ok(result, "플레이리스트가 성공적으로 삭제되었습니다.");
 	}
-	
 	
 	// 플레이리스트에 노래 추가
 	@PostMapping("/{playListId}/tracks")
@@ -107,6 +112,10 @@ public class PlayListController {
 	        @AuthenticationPrincipal CustomUserDetails user) {
 	    
 	    List<PlayListTrackVO> list = playListService.getPlaylistTracks(playListId, user.getUsername());
+	    // 노래가 없어도 빈 리스트를 보여주고(ResponseData.ok), 노래를 추가해달라고 메시지를 보내야한다.) 
+	    if (list == null || list.isEmpty()) {
+	    	return ResponseData.ok(list, "노래를 추가해 보세요!");
+	    }
 	    return ResponseData.ok(list, "플레이리스트 곡 목록 조회 성공");
 	}
 	

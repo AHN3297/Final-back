@@ -1,11 +1,14 @@
 package com.kh.replay.playList.model.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.global.api.model.dto.MusicDTO;
+import com.kh.replay.global.exception.ForbiddenException;
+import com.kh.replay.global.exception.NotFoundOrderListException;
 import com.kh.replay.playList.model.dao.PlayListMapper;
 import com.kh.replay.playList.model.dto.PlayListDTO;
 import com.kh.replay.playList.model.dto.UpdateOrderDTO;
@@ -28,7 +31,7 @@ public class PlayListServiceImpl implements PlayListService {
         int count = playListMapper.checkPlayListOwnership(playListId, memberId);
         if (count <= 0) {
             log.warn("권한 없는 접근 차단 - 사용자: {}, 플레이리스트ID: {}", memberId, playListId);
-            throw new RuntimeException("해당 플레이리스트에 대한 접근 권한이 없습니다.");
+            throw new ForbiddenException("해당 플레이리스트에 대한 접근 권한이 없습니다.");
         }
     }
 
@@ -42,7 +45,7 @@ public class PlayListServiceImpl implements PlayListService {
                 .build();       
         int result = playListMapper.createPlayList(vo);               
         if (result <= 0) {
-            throw new RuntimeException("플레이리스트 등록에 실패했습니다.");
+            throw new IllegalArgumentException("플레이리스트 등록에 실패했습니다.");
         }      
         return vo.getPlayListId(); 
     }
@@ -51,7 +54,14 @@ public class PlayListServiceImpl implements PlayListService {
     @Override
     @Transactional(readOnly = true) 
     public List<PlayListDTO> findAllMemberPlayLists(String memberId) {
-        return playListMapper.findAllMemberPlayLists(memberId);
+    	List<PlayListDTO> playList = playListMapper.findAllMemberPlayLists(memberId);
+    	
+    	// 방어목적
+    	if(playList == null) {
+    		return new ArrayList<>();
+    	}
+    	
+    	return playList;
     }
 
     // 3. 메인 플레이리스트 지정
@@ -85,7 +95,7 @@ public class PlayListServiceImpl implements PlayListService {
         
         int result = playListMapper.updatePlayListName(updateDto);
         if (result <= 0) {
-            throw new RuntimeException("이름 수정에 실패했습니다.");
+            throw new IllegalArgumentException("이름 수정에 실패했습니다.");
         }
         return result;
     }
@@ -131,10 +141,19 @@ public class PlayListServiceImpl implements PlayListService {
                 .releaseDate(musicDto.getReleaseDate())
                 .build();
 
-        playListMapper.createTrack(trackVo);
+        try {
+            playListMapper.createTrack(trackVo); //
+        } catch (Exception e) {
+            throw new RuntimeException("곡 정보 저장 중 서버 오류가 발생했습니다.");
+        }
         int nextOrder = playListMapper.getNextTrackOrder(playListId);
+        int result = playListMapper.insertPlaylistSong(playListId, trackVo.getSongNo(), nextOrder); //
 
-        return playListMapper.insertPlaylistSong(playListId, trackVo.getSongNo(), nextOrder);
+        if (result <= 0) {
+            throw new RuntimeException("플레이리스트에 곡을 담지 못했습니다.");
+        }
+
+        return result;
     }
     
     // 플레이리스트 곡 조회
@@ -152,11 +171,22 @@ public class PlayListServiceImpl implements PlayListService {
     public int updateTrackOrder(int playListId, String memberId, List<UpdateOrderDTO> orderList) {
 
         verifyMemberId(playListId, memberId);
+        
+        if(orderList == null || orderList.isEmpty()) {
+        	throw new NotFoundOrderListException("변경할 순서 정보가 없습니다.");
+        }
 
         int totalResult = 0;
         // 리스트를 돌며 순서 업데이트
-        for (UpdateOrderDTO dto : orderList) {
-            totalResult += playListMapper.updateTrackOrder(dto);
+        try {
+	        for (UpdateOrderDTO dto : orderList) {
+	            int result = playListMapper.updateTrackOrder(dto);
+	            if(result == 0) {
+	            	throw new IllegalStateException("순서 변경 중 오류가 발생하였습니다.");
+	            }
+	        }	
+        } catch (Exception e) {
+        	throw new IllegalStateException("순서 변경 중 오류가 발생하였습니다.");
         }
         
         return totalResult;
@@ -171,7 +201,7 @@ public class PlayListServiceImpl implements PlayListService {
 		
 		int result = playListMapper.deletePlaylistTracks(playListId, songId, memberId);
 		if(result<= 0) {
-			throw new RuntimeException("노래삭제에 실패앴습니다.");
+			throw new IllegalStateException("노래삭제에 실패했습니다.");
 		}
 		return result;
 	}

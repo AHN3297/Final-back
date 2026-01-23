@@ -37,6 +37,7 @@ public class LikeController {
 
     // 좋아하는 가수 조회
     
+    
     // 좋아하는 가수 삭제
     @DeleteMapping("/artists/{singerNo}")
     public ResponseEntity<ResponseData<LikeResponse>> unlikeArtist(

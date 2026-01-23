@@ -31,12 +31,18 @@ public class NoticeController {
 	private final NoticeService noticeService;
 	
 	/**
-	 * 공지사항 전체 조회
-	 * @param page
-	 * @param size
-	 * @param keyword
-	 * @param status
-	 * @return
+	 * 공지사항 목록 조회
+	 * - 상태(status) 기준 필터링
+	 * - 제목 키워드 검색 지원
+	 * - 페이징 처리
+	 *
+	 * 관리자 공지사항 관리 화면에서 사용하는 목록 조회 API
+	 *
+	 * @param page    현재 페이지 번호 (기본값: 1)
+	 * @param size    페이지당 조회 개수 (기본값: 10)
+	 * @param keyword 검색 키워드 (nullable)
+	 * @param status  공지사항 상태 (기본값: Y)
+	 * @return 공지사항 목록 및 페이징 정보
 	 */
 	@GetMapping
 	public ResponseEntity<ResponseData<NoticeListResponseDto>> getNoticeList(
@@ -56,9 +62,13 @@ public class NoticeController {
 	
 	/**
 	 * 공지사항 등록
-	 * @param requestDto
-	 * @param image
-	 * @return
+	 * - 관리자 전용 기능
+	 * - 공지사항 제목/내용을 Form-Data 방식으로 전달
+	 * - 이미지가 있을 경우 MultipartFile로 함께 업로드
+	 *
+	 * @param requestDto 공지사항 등록 요청 DTO (제목, 내용)
+	 * @param image      첨부 이미지 파일 (nullable)
+	 * @return 등록 결과 응답 (201 Created)
 	 */
 	@PostMapping("/register")
 	public ResponseEntity<ResponseData<Void>> registerNotice(
@@ -73,9 +83,14 @@ public class NoticeController {
 	}
 	
 	/**
-	 * 공지사항 상세조회
-	 * @param noticeNo
-	 * @return
+	 * 공지사항 상세 조회
+	 * - 공지사항 번호 기준 단건 조회
+	 * - 공지사항 본문과 연결된 이미지 목록을 함께 반환
+	 *
+	 * 관리자 공지사항 관리 화면에서 상세 확인 용도
+	 *
+	 * @param noticeNo 공지사항 번호
+	 * @return 공지사항 상세 정보
 	 */
 	@GetMapping("/{noticeNo}")
 	public ResponseEntity<ResponseData<NoticeDetailResponseDto>> getNoticeDetail(@PathVariable("noticeNo") Long noticeNo){
@@ -86,9 +101,15 @@ public class NoticeController {
 	
 	/**
 	 * 공지사항 수정
-	 * @param noticeNo
-	 * @param requestDto
-	 * @return
+	 * - 관리자 전용 기능
+	 * - 공지사항 제목/내용 수정
+	 * - 선택된 이미지 삭제 및 신규 이미지 추가 처리
+	 *
+	 * Multipart/Form-Data 방식으로 요청을 처리한다.
+	 *
+	 * @param noticeNo  공지사항 번호
+	 * @param requestDto 공지사항 수정 요청 DTO
+	 * @return 수정 결과 응답
 	 */
 	@PutMapping(value="/{noticeNo}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ResponseData<Void>> updateNotice(
@@ -103,9 +124,13 @@ public class NoticeController {
 	}
 
 	/**
-	 * 공지사항 삭제(소프트)
-	 * @param noticeNo
-	 * @return
+	 * 공지사항 삭제 (소프트 삭제)
+	 * - 관리자 전용 기능
+	 * - 공지사항 상태를 비활성화 처리
+	 * - 연결된 이미지도 함께 소프트 삭제
+	 *
+	 * @param noticeNo 공지사항 번호
+	 * @return 삭제 결과 응답
 	 */
 	@DeleteMapping("/{noticeNo}")
 	public ResponseEntity<ResponseData<Void>> deleteNotice(@PathVariable("noticeNo") Long noticeNo){

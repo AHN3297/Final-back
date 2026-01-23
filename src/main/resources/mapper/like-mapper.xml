@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.global.like.model.dao.LikeMapper">
+
+    <select id="checkLike" resultType="int">
+        SELECT 
+               COUNT(1) 
+          FROM 
+               TB_UNIVERSE_LIKED 
+         WHERE 
+               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+    </select>
+    
+    <insert id="insertLike">
+        INSERT 
+          INTO 
+               TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) 
+        VALUES 
+               (#{universeId}, #{memberId})
+    </insert>
+    
+    <delete id="deleteLike">
+        DELETE 
+          FROM 
+               TB_UNIVERSE_LIKED 
+         WHERE 
+               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+    </delete>
+    
+    <select id="countLikes" resultType="int">
+        SELECT 
+               COUNT(1) 
+          FROM 
+               TB_UNIVERSE_LIKED 
+         WHERE 
+               UNIVERSE_ID = #{universeId}
+    </select>
+
+</mapper>

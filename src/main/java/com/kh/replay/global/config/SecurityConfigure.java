@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -16,11 +17,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.kh.replay.auth.oauth.model.sevice.CustomOAuth2UserService;
 import com.kh.replay.global.config.filter.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -34,70 +37,58 @@ public class SecurityConfigure {
 	private String instance;
 	
 	private final JwtFilter jwtFilter;
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-		return httpSecurity
-				.formLogin(AbstractHttpConfigurer::disable)
-				.csrf(AbstractHttpConfigurer::disable)
-				.cors(Customizer.withDefaults())
-				.authorizeHttpRequests(requests -> {
-					
-					
+	 private final CustomOAuth2UserService oAuth2UserService;
+	 private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
+	
+	 @Bean
+		public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+			return httpSecurity
+					.formLogin(AbstractHttpConfigurer::disable)
+					.csrf(AbstractHttpConfigurer::disable)
+					.cors(Customizer.withDefaults())
+					// OAuth2 설정 유지 (팀원 작업분)
+					.oauth2Login(oauth -> oauth
+							.userInfoEndpoint(userInfo -> userInfo
+									.userService(oAuth2UserService)
+							)
+							.successHandler(oAuth2SuccessHandler)
+					)
+					.authorizeHttpRequests(requests -> {
+						// 1. 공통 비로그인 허용 경로
+						requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
+						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
+						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
+						
+						// 2. 플레이리스트 관련 허용 (팀원 작업분)
+						requests.requestMatchers("/api/member/playList/**").permitAll();
 
-					 // 공지 조회(전체)
-	                requests.requestMatchers(HttpMethod.GET,  "/api/admin/notices/**").permitAll();
-	                
-	                // 관리자 공지 등록/수정/삭제(ADMIN)
-	                requests.requestMatchers(HttpMethod.POST, "/api/admin/notices/**").hasRole("ADMIN");
-	                requests.requestMatchers(HttpMethod.PUT,  "/api/admin/notices/**").hasRole("ADMIN");
-	                requests.requestMatchers(HttpMethod.PATCH,"/api/admin/notices/**").hasRole("ADMIN");
-	                requests.requestMatchers(HttpMethod.DELETE,"/api/admin/notices/**").hasRole("ADMIN");
-					
-					
-	                // 유니버스 조회는 전체 허용
-	                requests.requestMatchers(HttpMethod.GET, "/api/universes/**").permitAll();
+						// 3. 좋아요(Likes) 관련 설정 (사용자님 작업분 - 인증 필요)
+						// POST, DELETE 등 모든 /api/likes/** 요청은 인증된 사용자만 가능
+						requests.requestMatchers("/api/likes/**").authenticated();
 
-	                // 유니버스 수정/등록/삭제만 로그인 필요
-	                requests.requestMatchers(HttpMethod.POST,   "/api/universes/**").authenticated();
-	                requests.requestMatchers(HttpMethod.PUT,    "/api/universes/**").authenticated();
-	                requests.requestMatchers(HttpMethod.PATCH,  "/api/universes/**").authenticated();
-	                requests.requestMatchers(HttpMethod.DELETE, "/api/universes/**").authenticated();
-
-					
-					
-					// 비로그인 허용
-					requests.requestMatchers(HttpMethod.GET,"/api/members", "/api/search").permitAll();
-					// 비로그인 허용(POST)
-					requests.requestMatchers(HttpMethod.POST,"/api/auth/signUp","/api/members/login").permitAll();
-					requests.requestMatchers(HttpMethod.DELETE,"/api/members").permitAll();
-					
-					requests.requestMatchers(HttpMethod.PUT).permitAll();
-					requests.requestMatchers(HttpMethod.PATCH,"/api/members").permitAll();
-				
-					// 로그인 필요(GET)
-					
-					requests.requestMatchers(HttpMethod.GET).authenticated();
-					// 로그인 필요(POST)
-					requests.requestMatchers(HttpMethod.POST,"/api/members/logout", "/api/likes/**").authenticated();
-					// 로그인 필요(PUT)
-					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
-					// 로그인 필요(DELETE)
-					requests.requestMatchers(HttpMethod.DELETE, "/api/likes/**").authenticated();
-					
-					
-					
-//					// 관리자
-//					requests.requestMatchers(HttpMethod.GET).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.POST).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.PUT).hasAuthority("");
-//					requests.requestMatchers(HttpMethod.DELETE).hasAuthority("");
-
-
-				})
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-		        .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-		        .build();
-	}
+						// 4. 회원 관련 설정
+						requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll(); // 회원탈퇴 등
+						requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
+						requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
+						
+						// 5. 로그인 필수 경로
+						requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
+						requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+						
+						// 6. 기타 기본 설정
+						requests.requestMatchers(HttpMethod.GET).authenticated();
+						requests.requestMatchers(HttpMethod.DELETE).authenticated();
+						requests.requestMatchers(HttpMethod.PUT).permitAll();
+					})
+					.exceptionHandling(ex -> 
+						ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+					)
+					.sessionManagement(manager -> 
+						manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+					)
+					.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+					.build();
+		}
 	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
@@ -120,5 +111,4 @@ public class SecurityConfigure {
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();
 	}
-	
 }

@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.kh.replay.auth.oauth.model.dto.AdditionalInfoRequest;
+import com.kh.replay.auth.oauth.model.dto.OAuthUserDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 
 @Mapper
@@ -35,6 +37,13 @@ public interface MemberMapper {
 
 	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
 	void withdrawMember(String memberId);
+
+	void insertOAuthBasicInfo(OAuthUserDTO oauthUser);
+
+	@Select("SELECT COUNT(*) FROM TB_MEMBER WHERE EMAIL = #{email}")
+	boolean existByEmail(String email);
+
+	void updateCompleteMember(AdditionalInfoRequest request);
 	
 	
 	

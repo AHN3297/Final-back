@@ -42,7 +42,7 @@ public class ArtistLikeService {
         params.put("singerNo", singerNo);
 
         if(likeMapper.checkArtistLikeExists(params) > 0) {
-        	throw new RuntimeException("이미좋아하는 아티스트입니다.");
+        	throw new RuntimeException("이미 좋아하는 아티스트입니다.");
         }
       
         int result = likeMapper.insertFavoriteArtist(params);

@@ -74,14 +74,14 @@ public class LikeServiceImpl implements LikeService {
         
         artistLikeService.createFavoriteArtist(singerNo, memberId);
         
-        
         return LikeResponse.builder()
                 .targetId(artistDto.getApiSingerId())
                 .type("ARTIST")
                 .isLiked(true)
                 .build();
     }
-
+    
+    // 좋아하는 아티스트 삭제
     @Override
     public LikeResponse unlikeArtist(int singerNo, String memberId) {
       

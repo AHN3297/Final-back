@@ -16,7 +16,7 @@ import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.auth.token.model.dao.TokenMapper;
 import com.kh.replay.auth.token.model.service.TokenService;
 import com.kh.replay.global.exception.CustomAuthenticationException;
-import com.kh.replay.member.model.dao.memberMapper;
+import com.kh.replay.member.model.dao.MemberMapper;
 import com.kh.replay.member.model.dto.ChangePasswordDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.vo.CustomUserDetails;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service	
 @Slf4j
 public class MemberServiceImpl implements MemberService{
-	private final memberMapper membermapper;
+	private final MemberMapper membermapper;
 	private final UserDetailsServiceImpl user;
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;

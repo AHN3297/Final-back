@@ -11,14 +11,14 @@ import com.kh.replay.auth.oauth.model.res.GoogleRes;
 import com.kh.replay.auth.oauth.model.res.OAuth2Res;
 import com.kh.replay.auth.oauth.model.vo.CustomOAuth2User;
 import com.kh.replay.global.exception.OAuth2AuthenticationException;
-import com.kh.replay.member.model.dao.memberMapper;
+import com.kh.replay.member.model.dao.MemberMapper;
 
 import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService{
 	private final SocialMapper socialMapper;
-	private final memberMapper membermapper;
+	private final MemberMapper membermapper;
 	
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException{

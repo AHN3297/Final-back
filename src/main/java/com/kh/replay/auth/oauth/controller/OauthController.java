@@ -1,7 +1,5 @@
 package com.kh.replay.auth.oauth.controller;
 
-import java.util.Map;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.replay.auth.oauth.model.dto.AdditionalInfoRequest;
 import com.kh.replay.auth.token.util.JwtUtil;
 import com.kh.replay.global.common.ResponseData;
-import com.kh.replay.member.model.dao.memberMapper;
+import com.kh.replay.member.model.dao.MemberMapper;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/oauth/social")
 @RequiredArgsConstructor
 public class OauthController {
-	private final memberMapper membermapper;
+	private final MemberMapper membermapper;
 	private final JwtUtil jwtUtil;
 	
 	@PutMapping("/complete")

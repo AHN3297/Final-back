@@ -12,7 +12,7 @@ import com.kh.replay.auth.oauth.model.dto.OAuthUserDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 
 @Mapper
-public interface memberMapper {
+public interface MemberMapper {
 
 	@Select("SELECT MEMBER_ID FROM TB_MEMBER")
 	int CountMemberId(String memberId);

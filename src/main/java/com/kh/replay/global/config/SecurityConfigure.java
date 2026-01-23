@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.kh.replay.auth.oauth.model.sevice.CustomOAuth2UserService;
 import com.kh.replay.global.config.filter.JwtFilter;
 
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,8 @@ public class SecurityConfigure {
 	private String instance;
 	
 	private final JwtFilter jwtFilter;
-	// private final OAuth2UserProviderRouter oAuth2UserProviderRouter;
-	// private final OAuth2SuccessHandler oAuth2SuccessHandler;
+	 private final CustomOAuth2UserService oAuth2UserService;
+	 private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -45,22 +46,25 @@ public class SecurityConfigure {
 	            .formLogin(AbstractHttpConfigurer::disable)
 	            .csrf(AbstractHttpConfigurer::disable)
 	            .cors(Customizer.withDefaults())
-//	            oAuth2LoginSuccessHandler
-	            .oauth2Login(oauth -> oauth.successHandler(null))
-	            
+	            .oauth2Login(oauth -> oauth
+	            	    .userInfoEndpoint(userInfo -> userInfo
+	            	        .userService(oAuth2UserService)  // 
+	            	    )
+	            	    .successHandler(oAuth2SuccessHandler)
+	            	)
 	            .authorizeHttpRequests(requests -> {
 	                requests.requestMatchers("/api/universes/**").permitAll();
-
+	                requests.requestMatchers("/oauth2/**", "/login/**").permitAll();
 	                requests.requestMatchers(HttpMethod.POST, "/api/member/playList/**").permitAll();
 	                requests.requestMatchers(HttpMethod.PATCH, "/api/member/playList/**").permitAll();
 	                requests.requestMatchers(HttpMethod.DELETE, "/api/member/playList/**").permitAll();
 	                requests.requestMatchers(HttpMethod.GET, "/api/member/playList/**").permitAll();
-
+	                requests.requestMatchers("/oauth-callback").permitAll();
 	                requests.requestMatchers(HttpMethod.GET, "/api/members", "/api/search").permitAll();
 	                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
 	                requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll();
 	                requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
-
+	                requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
 	                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 	                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
 

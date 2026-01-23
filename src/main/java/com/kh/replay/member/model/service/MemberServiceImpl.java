@@ -16,7 +16,7 @@ import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.auth.token.model.dao.TokenMapper;
 import com.kh.replay.auth.token.model.service.TokenService;
 import com.kh.replay.global.exception.CustomAuthenticationException;
-import com.kh.replay.member.model.dao.MemberMapper;
+import com.kh.replay.member.model.dao.memberMapper;
 import com.kh.replay.member.model.dto.ChangePasswordDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.vo.CustomUserDetails;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service	
 @Slf4j
 public class MemberServiceImpl implements MemberService{
-	private final MemberMapper memberMapper;
+	private final memberMapper membermapper;
 	private final UserDetailsServiceImpl user;
 	private final AuthenticationManager authenticationManager;
 	private final TokenService tokenService;
@@ -99,7 +99,7 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public Map<String, Object> findAllMember(String memberId) {
 		
-		Map<String, Object> result =memberMapper.findAllMember(memberId);
+		Map<String, Object> result =membermapper.findAllMember(memberId);
 		
 		
 		return result;
@@ -107,8 +107,8 @@ public class MemberServiceImpl implements MemberService{
 	@Transactional
 	@Override
 	public Map<String, Object> changeInfo(MemberDTO member) {
-		int result = memberMapper.changeInfo(member);
-		 Map<String, Object> updateMember =memberMapper.findAllMember(member.getMemberId());
+		int result = membermapper.changeInfo(member);
+		 Map<String, Object> updateMember =membermapper.findAllMember(member.getMemberId());
 		return  updateMember;
 		
 		
@@ -117,7 +117,7 @@ public class MemberServiceImpl implements MemberService{
 	public void withdrawMember(LocalDTO local) {
 		String memberId = local.getMemberDto().getMemberId();
 		
-		Map<String,String> userInfo =memberMapper.loadUser(local.getMemberDto().getEmail());
+		Map<String,String> userInfo =membermapper.loadUser(local.getMemberDto().getEmail());
 		
 		String userPassword =userInfo.get("PASSWORD");
 		
@@ -125,7 +125,7 @@ public class MemberServiceImpl implements MemberService{
 			log.info("{},{}" ,local.getPassword() , userPassword);
 			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
 		}
-		memberMapper.withdrawMember(memberId);
+		membermapper.withdrawMember(memberId);
 		
 		tokenMapper.memberLogout(memberId);
 		

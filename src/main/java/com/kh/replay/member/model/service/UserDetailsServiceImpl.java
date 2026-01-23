@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.kh.replay.member.model.dao.MemberMapper;
+import com.kh.replay.member.model.dao.memberMapper;
 import com.kh.replay.member.model.vo.CustomUserDetails;
 
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 
 public class UserDetailsServiceImpl implements UserDetailsService {
-	private final MemberMapper memberMapper;
+	private final memberMapper membermapper;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -29,10 +29,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	    
 	    if(username.contains("@")) {
 	        // 로그인: email로 조회
-	        local = memberMapper.loadUser(username);
+	        local = membermapper.loadUser(username);
 	    } else {
 	        // JWT 필터: memberId로 조회
-	        local = memberMapper.loadByMemberId(username);
+	        local = membermapper.loadByMemberId(username);
 	    }
 	    
 	    if(local == null) {

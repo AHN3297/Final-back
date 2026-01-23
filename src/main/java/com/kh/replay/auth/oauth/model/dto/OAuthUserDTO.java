@@ -1,14 +1,20 @@
 package com.kh.replay.auth.oauth.model.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OAuthUserDTO {
-	private String memberId; //DB PK
-	private String provider; //kakao ,google
-	private String providerId; //각 제공자가 내려준 id
-	private String createdAt; //생성 날짜
-	
+    private String memberId;        // DB PK
+    private String provider;        // kakao, google
+    private String providerId;      // 각 제공자가 내려준 id
+    private String createdAt;       // 생성 날짜
+    private String email;           // 회원가입 시 member 테이블 저장
+    private String name;            // 회원 name
+    private boolean isNewUser;      // 신규 회원 여부 판단용
 }

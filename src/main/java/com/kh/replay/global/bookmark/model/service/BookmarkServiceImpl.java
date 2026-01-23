@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.global.bookmark.model.dao.BookmarkMapper;
-import com.kh.replay.global.bookmark.model.dto.BookmarkResponse; // DTO 임포트 확인
+import com.kh.replay.global.bookmark.model.dto.BookmarkResponse;
 import com.kh.replay.universe.model.service.UniverseValidator;
 
 import lombok.RequiredArgsConstructor;
@@ -24,43 +24,44 @@ public class BookmarkServiceImpl implements BookmarkService {
 	@Override
 	public BookmarkResponse bookmarkUniverse(Long universeId, String memberId) {
 		
+        // 1. 존재 확인
 	    validator.validateExisting(universeId);
 	    
+        // 2. 매니저 호출 
 	    bookmarkManager.createBookmark(universeId, memberId); 
 	    
+        // 3. 카운트 조회 (Long 타입 그대로 전달)
 	    int totalBookmark = countBookmarks(universeId);
 	    
 	    return BookmarkResponse.builder()
 	            .targetId(universeId)
-	            .isBookmark(true) // 무조건 true
+	            .isBookmark(true)
 	            .bookmarkCount(totalBookmark)
 	            .build();
 	}
 	
 	@Override
 	public BookmarkResponse unbookmarkUniverse(Long universeId, String memberId) {
+        
+        // 1. 존재 확인
 	    validator.validateExisting(universeId);
 	    
+	    // 2. 매니저 호출
 	    bookmarkManager.deleteBookmark(universeId, memberId); 
 	    
+        // 3. 카운트 조회
 	    int totalBookmark = countBookmarks(universeId);
 	    
 	    return BookmarkResponse.builder()
 	            .targetId(universeId)
-	            .isBookmark(false) // 무조건 false
+	            .isBookmark(false)
 	            .bookmarkCount(totalBookmark)
 	            .build();
 	}
-
-
-
 
     // 갯수 조회용 메소드
     private int countBookmarks(Long universeId) {
     	return bookmarkMapper.countBookmark(universeId);
     }
-
-
-
 
 }

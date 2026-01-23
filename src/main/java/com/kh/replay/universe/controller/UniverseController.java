@@ -198,7 +198,6 @@ public class UniverseController {
     	BookmarkResponse response = bookmarkService.bookmarkUniverse(universeId, user.getUsername());
         
         return ResponseData.ok(response, "찜하기를 눌렀습니다.");
-<<<<<<< HEAD
     }
     
     /**
@@ -213,8 +212,6 @@ public class UniverseController {
     	BookmarkResponse response = bookmarkService.unbookmarkUniverse(universeId, user.getUsername());
         
         return ResponseData.ok(response, "찜하기를 취소했습니다.");
-=======
->>>>>>> 3df000459204b727ee25b5abcd25d76033de412a
     }
     
     

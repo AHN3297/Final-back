@@ -13,7 +13,7 @@
            AND MEMBER_ID = #{memberId}
     </select>
     
-    <insert id="insertBookmark">
+    <insert id="insertBookmark" parameterType="map">
         INSERT 
           INTO 
                TB_FAV_UNIVERSE (
@@ -32,7 +32,7 @@
                )
     </insert>
     
-        <delete id="deleteBookmark">
+        <delete id="deleteBookmark" parameterType="map">
         DELETE 
           FROM 
                 TB_FAV_UNIVERSE 

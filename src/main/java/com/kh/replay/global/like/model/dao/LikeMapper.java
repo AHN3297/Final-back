@@ -1,16 +1,16 @@
 package com.kh.replay.global.like.model.dao; 
 
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper; 
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface LikeMapper {
 
-    int checkLike(@Param("universeId") Long universeId, @Param("memberId") String memberId);
+    int checkLike(Map<String, Object> params);
     
-    int insertLike(@Param("universeId") Long universeId, @Param("memberId") String memberId);
+    int insertLike(Map<String, Object> params);
     
-    int deleteLike(@Param("universeId") Long universeId, @Param("memberId") String memberId);
+    int deleteLike(Map<String, Object> params);
     
     int countLikes(Long universeId);
     

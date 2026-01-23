@@ -35,7 +35,7 @@ public String getAccessToken(String username) {
 	return Jwts.builder()
 				.subject(username) //사용자 아이디
 				.issuedAt(new Date()) //발급일
-				.expiration(new Date(System.currentTimeMillis() + (1000*60*60*24)))//만료일
+				.expiration(new Date(System.currentTimeMillis() + (1000*60*60*24*7)))//만료일 //이거 나중에 꼭 수정해야함
 				.signWith(key)//서명
 				.compact();
 }

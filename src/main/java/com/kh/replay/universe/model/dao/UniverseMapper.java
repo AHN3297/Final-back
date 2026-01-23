@@ -1,39 +1,24 @@
 package com.kh.replay.universe.model.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
 import com.kh.replay.universe.model.dto.UniverseDTO;
 
 @Mapper
 public interface UniverseMapper {
 
-	
-    List<UniverseDTO> findAllUniverse(
-        @Param("sort") String sort,
-        @Param("lastUniverseId") Long lastUniverseId,
-        @Param("lastLikeCount") Long lastLikeCount,
-        @Param("limit") int limit
-    );
+    List<UniverseDTO> findAllUniverse(Map<String, Object> params);
 
-	List<UniverseDTO> findByKeyword(
-		@Param("keyword") String keyword, 
-		@Param("condition")	String condition, 
-		@Param("sort")	String sort, 
-		@Param("lastUniverseId")	Long lastUniverseId,
-		@Param("lastLikeCount")	Long lastLikeCount, 
-		@Param("limit")	int limit);
+    List<UniverseDTO> findByKeyword(Map<String, Object> params);
 
-	UniverseDTO findByUniverseId( 
-			@Param("universeId") Long universeId);
+    UniverseDTO findByUniverseId(Long universeId);
 
-	int insertUniverse(UniverseDTO universe);
+    int insertUniverse(UniverseDTO universe);
 
-	int updateUniverse(UniverseDTO update);
+    int updateUniverse(UniverseDTO update);
 
-	void deleteUniverse(Long universeId);
-
+    void deleteUniverse(Long universeId);
 
 }

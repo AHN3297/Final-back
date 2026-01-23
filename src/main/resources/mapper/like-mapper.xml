@@ -3,7 +3,7 @@
 
 <mapper namespace="com.kh.replay.global.like.model.dao.LikeMapper">
 
-    <select id="checkLike" resultType="int">
+    <select id="checkLike" resultType="int" parameterType="map">
         SELECT 
                COUNT(1) 
           FROM 
@@ -12,7 +12,7 @@
                UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
     </select>
     
-    <insert id="insertLike">
+    <insert id="insertLike" parameterType="map">
         INSERT 
           INTO 
                TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) 
@@ -20,7 +20,7 @@
                (#{universeId}, #{memberId})
     </insert>
     
-    <delete id="deleteLike">
+    <delete id="deleteLike" parameterType="map">
         DELETE 
           FROM 
                TB_UNIVERSE_LIKED 

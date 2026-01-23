@@ -13,7 +13,7 @@
            AND MEMBER_ID = #{memberId}
     </select>
     
-    <insert id="insertBookmark">
+    <insert id="insertBookmark" parameterType="map">
         INSERT 
           INTO 
                TB_FAV_UNIVERSE (
@@ -31,6 +31,14 @@
                SYSDATE
                )
     </insert>
+    
+        <delete id="deleteBookmark" parameterType="map">
+        DELETE 
+          FROM 
+                TB_FAV_UNIVERSE 
+         WHERE 
+               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+    </delete>
     
     
     <select id="countBookmark" resultType="int">

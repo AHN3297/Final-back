@@ -60,7 +60,7 @@ public class NoticeController {
 	 * @param image
 	 * @return
 	 */
-	@PostMapping
+	@PostMapping("/register")
 	public ResponseEntity<ResponseData<Void>> registerNotice(
 			@ModelAttribute NoticeRequestDto requestDto, // 제목, 내용 (JSON이 아닌 Form - data 방식)
 			@RequestPart(value = "images", required = false ) MultipartFile image)

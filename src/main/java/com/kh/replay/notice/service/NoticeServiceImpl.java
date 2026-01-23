@@ -5,11 +5,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.replay.global.exception.CustomAuthenticationException;
 import com.kh.replay.global.exception.FileUploadException;
+import com.kh.replay.global.exception.ForbiddenException;
 import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.s3.S3Service;
 import com.kh.replay.global.util.PageInfo;
@@ -34,6 +38,15 @@ public class NoticeServiceImpl implements NoticeService {
 	private final Pagenation pagenation;
 	private final S3Service s3Service;
 	
+	/**
+	 * 공지사항 존재 여부 및 활성 상태를 검증한다.
+	 * - 공지사항이 존재하지 않거나
+	 * - 상태가 비활성(Y가 아닌 경우)
+	 * 위 조건 중 하나라도 만족하지 않으면 예외를 발생시킨다.
+	 *
+	 * @param noticeNo 공지사항 번호
+	 * @return 활성 상태의 공지사항 엔티티
+	 */
 	private Notice getActiveNoticeOrThrow(Long noticeNo) {
 		
 		Notice notice = noticeRepository.findByNoticeNo(noticeNo);
@@ -48,8 +61,32 @@ public class NoticeServiceImpl implements NoticeService {
 		return notice;
 	}
 	
+	/**
+	 * 현재 요청 사용자가 관리자 권한을 가지고 있는지 검증한다.
+	 * - 인증 정보가 없거나 익명 사용자일 경우 401 예외 발생
+	 * - 관리자 권한이 없는 경우 403 예외 발생
+	 */
+	private void assertAdmin() {
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		
+		// 인증 자체가 없거나(로그인 X) 익명인 경우 -> 401
+	    if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+	        throw new CustomAuthenticationException("로그인이 필요합니다.");
+	    }
+		
+	    // 권한 체크 -> 403
+	    boolean isAdmin = auth.getAuthorities().stream()
+	            .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+		
+		if (!isAdmin) {
+			throw new ForbiddenException("관리자 권한이 필요합니다.");
+		}
+	}
 	
-
+	
+	/**
+	 * 공지사항 전체 목록
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public NoticeListResponseDto getNoticeList(int page, int size, String keyword, String status) {
@@ -80,15 +117,28 @@ public class NoticeServiceImpl implements NoticeService {
 											  .build();
 	}
 	
+	
+	/**
+	 * 공지사항 등록
+	 */
 	@Override
 	@Transactional
 	public void registerNotice(NoticeRequestDto requestDto, MultipartFile image) {
+		
+		// Admin 확인용 메소드 호출
+		assertAdmin();
+		
+		// 현재 로그인한 관리자 ID
+		String memberId = SecurityContextHolder
+							.getContext()
+							.getAuthentication()
+							.getName();
 		
 		// 1. 공지사항 본문(Notice) 객체 생성
 		Notice notice = Notice.builder()
 						.noticeTitle(requestDto.getTitle())
 						.noticeContent(requestDto.getContent())
-						.memberId("user1") // currentMemberId 나중에 교체
+						.memberId(memberId)
 						.status("Y")
 						.build();
 		
@@ -118,6 +168,9 @@ public class NoticeServiceImpl implements NoticeService {
 		}
 	}
 	
+	/**
+	 * 공지사항 상세보기
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public NoticeDetailResponseDto getNoticeDetail(Long noticeNo) {
@@ -139,9 +192,15 @@ public class NoticeServiceImpl implements NoticeService {
 					.build();
 	}
 	
+	/**
+	 * 공지사항 수정
+	 */
 	@Override
 	@Transactional
 	public void updateNotice(Long noticeNo, NoticeUpdateRequestDto requestDto) {
+		
+		// Admin 확인용 메소드 호출
+		assertAdmin();
 		
 		// 1. 공지사항 확인
 		getActiveNoticeOrThrow(noticeNo);
@@ -178,9 +237,15 @@ public class NoticeServiceImpl implements NoticeService {
 	    }
 	}
 	
+	/**
+	 * 공지사항 삭제
+	 */
 	@Override
 	@Transactional
 	public void deleteNotice(Long noticeNo) {
+		
+		// Admin 확인용 메소드 호출
+		assertAdmin();
 		
 		// 1. 공지사항 확인
 		getActiveNoticeOrThrow(noticeNo);

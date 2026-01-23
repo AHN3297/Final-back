@@ -34,6 +34,20 @@ public class NoticeServiceImpl implements NoticeService {
 	private final Pagenation pagenation;
 	private final S3Service s3Service;
 	
+	private Notice getActiveNoticeOrThrow(Long noticeNo) {
+		
+		Notice notice = noticeRepository.findByNoticeNo(noticeNo);
+		
+		if(notice == null) {
+			throw new ResourceNotFoundException("공지사항을 찾을 수 없습니다. noticeNo=" + noticeNo);
+		}
+		if(!"Y".equals(notice.getStatus())) {
+			throw new ResourceNotFoundException("비활성화된 공지사항입니다. noticeNo=" + noticeNo);
+		}
+		
+		return notice;
+	}
+	
 	
 
 	@Override
@@ -109,16 +123,7 @@ public class NoticeServiceImpl implements NoticeService {
 	public NoticeDetailResponseDto getNoticeDetail(Long noticeNo) {
 		
 		// 1. 본문 조회
-		Notice notice = noticeRepository.findByNoticeNo(noticeNo);
-		
-		if (notice == null) {
-			throw new ResourceNotFoundException("공지사항을 찾을수 업습니다. noticeNo=" + noticeNo);
-		}
-		
-		// Status "Y"만 노출
-		if (!"Y".equals(notice.getStatus())) {
-			throw new ResourceNotFoundException("비활성화된 공지사항입니다. notice=" + noticeNo);
-		}
+		Notice notice = getActiveNoticeOrThrow(noticeNo);
 		
 		// 2. 이미지 조회
 		List<String> images = noticeRepository.findImageUrlsByNoticeNo(noticeNo);
@@ -134,12 +139,12 @@ public class NoticeServiceImpl implements NoticeService {
 					.build();
 	}
 	
+	@Override
 	@Transactional
 	public void updateNotice(Long noticeNo, NoticeUpdateRequestDto requestDto) {
 		
 		// 1. 공지사항 확인
-		Notice origin = noticeRepository.findByNoticeNo(noticeNo);
-		if(origin == null) throw new ResourceNotFoundException("공지사항을 찾을수 없습니다. noticeNo=" + noticeNo);
+		getActiveNoticeOrThrow(noticeNo);
 		
 		 
 		// 2. 본문 수정
@@ -171,6 +176,23 @@ public class NoticeServiceImpl implements NoticeService {
 	            }
 	        }
 	    }
+	}
+	
+	@Override
+	@Transactional
+	public void deleteNotice(Long noticeNo) {
+		
+		// 1. 공지사항 확인
+		getActiveNoticeOrThrow(noticeNo);
+		
+		// 2. 공지사항 소프트 삭제
+		noticeRepository.deleteNotice(noticeNo);
+		
+		// 3. 해당 공지사항 이미지 소프트 삭제 (Status 'Y' -> 'N')
+		List<Long> imgIds = noticeRepository.findImgIdsByNoticeNo(noticeNo);
+		if(imgIds != null && !imgIds.isEmpty()) {
+			noticeRepository.deleteNoticeImages(imgIds);
+		}
 	}
 
 }

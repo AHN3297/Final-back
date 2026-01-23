@@ -2,6 +2,7 @@ package com.kh.replay.notice.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -101,4 +102,16 @@ public class NoticeController {
 		
 	}
 
+	/**
+	 * 공지사항 삭제(소프트)
+	 * @param noticeNo
+	 * @return
+	 */
+	@DeleteMapping("/{noticeNo}")
+	public ResponseEntity<ResponseData<Void>> deleteNotice(@PathVariable("noticeNo") Long noticeNo){
+		
+		noticeService.deleteNotice(noticeNo);
+		
+		return ResponseData.ok(null, "공지사항 삭제 성공");
+	}
 }

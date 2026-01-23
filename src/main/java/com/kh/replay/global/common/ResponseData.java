@@ -15,7 +15,7 @@ public class ResponseData<T> {
    private String error;
    
 
-   // 성공 응답d
+   // 성공 응답
    public static <T> ResponseEntity<ResponseData<T>> ok(T data) {
       return ResponseEntity.ok(
          new ResponseData<T>(null, data, HttpStatus.OK.value(), null)

@@ -1,18 +1,19 @@
-package com.kh.replay.global.api.model.dto;
+package com.kh.replay.playList.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
-@Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MusicDTO {
-    private Long trackId;       // TRACK_ID 
+@Builder
+public class PlayListTrackVO {
+	private Long songNo;
+	private Long trackId;       // TRACK_ID 
     private Long artistId;      // ARTIST_ID 
     private String title;       // TITLE
     private String artistName;  // ARTIST_NAME
@@ -21,7 +22,5 @@ public class MusicDTO {
     private String coverImgUrl; // COVERIMG_URL
     private String previewUrl;  // PREVIEW_URL
     private String releaseDate; // RELEASE_DATE
-    @JsonProperty("trackTimeMillis")
-    private Long duration;    // DURATION
-    private String lyrics;
+    private String duration;    // DURATION
 }

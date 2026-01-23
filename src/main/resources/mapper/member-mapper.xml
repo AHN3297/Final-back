@@ -3,56 +3,65 @@
 <mapper namespace="com.kh.replay.member.model.dao.MemberMapper">
 
 
-<select id="loadByMemberId" resultType="map">
-	SELECT
-		   TB_MEMBER.MEMBER_ID 
-		 , TB_MEMBER.EMAIL
-		 , TB_LOCAL.PASSWORD 
-		 , TB_MEMBER.ROLE
-	FROM 
-		 TB_MEMBER
-	INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
-	WHERE TB_MEMBER.MEMBER_ID = #{username}	
-</select>
- 
-
-<select id="loadUser" resultType="map">
-	SELECT
-		   TB_MEMBER.MEMBER_ID 
-		 , TB_MEMBER.EMAIL
-		 , TB_LOCAL.PASSWORD 
-		 , TB_MEMBER.ROLE
-	FROM 
-		 TB_MEMBER
-	INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
-	WHERE TB_MEMBER.EMAIL = #{email}	
-			
+	<select id="loadByMemberId" resultType="map">
+		SELECT
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_LOCAL.PASSWORD
+		, TB_MEMBER.ROLE
+		FROM
+		TB_MEMBER
+		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
+		WHERE TB_MEMBER.MEMBER_ID = #{username}
 	</select>
 
-<update id="changeInfo" parameterType="com.kh.replay.member.model.dto.MemberDTO">
-        UPDATE TB_MEMBER
-        SET 
-            NICKNAME = #{nickName},
-            PHONE = #{phone},
-            GENRE = #{genre},
-            EMAIL = #{email},
-            MBTI = #{mbti},
-            GENDER = #{gender},
-            JOB=#{job}
-        WHERE MEMBER_ID = #{memberId}
-    </update>
-	<update id="socialUpdate" parameterType="com.kh.replay.member.model.vo.MemberVO">
+
+	<select id="loadUser" resultType="map">
+		SELECT
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_LOCAL.PASSWORD
+		, TB_MEMBER.ROLE
+		FROM
+		TB_MEMBER
+		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
+		WHERE TB_MEMBER.EMAIL = #{email}
+
+	</select>
+
+	<update id="changeInfo"
+		parameterType="com.kh.replay.member.model.dto.MemberDTO">
 		UPDATE TB_MEMBER
 		SET
-		    JOB = #{job},
-		    GENDER = #{gender},
-		    GENRE = #{genre} , 
-		    NICKNAME= #{nickName},
-		    PHONE =#{phone}
-		    WHERE
-			 MEMBER_ID =#{memberId}
+		NICKNAME = #{nickName},
+		PHONE = #{phone},
+		GENRE = #{genre},
+		EMAIL = #{email},
+		MBTI = #{mbti},
+		GENDER = #{gender},
+		JOB=#{job}
+		WHERE MEMBER_ID = #{memberId}
 	</update>
-	
-	
-	
+	<update id="socialUpdate"
+		parameterType="com.kh.replay.member.model.vo.MemberVO">
+		UPDATE TB_MEMBER
+		SET
+		JOB = #{job},
+		GENDER = #{gender},
+		GENRE = #{genre} ,
+		NICKNAME= #{nickName},
+		PHONE =#{phone}
+		WHERE
+		MEMBER_ID =#{memberId}
+	</update>
+	<insert id="insertOAuthBasicInfo"> INSERT INTO TB_MEMBER ( MEMBER_ID, EMAIL,
+		MEMBER_NAME, NICKNAME, PHONE, MBTI, MEMBER_JOB, GENRE, GENDER ) VALUES (
+		#{memberId}, #{email}, #{name}, 'TEMP', 'TEMP', 'UNKNOWN', 'UNKNOWN',
+		'UNKNOWN', 'U' ) </insert>
+	<update id="updateCompleteMember"> UPDATE TB_MEMBER SET NICKNAME =
+		#{nickName}, PHONE = #{phone}, MBTI = #{mbti}, MEMBER_JOB = #{job},
+		GENRE = #{genre}, GENDER = #{gender}, UPDATED_AT = SYSDATE WHERE
+		MEMBER_ID = #{memberId} </update>
+
+
 </mapper>

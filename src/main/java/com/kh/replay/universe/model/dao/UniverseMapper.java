@@ -1,4 +1,4 @@
-package com.kh.replay.universe.model.mapper;
+package com.kh.replay.universe.model.dao;
 
 import java.util.List;
 
@@ -34,4 +34,6 @@ public interface UniverseMapper {
 	int updateUniverse(UniverseDTO update);
 
 	void deleteUniverse(Long universeId);
+
+
 }

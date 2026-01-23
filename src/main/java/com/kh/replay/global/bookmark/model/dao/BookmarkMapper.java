@@ -13,6 +13,6 @@ public interface BookmarkMapper {
 
     int deleteBookmark(@Param("universeId") Long universeId, @Param("memberId") String memberId);
 
-    int countBookmark(@Param("universeId") Long universeId);
+    int countBookmark(Long universeId);
 
 }

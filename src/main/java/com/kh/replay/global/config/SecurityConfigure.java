@@ -41,7 +41,7 @@ public class SecurityConfigure {
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(Customizer.withDefaults())
 				.authorizeHttpRequests(requests -> {
-
+					
 					
 
 					 // 공지 조회(전체)
@@ -78,11 +78,12 @@ public class SecurityConfigure {
 					
 					requests.requestMatchers(HttpMethod.GET).authenticated();
 					// 로그인 필요(POST)
-					requests.requestMatchers(HttpMethod.POST,"/api/members/logout").authenticated();
+					requests.requestMatchers(HttpMethod.POST,"/api/members/logout", "/api/likes/**").authenticated();
 					// 로그인 필요(PUT)
 					requests.requestMatchers(HttpMethod.PUT,"/api/members").authenticated();
 					// 로그인 필요(DELETE)
-					requests.requestMatchers(HttpMethod.DELETE).authenticated();
+					requests.requestMatchers(HttpMethod.DELETE, "/api/likes/**").authenticated();
+					
 					
 					
 //					// 관리자

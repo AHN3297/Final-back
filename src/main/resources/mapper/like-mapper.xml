@@ -36,5 +36,72 @@
          WHERE 
                UNIVERSE_ID = #{universeId}
     </select>
+    
+    <select id="findSingerNoByApiId" resultType="Integer">
+        SELECT 
+               SINGER_NO 
+          FROM 
+               TB_API_SINGER 
+         WHERE 
+               API_SINGER_ID = #{apiSingerId}
+    </select>
+
+    <insert id="insertArtistApiInfo" useGeneratedKeys="true" keyProperty="singerNo" keyColumn="SINGER_NO">
+        INSERT 
+          INTO 
+               TB_API_SINGER 
+               (
+               SINGER_NO
+             , API_SINGER_NAME
+             , SINGER_GENRE
+             , SINGER_IMG_URL
+             , API_SINGER_ID
+               )
+        VALUES (
+               SEQ_SINGER_NO.NEXTVAL
+             , #{apiSingerName}
+             , #{singerGenre}
+             , #{singerImgUrl}
+             , #{apiSingerId}
+               )
+    </insert>
+
+    <select id="checkArtistLikeExists" resultType="_int">
+        SELECT 
+               COUNT(*) 
+          FROM 
+               TB_FAV_SINGER 
+         WHERE 
+               MEMBER_ID = #{memberId} 
+           AND 
+               SINGER_NO = #{singerNo}
+    </select>
+
+    <insert id="insertFavoriteArtist">
+        INSERT 
+          INTO 
+               TB_FAV_SINGER 
+               (
+               FAVORITE_SINGER_NO
+             , MEMBER_ID
+             , SINGER_NO
+               )
+        VALUES 
+               (
+               SEQ_FAVORITE_SINGER_NO.NEXTVAL
+             , #{memberId}
+             , #{singerNo}
+               )
+    </insert>
+
+    <delete id="deleteArtistLike">
+        DELETE 
+          FROM 
+               TB_FAV_SINGER
+         WHERE 
+               MEMBER_ID = #{memberId} 
+           AND 
+               SINGER_NO = #{singerNo}
+    </delete>
 
 </mapper>

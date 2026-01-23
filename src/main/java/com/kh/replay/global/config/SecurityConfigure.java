@@ -52,6 +52,8 @@ public class SecurityConfigure {
 	                requests.requestMatchers(HttpMethod.PUT,  "/api/admin/notices/**").hasRole("ADMIN");
 	                requests.requestMatchers(HttpMethod.PATCH,"/api/admin/notices/**").hasRole("ADMIN");
 	                requests.requestMatchers(HttpMethod.DELETE,"/api/admin/notices/**").hasRole("ADMIN");
+	                
+	                requests.requestMatchers(HttpMethod.POST, "/api/favorite/**").authenticated();
 					
 					
 	                // 유니버스 조회는 전체 허용

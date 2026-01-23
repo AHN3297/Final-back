@@ -36,5 +36,48 @@
          WHERE 
                UNIVERSE_ID = #{universeId}
     </select>
+    
+    <select id="findGenreIdByName"
+    		resultType="long">
+    	SELECT
+    	       GENRE_ID
+    	  FROM
+    	       TB_GENRE
+    	 WHERE
+    	       GENRE_NAME = #{genreName}		
+    </select>
+    
+    <select id="existsMemberGenre"
+    		resultType="int">
+    	SELECT
+    	       COUNT(*)
+    	  FROM
+    	       TB_MEMBER_GENRE
+    	 WHERE
+    	       MEMBER_ID = #{memberId}
+    	   AND
+    	       GENRE_ID = #{genreId}
+    </select>
+    
+    <insert id="insertMemberGenre"
+    		parameterType="com.kh.replay.global.like.model.vo.LikeGenreVO">
+    	<selectKey keyProperty="memberGenreNo" resultType="long" order="BEFORE">
+			SELECT SEQ_MEMBER_GENRE_NO.NEXTVAL FROM DUAL  
+		</selectKey>
+    	INSERT
+    	  INTO
+    	       TB_MEMBER_GENRE
+    	       (
+    	       MEMBER_GENRE_NO
+    	     , MEMBER_ID
+    	     , GENRE_ID  
+    	       )
+    	VALUES
+    		   (
+    		   #{memberGenreNo}
+    		 , #{memberId}
+    		 , #{genreId}  
+    		   )
+    </insert>
 
 </mapper>

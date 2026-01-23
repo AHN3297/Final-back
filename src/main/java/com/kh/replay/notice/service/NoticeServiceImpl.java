@@ -123,7 +123,7 @@ public class NoticeServiceImpl implements NoticeService {
 	public NoticeDetailResponseDto getNoticeDetail(Long noticeNo) {
 		
 		// 1. 본문 조회
-		Notice notice = noticeRepository.findByNoticeNo(noticeNo);
+		Notice notice = getActiveNoticeOrThrow(noticeNo);
 		
 		// 2. 이미지 조회
 		List<String> images = noticeRepository.findImageUrlsByNoticeNo(noticeNo);

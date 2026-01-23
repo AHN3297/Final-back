@@ -187,7 +187,7 @@ public class UniverseController {
     }
     
     /**
-     * 7. 유니버스 북마크 (생성)
+     * 9. 유니버스 북마크 (생성)
      */
     @PostMapping("/{universeId}/bookmark")
     public ResponseEntity<ResponseData<BookmarkResponse>> bookmarkUniverse(
@@ -197,7 +197,21 @@ public class UniverseController {
         // 추가 서비스 
     	BookmarkResponse response = bookmarkService.bookmarkUniverse(universeId, user.getUsername());
         
-        return ResponseData.ok(response, "좋아요를 눌렀습니다.");
+        return ResponseData.ok(response, "찜하기를 눌렀습니다.");
+    }
+    
+    /**
+     * 10. 유니버스 북마크 취소 (삭제)
+     */
+    @DeleteMapping("/{universeId}/bookmark")
+    public ResponseEntity<ResponseData<BookmarkResponse>> unbookmarkUniverse(
+            @PathVariable("universeId") Long universeId,
+            @AuthenticationPrincipal CustomUserDetails user 
+    ) {
+        //삭제서비스
+    	BookmarkResponse response = bookmarkService.unbookmarkUniverse(universeId, user.getUsername());
+        
+        return ResponseData.ok(response, "찜하기를 취소했습니다.");
     }
     
     

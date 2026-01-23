@@ -36,6 +36,22 @@ public class BookmarkServiceImpl implements BookmarkService {
 	            .bookmarkCount(totalBookmark)
 	            .build();
 	}
+	
+	@Override
+	public BookmarkResponse unbookmarkUniverse(Long universeId, String memberId) {
+	    validator.validateExisting(universeId);
+	    
+	    bookmarkManager.deleteBookmark(universeId, memberId); 
+	    
+	    int totalBookmark = countBookmarks(universeId);
+	    
+	    return BookmarkResponse.builder()
+	            .targetId(universeId)
+	            .isBookmark(false) // 무조건 false
+	            .bookmarkCount(totalBookmark)
+	            .build();
+	}
+
 
 
 
@@ -43,5 +59,8 @@ public class BookmarkServiceImpl implements BookmarkService {
     private int countBookmarks(Long universeId) {
     	return bookmarkMapper.countBookmark(universeId);
     }
+
+
+
 
 }

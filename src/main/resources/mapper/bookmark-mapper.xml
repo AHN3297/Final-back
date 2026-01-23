@@ -32,6 +32,14 @@
                )
     </insert>
     
+        <delete id="deleteBookmark">
+        DELETE 
+          FROM 
+                TB_FAV_UNIVERSE 
+         WHERE 
+               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+    </delete>
+    
     
     <select id="countBookmark" resultType="int">
         SELECT 

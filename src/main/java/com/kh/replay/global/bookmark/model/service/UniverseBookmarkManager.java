@@ -18,4 +18,10 @@ public class UniverseBookmarkManager {
         	bookmarkMapper.insertBookmark(universeId, memberId);
         }
     }
+
+	public void deleteBookmark(Long universeId, String memberId) {
+        if (bookmarkMapper.checkBookmark(universeId, memberId) > 0) {
+        	bookmarkMapper.deleteBookmark(universeId, memberId);
+        }
+	}
 }

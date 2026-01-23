@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,14 +27,37 @@ import com.kh.replay.notice.model.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 
 
+
+/**
+ * 공지사항 도메인의 비즈니스 로직을 담당하는 Service 구현체
+ * - 공지사항 CRUD 처리
+ * - 관리자 권한 검증
+ * - 공지사항 상태(활성/비활성) 검증
+ * - 이미지 업로드(S3) 및 이미지 상태 관리
+ *
+ * Controller → Service → Repository 구조에서
+ * Service 계층이 비즈니스 규칙의 중심 역할을 수행한다.
+ */
 @Service
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 	
+	/** 공지사항 및 이미지 관련 DB 접근을 담당하는 Repository */
 	private final NoticeRepository noticeRepository;
+	/** 공통 페이징 계산 유틸 */
 	private final Pagenation pagenation;
+	/** 공지사항 이미지 업로드를 위한 S3 서비스 */
 	private final S3Service s3Service;
 	
+	/**
+	 * 공지사항 존재 여부 및 활성 상태를 검증한다.
+	 * - 공지사항이 존재하지 않거나
+	 * - 상태가 비활성(Y가 아닌 경우)
+	 * 위 조건 중 하나라도 만족하지 않으면 예외를 발생시킨다.
+	 *
+	 * @param noticeNo 공지사항 번호
+	 * @return 활성 상태의 공지사항 엔티티
+	 */
 	private Notice getActiveNoticeOrThrow(Long noticeNo) {
 		
 		Notice notice = noticeRepository.findByNoticeNo(noticeNo);
@@ -48,8 +72,20 @@ public class NoticeServiceImpl implements NoticeService {
 		return notice;
 	}
 	
-	
-
+	/**
+	 * 공지사항 목록 조회
+	 * - 상태(status) 기준 필터링
+	 * - 제목 키워드 검색 지원
+	 * - 페이징 처리
+	 *
+	 * 관리자/일반 조회 공통으로 사용되는 목록 조회 로직
+	 *
+	 * @param page    현재 페이지 번호 (1부터 시작)
+	 * @param size    페이지당 조회 개수
+	 * @param keyword 검색 키워드 (nullable)
+	 * @param status  공지사항 상태 (Y/N)
+	 * @return 공지사항 목록 및 페이징 정보 DTO
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public NoticeListResponseDto getNoticeList(int page, int size, String keyword, String status) {
@@ -80,15 +116,31 @@ public class NoticeServiceImpl implements NoticeService {
 											  .build();
 	}
 	
+	
+	/**
+	 * 공지사항 등록
+	 * - 관리자 권한 필요
+	 * - 공지사항 본문 저장
+	 * - 이미지가 존재할 경우 S3 업로드 후 이미지 테이블에 저장
+	 *
+	 * @param requestDto 공지사항 등록 요청 DTO (제목, 내용)
+	 * @param image      첨부 이미지 파일 (nullable)
+	 */
 	@Override
 	@Transactional
 	public void registerNotice(NoticeRequestDto requestDto, MultipartFile image) {
+		
+		// 현재 로그인한 관리자 ID
+		String memberId = SecurityContextHolder
+							.getContext()
+							.getAuthentication()
+							.getName();
 		
 		// 1. 공지사항 본문(Notice) 객체 생성
 		Notice notice = Notice.builder()
 						.noticeTitle(requestDto.getTitle())
 						.noticeContent(requestDto.getContent())
-						.memberId("user1") // currentMemberId 나중에 교체
+						.memberId(memberId)
 						.status("Y")
 						.build();
 		
@@ -118,6 +170,14 @@ public class NoticeServiceImpl implements NoticeService {
 		}
 	}
 	
+	/**
+	 * 공지사항 상세 조회
+	 * - 활성 상태(Y) 공지사항만 조회 가능
+	 * - 공지사항 본문과 연결된 이미지 목록을 함께 조회
+	 *
+	 * @param noticeNo 공지사항 번호
+	 * @return 공지사항 상세 정보 DTO
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public NoticeDetailResponseDto getNoticeDetail(Long noticeNo) {
@@ -139,6 +199,16 @@ public class NoticeServiceImpl implements NoticeService {
 					.build();
 	}
 	
+	/**
+	 * 공지사항 수정
+	 * - 관리자 권한 필요
+	 * - 공지사항 본문 수정
+	 * - 선택된 이미지 소프트 삭제 처리
+	 * - 신규 이미지가 있을 경우 S3 업로드 후 추가
+	 *
+	 * @param noticeNo   공지사항 번호
+	 * @param requestDto 공지사항 수정 요청 DTO
+	 */
 	@Override
 	@Transactional
 	public void updateNotice(Long noticeNo, NoticeUpdateRequestDto requestDto) {
@@ -178,6 +248,14 @@ public class NoticeServiceImpl implements NoticeService {
 	    }
 	}
 	
+	/**
+	 * 공지사항 삭제 (소프트 삭제)
+	 * - 관리자 권한 필요
+	 * - 공지사항 상태를 비활성화 처리
+	 * - 연결된 이미지도 함께 소프트 삭제
+	 *
+	 * @param noticeNo 공지사항 번호
+	 */
 	@Override
 	@Transactional
 	public void deleteNotice(Long noticeNo) {

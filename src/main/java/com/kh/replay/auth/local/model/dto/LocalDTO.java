@@ -5,8 +5,10 @@ package com.kh.replay.auth.local.model.dto;
 import com.kh.replay.member.model.dto.MemberDTO;
 
 import jakarta.validation.Valid;
+import lombok.Builder;
 import lombok.Data;
-
+import lombok.Setter;
+@Builder
 @Data
 public class LocalDTO {
 	

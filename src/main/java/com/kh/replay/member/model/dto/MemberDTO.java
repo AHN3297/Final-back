@@ -2,11 +2,12 @@ package com.kh.replay.member.model.dto;
 
 import java.sql.Date;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Setter;
 @Data
+@Setter
 public class MemberDTO {
 
 //	@NotBlank(message="memberId는 필수입니다.")

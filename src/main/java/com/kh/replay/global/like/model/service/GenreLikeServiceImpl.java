@@ -49,7 +49,6 @@ public class GenreLikeServiceImpl implements GenreLikeService {
 				.targetId(genreId)
 				.type("GENRE")
 				.isLiked(true)
-				.likeCount(0)
 				.build();
 	}
 }

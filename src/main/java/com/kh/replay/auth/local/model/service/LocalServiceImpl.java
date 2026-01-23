@@ -4,7 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kh.replay.auth.local.model.dao.LocalMapper;
+import com.kh.replay.auth.local.model.dao.localMapper;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.global.exception.MemberJoinException;
 import com.kh.replay.member.model.vo.MemberVO;
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class LocalServiceImpl implements LocalService {
-	private final LocalMapper localMapper;
+	private final localMapper localmapper;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional 
@@ -39,13 +39,13 @@ public class LocalServiceImpl implements LocalService {
 				.status("Y").build();
 
 		// 회원 공통 정보 insert
-		int result = localMapper.insertMember(member);
+		int result = localmapper.insertMember(member);
 
 		if (result <= 0) {
 			throw new MemberJoinException("회원가입에 실패했습니다.");
 		}
 
-		result = localMapper.signUp(local);
+		result = localmapper.signUp(local);
 
 		if (result <= 0) {
 			throw new MemberJoinException("로컬 인증 정보 등록에 실패했습니다.");

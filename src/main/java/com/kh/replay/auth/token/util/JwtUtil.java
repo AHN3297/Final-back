@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
-
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,40 +17,69 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-//토큰을 만들어내는 기능들을 가지고 있을  클래스
 public class JwtUtil {
-@Value("${jwt.secret}")
-private String secretKey;
-private SecretKey key;
-
-@PostConstruct
-public void init() {
-	log.info("{}",secretKey);
-	byte[] arr = Base64.getDecoder().decode(secretKey);
-	this.key = Keys.hmacShaKeyFor(arr);
-	
-}
-public String getAccessToken(String username) {
-	return Jwts.builder()
-				.subject(username) //사용자 아이디
-				.issuedAt(new Date()) //발급일
-				.expiration(new Date(System.currentTimeMillis() + (1000*60*60*24*7)))//만료일 //이거 나중에 꼭 수정해야함
-				.signWith(key)//서명
-				.compact();
-}
-public String getRefreshToken(String username) {
-	return Jwts.builder()
-				.subject(username)
-				.issuedAt(new Date())
-				.expiration(Date.from(Instant.now().plus(Duration.ofDays(3))))
-				.signWith(key)
-				.compact();
-}
-public Claims parseJwt(String token) {
-	return Jwts.parser()	
-			   .verifyWith(key)
-			   .build()
-			   .parseSignedClaims(token)
-			   .getPayload();
-}
+    
+    @Value("${jwt.secret}")
+    private String secretKey;
+    
+    private SecretKey key;
+    
+    @PostConstruct
+    public void init() {
+        log.info("{}", secretKey);
+        byte[] arr = Base64.getDecoder().decode(secretKey);
+        this.key = Keys.hmacShaKeyFor(arr);
+    }
+    
+    // 기존 메서드 (일반 로그인용)
+    public String getAccessToken(String username) {
+        return Jwts.builder()
+                    .subject(username)
+                    .issuedAt(new Date())
+                    .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
+                    .signWith(key)
+                    .compact();
+    }
+    
+    // OAuth 로그인용 메서드 추가
+    public String getAccessToken(String memberId, String email, String role ,String name) {
+        return Jwts.builder()
+                    .subject(memberId)                    // memberId를 subject로
+                    .claim("email", email)                // email 추가
+                    .claim("role", role)                  // role 추가
+                    .claim("name",name)
+                    .issuedAt(new Date())
+                    .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))  // 24시간
+                    .signWith(key)
+                    .compact();
+    }
+    
+    public String getRefreshToken(String username) {
+        return Jwts.builder()
+                    .subject(username)
+                    .issuedAt(new Date())
+                    .expiration(Date.from(Instant.now().plus(Duration.ofDays(3))))
+                    .signWith(key)
+                    .compact();
+    }
+    
+    public Claims parseJwt(String token) {
+        return Jwts.parser()	
+                   .verifyWith(key)
+                   .build()
+                   .parseSignedClaims(token)
+                   .getPayload();
+    }
+    
+    public String getMemberIdFromToken(String token) {
+        return parseJwt(token).getSubject();
+    }
+    
+    public String getEmailFromToken(String token) {
+        return parseJwt(token).get("email", String.class);
+    }
+    
+    public String getRoleFromToken(String token) {
+        return parseJwt(token).get("role", String.class);
+    }
 }

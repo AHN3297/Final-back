@@ -14,7 +14,6 @@ import lombok.Setter;
 public class BookmarkResponse {
 
 	private Long targetId;
-	private String type;
 	private boolean isBookmark;
 	private int bookmarkCount;
 

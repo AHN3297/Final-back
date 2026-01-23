@@ -197,7 +197,7 @@ public class UniverseController {
         // 추가 서비스 
     	BookmarkResponse response = bookmarkService.bookmarkUniverse(universeId, user.getUsername());
         
-        return ResponseData.ok(response, "좋아요를 눌렀습니다.");
+        return ResponseData.ok(response, "찜하기를 눌렀습니다.");
     }
     
     

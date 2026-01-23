@@ -18,7 +18,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 	
     private final BookmarkMapper bookmarkMapper;
     private final UniverseValidator validator;
-    private final UniverseBookmarkManager bookmarkManager; 
+    private final UniverseBookmarkService bookmarkService; 
 	
 
 	@Override
@@ -28,7 +28,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 	    validator.validateExisting(universeId);
 	    
         // 2. 매니저 호출 
-	    bookmarkManager.createBookmark(universeId, memberId); 
+	    bookmarkService.createBookmark(universeId, memberId); 
 	    
         // 3. 카운트 조회 (Long 타입 그대로 전달)
 	    int totalBookmark = countBookmarks(universeId);
@@ -47,7 +47,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 	    validator.validateExisting(universeId);
 	    
 	    // 2. 매니저 호출
-	    bookmarkManager.deleteBookmark(universeId, memberId); 
+	    bookmarkService.deleteBookmark(universeId, memberId); 
 	    
         // 3. 카운트 조회
 	    int totalBookmark = countBookmarks(universeId);

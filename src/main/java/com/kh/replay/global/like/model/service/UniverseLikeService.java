@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class UniverseLikeManager {
+public class UniverseLikeService {
 
     private final LikeMapper likeMapper;
     

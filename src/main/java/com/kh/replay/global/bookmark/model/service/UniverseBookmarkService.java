@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class UniverseBookmarkManager {
+public class UniverseBookmarkService {
 
     private final BookmarkMapper bookmarkMapper;
     

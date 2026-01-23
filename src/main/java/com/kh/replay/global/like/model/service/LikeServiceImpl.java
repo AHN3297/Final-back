@@ -18,7 +18,7 @@ public class LikeServiceImpl implements LikeService {
 
     private final LikeMapper likeMapper; // 카운트 조회용
     private final UniverseValidator validator;
-    private final UniverseLikeManager likeManager; // 매니저 추가
+    private final UniverseLikeService universeLikeService; // 매니저 추가
 
     // 좋아요 추가
     @Override
@@ -27,7 +27,7 @@ public class LikeServiceImpl implements LikeService {
         validator.validateExisting(universeId);
         
         // 2. 매니저에게 위임
-        likeManager.createLike(universeId, memberId); 
+        universeLikeService.createLike(universeId, memberId); 
         
         // 3. 총 개수 조회
         int totalLikes = countLikes(universeId);
@@ -46,7 +46,7 @@ public class LikeServiceImpl implements LikeService {
         validator.validateExisting(universeId);
         
         // 2. 매니저에게 위임
-        likeManager.deleteLike(universeId, memberId);
+        universeLikeService.deleteLike(universeId, memberId);
         
         // 3. 총 개수 조회
         int totalLikes = countLikes(universeId);

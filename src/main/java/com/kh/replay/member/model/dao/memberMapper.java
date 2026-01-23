@@ -34,7 +34,7 @@ public interface memberMapper {
 	void withdrawMember(String memberId);
 
 	@Update("UPDATE TB_MEMBER SET NICKNAME = #{nickName}, PHONE = #{phone}, MBTI = #{mbti},	  MEMBER_JOB = #{job},GENRE = #{genre}, GENDER = #{gender}, UPDATED_AT = SYSDATE	 WHERE MEMBER_ID = #{memberId}")
-	Map<String,Object> updateCompleteMember(AdditionalInfoRequest request);
+	void updateCompleteMember(AdditionalInfoRequest request);
 
 	@Insert("INSERT INTO TB_MEMBER (MEMBER_ID ,EMAIL,MEMBER_NAME ,NICKNAME, PHONE,MBTI,MEMBER_JOB,GENRE,GENDER)VALUES(#{memberId},#{email},#{name},'TEMP','TEMP','UNKNOWN','UNKNOWN','UNKNOWN','U')")
 	void insertOAuthBasicInfo(OAuthUserDTO oauthUser);

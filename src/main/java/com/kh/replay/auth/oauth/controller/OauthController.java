@@ -27,7 +27,7 @@ public class OauthController {
 	private final JwtUtil jwtUtil;
 	
 	@PutMapping("/complete")
-	public ResponseEntity<ResponseData<Map<String,Object>>> addsocialInfo(
+	public ResponseEntity<ResponseData<AdditionalInfoRequest>> addsocialInfo(
 			@RequestBody AdditionalInfoRequest request, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
 				String token = authorization.substring(7); 
 		        Claims claims = jwtUtil.parseJwt(token);
@@ -40,11 +40,10 @@ public class OauthController {
 		        request.setMemberId(memberId);
 		        request.setEmail(email);
 		        request.setName(name);
-		        log.info("{}",request);
 		//멤버 테이블에 나머지 정보 저장
-	Map<String,Object>	response =membermapper.updateCompleteMember(request);
-		
-		return ResponseData.created(response, "회원가입이 성공하셨습니다.");
+		membermapper.updateCompleteMember(request);
+		        
+		return ResponseData.created(request, "회원가입이 성공하셨습니다.");
 	}
 	
 	

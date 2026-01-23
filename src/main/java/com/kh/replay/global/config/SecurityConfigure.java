@@ -68,6 +68,7 @@ public class SecurityConfigure {
 	                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 	                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
 
+
 	                requests.requestMatchers(HttpMethod.PUT).permitAll(); 
 	                
 	                requests.requestMatchers(HttpMethod.GET).authenticated();

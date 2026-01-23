@@ -1,6 +1,9 @@
 package com.kh.replay.global.api.itunes;
 
+import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +26,8 @@ public class ItunesVO {
         private String previewUrl;     // 미리듣기
         private String primaryGenreName;
         private String releaseDate;	
+        @JsonProperty("trackTimeMillis")
+        private Long duration;
 	}
 
 }

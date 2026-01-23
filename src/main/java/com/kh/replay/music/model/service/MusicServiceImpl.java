@@ -53,6 +53,7 @@ public class MusicServiceImpl implements MusicService {
                 .previewUrl(item.getPreviewUrl())
                 .releaseDate(item.getReleaseDate())
                 .genreName(item.getPrimaryGenreName())
+                .duration(item.getDuration())
                 .build()
         ).collect(Collectors.toList());
     }
@@ -103,6 +104,7 @@ public class MusicServiceImpl implements MusicService {
                 .previewUrl(item.getPreviewUrl())
                 .releaseDate(item.getReleaseDate())
                 .genreName(item.getPrimaryGenreName())
+                .duration(item.getDuration())
                 .lyrics(lyrics)
                 .build();
     }

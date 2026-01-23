@@ -172,5 +172,24 @@ public class NoticeServiceImpl implements NoticeService {
 	        }
 	    }
 	}
+	
+	@Transactional
+	public void deleteNotice(Long noticeNo) {
+		
+		// 1. 공지사항 확인
+		Notice origin = noticeRepository.findByNoticeNo(noticeNo);
+		if(origin == null) {
+			throw new ResourceNotFoundException("공지사항을 찾을 수 없습니다. noticeNo=" + noticeNo);
+		}
+		
+		// 2. 공지사항 소프트 삭제
+		noticeRepository.deleteNotice(noticeNo);
+		
+		// 3. 해당 공지사항 이미지 소프트 삭제 (Status 'Y' -> 'N')
+		List<Long> imgIds = noticeRepository.findImgIdsByNoticeNo(noticeNo);
+		if(imgIds != null && !imgIds.isEmpty()) {
+			noticeRepository.deleteNoticeImages(imgIds);
+		}
+	}
 
 }

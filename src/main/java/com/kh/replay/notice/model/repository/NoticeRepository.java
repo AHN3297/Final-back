@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.session.RowBounds;
 
 import com.kh.replay.notice.model.domain.Notice;
 import com.kh.replay.notice.model.domain.NoticeImg;
@@ -32,14 +31,17 @@ public interface NoticeRepository {
 	int updateNotice(@Param("noticeNo") Long noticeNo,
 					 @Param("req") NoticeUpdateRequestDto req);
 	
+	// 이미지 삭제(소프트)
 	int deleteNoticeImages(List<Long> imgIds);
 	
 	int insertNoticeImage(@Param("noticeNo") Long noticeNo,
 						  @Param("originName") String originName,
 						  @Param("changeName") String changeName);
 	
-	// 공지사항 삭제
-	int delete(Long id);
+	// 공지사항 삭제(소프트 삭제)
+	int deleteNotice(Long noticeNo);
 	
-
+	// 해당 공지 이미지 ID 목록
+	List<Long> findImgIdsByNoticeNo(Long noticeNo);
+	
 }

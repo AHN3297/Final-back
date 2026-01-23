@@ -1,17 +1,16 @@
 package com.kh.replay.global.bookmark.model.dao;
 
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface BookmarkMapper {
 
+    int checkBookmark(Map<String, Object> params);
 
-    int checkBookmark(@Param("universeId") Long universeId, @Param("memberId") String memberId);
+    int insertBookmark(Map<String, Object> params);
 
-    int insertBookmark(@Param("universeId") Long universeId, @Param("memberId") String memberId);
-
-    int deleteBookmark(@Param("universeId") Long universeId, @Param("memberId") String memberId);
+    int deleteBookmark(Map<String, Object> params);
 
     int countBookmark(Long universeId);
 

@@ -6,4 +6,6 @@ public interface BookmarkService {
 
 	BookmarkResponse bookmarkUniverse(Long universeId, String username);
 
+	BookmarkResponse unbookmarkUniverse(Long universeId, String username);
+
 }

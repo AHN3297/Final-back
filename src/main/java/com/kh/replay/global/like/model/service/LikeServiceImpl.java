@@ -1,11 +1,16 @@
 package com.kh.replay.global.like.model.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.global.api.model.dto.ArtistDTO;
+import com.kh.replay.global.api.model.dto.MusicDTO;
 import com.kh.replay.global.like.model.dao.LikeMapper;
 import com.kh.replay.global.like.model.dto.LikeResponse;
+import com.kh.replay.global.like.model.vo.LikeArtistVO;
+import com.kh.replay.global.like.model.vo.LikeTrackVO;
 import com.kh.replay.universe.model.service.UniverseValidator;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +26,7 @@ public class LikeServiceImpl implements LikeService {
     private final UniverseValidator validator;
     private final UniverseLikeService universeLikeService; // 매니저 추가
     private final ArtistLikeService artistLikeService;
+    private final TrackLikeService trackLikeService;
 
     // 좋아요 추가
     @Override
@@ -81,6 +87,14 @@ public class LikeServiceImpl implements LikeService {
                 .build();
     }
     
+    // 좋아하는 아티스트 조회
+    @Override
+    @Transactional(readOnly = true)
+    public List<LikeArtistVO> findAllFavoriteArtists(String memberId) {
+        // 이제 JwtFilter에서 정상적으로 전달된 memberId를 기반으로 조회합니다.
+        return likeMapper.selectFavoriteArtists(memberId);
+    }
+    
     // 좋아하는 아티스트 삭제
     @Override
     public LikeResponse unlikeArtist(int singerNo, String memberId) {
@@ -91,5 +105,59 @@ public class LikeServiceImpl implements LikeService {
                 .targetId((long)singerNo)
                 .isLiked(false)
                 .build();
+    }
+    
+    
+    // 좋아하는 노래 추가
+    @Override
+    @Transactional
+    public LikeTrackVO likeTrack(MusicDTO musicDto, String memberId) { 
+        LikeTrackVO trackVO = LikeTrackVO.builder()
+                .trackId(musicDto.getTrackId())     
+                .artistId(musicDto.getArtistId())   
+                .title(musicDto.getTitle())
+                .artistName(musicDto.getArtistName())
+                .album(musicDto.getAlbum())
+                .genreName(musicDto.getGenreName())
+                .duration(String.valueOf(musicDto.getDuration())) 
+                .releaseDate(musicDto.getReleaseDate())
+                .coverImgUrl(musicDto.getCoverImgUrl())
+                .previewUrl(musicDto.getPreviewUrl())
+                .build();
+
+        // DB에서 songNo를 가져오거나 생성
+        Long songNo = trackLikeService.getOrInsertTrack(trackVO);
+        
+        // 생성된(혹은 조회된) PK를 객체에 넣어줌
+        trackVO.setSongNo(songNo);
+
+        // 좋아요 테이블 등록
+        trackLikeService.addTrackToFavorite(memberId, songNo);
+
+        return trackVO;
+    }
+    
+    @Override
+    public List<LikeTrackVO> getMyLikes(String memberId) {
+        return trackLikeService.getFavoriteTracks(memberId);
+    }
+
+    @Override
+    @Transactional
+    public int deleteLike(String memberId, Long songNo) {
+        int result = trackLikeService.removeFavorite(memberId, songNo);
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public int reorderTracks(String memberId, List<LikeTrackVO> newOrderList) {
+    	int totalUpdatedRows = 0;
+        // 리액트에서 변경된 순서가 담긴 리스트를 보내주면 순차적으로 업데이트
+        for (LikeTrackVO track : newOrderList) {
+            int result = trackLikeService.changeOrder(memberId, track.getSongNo(), track.getTrackOrder());
+            totalUpdatedRows += result;
+        }
+		return totalUpdatedRows;
     }
 }

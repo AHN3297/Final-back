@@ -1,5 +1,6 @@
 package com.kh.replay.global.like.model.dao; 
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -9,7 +10,8 @@ import com.kh.replay.global.like.model.vo.LikeArtistVO;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.kh.replay.global.like.model.vo.LikeGenreVO; 
+import com.kh.replay.global.like.model.vo.LikeGenreVO;
+import com.kh.replay.global.like.model.vo.LikeTrackVO; 
 
 
 @Mapper
@@ -39,6 +41,9 @@ public interface LikeMapper {
     // 좋아하는 가수 삭제 (중간테이블만 삭제)
     int deleteArtistLike(Map<String, Object> params);
    
+    // 좋아하는 가수 조회
+    List<LikeArtistVO> selectFavoriteArtists(String memberId);
+    
     // 장르 선택 인터페이스
     Long findGenreIdByName(String genreName);
     
@@ -46,6 +51,29 @@ public interface LikeMapper {
     					  @Param("genreId") Long genreId);
     
     int insertMemberGenre(LikeGenreVO vo);
+    
+    
+    // 노래 중복 확인
+	Long selectSongNoByApiId(Long track);
+	
+	// 좋아하는 노래 중복 확인
+	int checkSongLikeExists(@Param("memberId") String memberId, @Param("songNo") Long songNo);
+	
+	// 좋아하는 노래 정보 추가
+	int insertApiSong(LikeTrackVO trackVO);
+	
+	// 좋아하는 노래 추가
+	int insertFavoriteSong(@Param("memberId") String memberId, 
+			                @Param("songNo") Long songNo);
+
+	List<LikeTrackVO> selectFavoriteTracks(String memberId);
+
+	int deleteFavoriteSong(@Param("memberId") String memberId, @Param("songNo")Long songNo);
+
+	int updateTrackOrder(@Param("memberId")String memberId, @Param("songNo") Long songNo, @Param("newOrder")int newOrder);
+
+	
+
 
     
 

@@ -46,8 +46,7 @@ public class SecurityConfigure {
 					.formLogin(AbstractHttpConfigurer::disable)
 					.csrf(AbstractHttpConfigurer::disable)
 					.cors(Customizer.withDefaults())
-					// 팀원이 추가한 OAuth2 소셜 로그인 설정 통합
-					.oauth2Login(oauth -> oauth
+					.oauth2Login(oauth -> oauth 
 							.userInfoEndpoint(userInfo -> userInfo
 									.userService(oAuth2UserService)
 							)
@@ -59,12 +58,11 @@ public class SecurityConfigure {
 						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
 						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
 						
-						// 2. 플레이리스트 관련 허용 (팀원 작업분 반영)
+
 						requests.requestMatchers("/api/member/playList/**").permitAll();
 						
-						// 3. 좋아요(Likes) 관련 설정 (사용자님 작업분 - 인증 필수)
-						// 이 설정이 있어야 Postman 테스트 시 토큰 인증이 정상 작동합니다.
-						requests.requestMatchers("/api/likes/**").authenticated();
+
+						requests.requestMatchers("/api/favorite/**").authenticated();
 
 						// 4. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
 						requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll(); 

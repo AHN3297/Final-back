@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kh.replay.global.api.model.dto.ArtistDTO;
+import com.kh.replay.global.exception.DuplicateException;
+import com.kh.replay.global.exception.LikeException;
 import com.kh.replay.global.like.model.dao.LikeMapper;
 import com.kh.replay.global.like.model.vo.LikeArtistVO;
 
@@ -42,7 +44,7 @@ public class ArtistLikeService {
         params.put("singerNo", singerNo);
 
         if(likeMapper.checkArtistLikeExists(params) > 0) {
-        	throw new RuntimeException("이미 좋아하는 아티스트입니다.");
+        	throw new DuplicateException("이미 좋아하는 아티스트입니다.");
         }
       
         int result = likeMapper.insertFavoriteArtist(params);
@@ -57,6 +59,8 @@ public class ArtistLikeService {
         params.put("singerNo", singerNo);
 
         int result = likeMapper.deleteArtistLike(params);
-        if (result <= 0) throw new RuntimeException("좋아요 삭제 실패");
+        if (result <= 0) {
+        	throw new LikeException("좋아요 삭제 실패");
+        }
     }
 }

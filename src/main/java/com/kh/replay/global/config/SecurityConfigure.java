@@ -57,23 +57,22 @@ public class SecurityConfigure {
 						requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
 						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
 						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
-						
 
-						requests.requestMatchers("/api/member/playList/**").permitAll();
-						
-
+						// 2. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
+						requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated(); 
+						requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
+						requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").authenticated();
 						requests.requestMatchers("/api/favorite/**").authenticated();
-
-						// 4. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
-						requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll(); 
-						requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
-						requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
+						requests.requestMatchers("/api/member/playList/**").authenticated();
 						
-						// 5. 명시적 인증 필요 경로 (로그아웃, 내 정보 수정)
+						// 3. 명시적 인증 필요 경로 (로그아웃, 내 정보 수정)
 						requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 						requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
 						
-						// 6. 기타 기본 보안 정책
+						// 음악/아티스트 상세조회 로그인필요
+						requests.requestMatchers(HttpMethod.GET, "/api/music/**", "/api/artist/**").authenticated();
+						
+						// 5. 기타 기본 보안 정책
 						requests.requestMatchers(HttpMethod.GET).authenticated();
 						requests.requestMatchers(HttpMethod.DELETE).authenticated();
 						requests.requestMatchers(HttpMethod.PUT).permitAll();

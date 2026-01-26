@@ -3,8 +3,7 @@ package com.kh.replay.global.like.model.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 
 import com.kh.replay.global.api.model.dto.ArtistDTO;
 import com.kh.replay.global.exception.DuplicateException;
@@ -14,7 +13,7 @@ import com.kh.replay.global.like.model.vo.LikeArtistVO;
 
 import lombok.RequiredArgsConstructor;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ArtistLikeService {
 
@@ -48,7 +47,9 @@ public class ArtistLikeService {
         }
       
         int result = likeMapper.insertFavoriteArtist(params);
-        if (result <= 0) throw new RuntimeException("좋아요 등록 실패");
+        if (result <= 0) {
+        	throw new RuntimeException("좋아요 등록 실패");
+        }
         
     }
 

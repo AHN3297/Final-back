@@ -3,38 +3,29 @@
 
 <mapper namespace="com.kh.replay.global.like.model.dao.LikeMapper">
 
+    <!-- ===================== 유니버스 좋아요 ===================== -->
     <select id="checkLike" resultType="int" parameterType="map">
-        SELECT 
-               COUNT(1) 
-          FROM 
-               TB_UNIVERSE_LIKED 
-         WHERE 
-               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+        SELECT COUNT(1) 
+          FROM TB_UNIVERSE_LIKED 
+         WHERE UNIVERSE_ID = #{universeId} 
+           AND MEMBER_ID = #{memberId}
     </select>
     
     <insert id="insertLike" parameterType="map">
-        INSERT 
-          INTO 
-               TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) 
-        VALUES 
-               (#{universeId}, #{memberId})
+        INSERT INTO TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) 
+        VALUES (#{universeId}, #{memberId})
     </insert>
     
     <delete id="deleteLike" parameterType="map">
-        DELETE 
-          FROM 
-               TB_UNIVERSE_LIKED 
-         WHERE 
-               UNIVERSE_ID = #{universeId} AND MEMBER_ID = #{memberId}
+        DELETE FROM TB_UNIVERSE_LIKED 
+         WHERE UNIVERSE_ID = #{universeId} 
+           AND MEMBER_ID = #{memberId}
     </delete>
     
-    <select id="countLikes" resultType="int">
-        SELECT 
-               COUNT(1) 
-          FROM 
-               TB_UNIVERSE_LIKED 
-         WHERE 
-               UNIVERSE_ID = #{universeId}
+    <select id="countUniverseLikes" resultType="int">
+        SELECT COUNT(1) 
+          FROM TB_UNIVERSE_LIKED 
+         WHERE UNIVERSE_ID = #{universeId}
     </select>
     
     <select id="findSingerNoByApiId" resultType="Integer">
@@ -304,5 +295,30 @@
     		   )
     </insert>
 
+
+    <!-- ===================== 숏폼 좋아요 ===================== -->
+    <select id="checkShortformLike" resultType="int" parameterType="map">
+        SELECT COUNT(1) 
+          FROM TB_FAV_SHORT_FORM 
+         WHERE SHORTS_ID = #{shortFormId} 
+           AND MEMBER_ID = #{memberId}
+    </select>
+    
+    <insert id="insertShortformLike" parameterType="map">
+        INSERT INTO TB_FAV_SHORT_FORM (LIKE_ID, SHORTS_ID, MEMBER_ID, CREATED_AT) 
+        VALUES (SEQ_LIKE_ID.NEXTVAL, #{shortFormId}, #{memberId}, SYSDATE)
+    </insert>
+    
+    <delete id="deleteShortformLike" parameterType="map">
+        DELETE FROM TB_FAV_SHORT_FORM 
+         WHERE SHORTS_ID = #{shortFormId} 
+           AND MEMBER_ID = #{memberId}
+    </delete>
+    
+    <select id="countShortformLikes" resultType="int">
+        SELECT COUNT(1) 
+          FROM TB_FAV_SHORT_FORM 
+         WHERE SHORTS_ID = #{shortFormId}
+    </select>
 
 </mapper>

@@ -18,7 +18,8 @@ public class BookmarkServiceImpl implements BookmarkService {
 	
     private final BookmarkMapper bookmarkMapper;
     private final UniverseValidator validator;
-    private final UniverseBookmarkService bookmarkService; 
+    // 변수명을 구체적으로 변경 (혼동 방지)
+    private final UniverseBookmarkService universeBookmarkService; 
 	
 
 	@Override
@@ -27,14 +28,15 @@ public class BookmarkServiceImpl implements BookmarkService {
         // 1. 존재 확인
 	    validator.validateExisting(universeId);
 	    
-        // 2. 매니저 호출 
-	    bookmarkService.createBookmark(universeId, memberId); 
+        // 2. 유니버스 찜 서비스 호출 
+	    universeBookmarkService.createBookmark(universeId, memberId); 
 	    
-        // 3. 카운트 조회 (Long 타입 그대로 전달)
+        // 3. 카운트 조회
 	    int totalBookmark = countBookmarks(universeId);
 	    
 	    return BookmarkResponse.builder()
 	            .targetId(universeId)
+	            .type("UNIVERSE") // 타입 명시
 	            .isBookmark(true)
 	            .bookmarkCount(totalBookmark)
 	            .build();
@@ -46,14 +48,15 @@ public class BookmarkServiceImpl implements BookmarkService {
         // 1. 존재 확인
 	    validator.validateExisting(universeId);
 	    
-	    // 2. 매니저 호출
-	    bookmarkService.deleteBookmark(universeId, memberId); 
+	    // 2. 유니버스 찜 서비스 호출
+	    universeBookmarkService.deleteBookmark(universeId, memberId); 
 	    
         // 3. 카운트 조회
 	    int totalBookmark = countBookmarks(universeId);
 	    
 	    return BookmarkResponse.builder()
 	            .targetId(universeId)
+	            .type("UNIVERSE") // 타입 명시
 	            .isBookmark(false)
 	            .bookmarkCount(totalBookmark)
 	            .build();

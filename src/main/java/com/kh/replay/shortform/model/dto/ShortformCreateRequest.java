@@ -1,4 +1,4 @@
-package com.kh.replay.global.bookmark.model.dto;
+package com.kh.replay.shortform.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookmarkResponse {
+public class ShortformCreateRequest {
 
-	private Long targetId;
-	private String type;
-	private boolean isBookmark;
-	private int bookmarkCount;
+	private String shortFormTitle;
+	private String caption;
+	private String status;
 
 }

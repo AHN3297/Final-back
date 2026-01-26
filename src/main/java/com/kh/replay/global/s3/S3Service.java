@@ -1,6 +1,8 @@
 package com.kh.replay.global.s3;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -47,5 +50,35 @@ public class S3Service {
                 .bucket(bucket)
                 .key(fileName)
                 .build()).toExternalForm();
+    }
+
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return;
+        }
+
+        try {
+            // 1. URL에서 Key(파일명) 추출
+            // 예: https://.../uuid_이미지.jpg -> uuid_이미지.jpg
+            String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+            
+            // 2. URL 디코딩 (한글/특수문자 처리)
+            String decodedKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+
+            // 3. 삭제 요청 객체 생성
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(decodedKey)
+                    .build();
+
+            // 4. S3 삭제 요청
+            s3Client.deleteObject(deleteObjectRequest);
+            
+            log.info("S3 File Deleted: {}", decodedKey);
+
+        } catch (Exception e) {
+            log.error("S3 File Delete Failed: {}", fileUrl, e);
+            // 필요시 예외를 던지거나, 로그만 남기고 넘어감
+        }
     }
 }

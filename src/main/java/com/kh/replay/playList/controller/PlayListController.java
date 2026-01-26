@@ -124,7 +124,7 @@ public class PlayListController {
 	        @AuthenticationPrincipal CustomUserDetails user) {
 	    
 	    int result = playListService.updateTrackOrder(playListId, user.getUsername(), orderList);
-	    return ResponseData.ok(result, "재생 순서가 변경되었습니다.");
+	    return ResponseData.ok(result, result + "재생 순서가 변경되었습니다.");
 	}
 	
 	// 플레이리스트 노래 삭제

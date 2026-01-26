@@ -42,59 +42,57 @@ public class SecurityConfigure {
 	
 	 @Bean
 		public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-		    return httpSecurity
-		            .formLogin(AbstractHttpConfigurer::disable)
-		            .csrf(AbstractHttpConfigurer::disable)
-		            .cors(Customizer.withDefaults())
-		            .oauth2Login(oauth -> oauth
-		            	    .userInfoEndpoint(userInfo -> userInfo
-		            	        .userService(oAuth2UserService)  // 
-		            	    )
-		            	    .successHandler(oAuth2SuccessHandler)
-		            	)
-		            .authorizeHttpRequests(requests -> {
-		                requests.requestMatchers("/api/universes/**").permitAll();
-		                requests.requestMatchers("/oauth2/**", "/login/**").permitAll();
-		                requests.requestMatchers(HttpMethod.POST, "/api/member/playList/**").permitAll();
-		                requests.requestMatchers(HttpMethod.PATCH, "/api/member/playList/**").permitAll();
-		                requests.requestMatchers(HttpMethod.DELETE, "/api/member/playList/**").permitAll();
-		                requests.requestMatchers(HttpMethod.GET, "/api/member/playList/**").permitAll();
-		                requests.requestMatchers("/oauth-callback").permitAll();
-		                requests.requestMatchers(HttpMethod.GET, "/api/members", "/api/search").permitAll();
-		                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
-		                requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll();
-		                requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
-		                requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
-		                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
-		                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+			return httpSecurity
+					.formLogin(AbstractHttpConfigurer::disable)
+					.csrf(AbstractHttpConfigurer::disable)
+					.cors(Customizer.withDefaults())
+					.oauth2Login(oauth -> oauth 
+							.userInfoEndpoint(userInfo -> userInfo
+									.userService(oAuth2UserService)
+							)
+							.successHandler(oAuth2SuccessHandler)
+					)
+					.authorizeHttpRequests(requests -> {
+						// 1. 공통 비로그인 허용 경로 (유니버스, 소셜로그인, 검색)
+						requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
+						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
+						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
 
-
-		                requests.requestMatchers(HttpMethod.PUT).permitAll(); 
-		                
-		                requests.requestMatchers(HttpMethod.GET).authenticated();
-		                
-		                requests.requestMatchers(HttpMethod.DELETE).authenticated();
-		                
-		            })
-
-		            .exceptionHandling(ex -> 
-		                ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-		            )
-
-		            .sessionManagement(manager -> 
-		                manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		            )
-
-		            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-		            .build();
+						// 2. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
+						requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated(); 
+						requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
+						requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").authenticated();
+						requests.requestMatchers("/api/favorite/**").authenticated();
+						requests.requestMatchers("/api/member/playList/**").authenticated();
+						
+						// 3. 명시적 인증 필요 경로 (로그아웃, 내 정보 수정)
+						requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
+						requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+						
+						// 음악/아티스트 상세조회 로그인필요
+						requests.requestMatchers(HttpMethod.GET, "/api/music/**", "/api/artist/**").authenticated();
+						
+						// 5. 기타 기본 보안 정책
+						requests.requestMatchers(HttpMethod.GET).authenticated();
+						requests.requestMatchers(HttpMethod.DELETE).authenticated();
+						requests.requestMatchers(HttpMethod.PUT).permitAll();
+					})
+					.exceptionHandling(ex -> 
+						ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+					)
+					.sessionManagement(manager -> 
+						manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+					)
+					.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+					.build();
 		}
+		
 	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Arrays.asList(instance));
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
 		configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-type"));
 		configuration.setAllowCredentials(true);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

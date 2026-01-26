@@ -70,6 +70,9 @@ public class SecurityConfigure {
 						requests.requestMatchers(HttpMethod.GET).authenticated();
 						requests.requestMatchers(HttpMethod.DELETE).authenticated();
 						requests.requestMatchers(HttpMethod.PUT).permitAll();
+						
+						//6. 관리자 
+						requests.requestMatchers("/admin/**").hasRole("ADMIN");
 					})
 					.exceptionHandling(ex ->
 						ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

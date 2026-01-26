@@ -124,4 +124,9 @@ public class GlobalHandlerException {
     	log.error("좋아요 오류", e.getMessage());
     	return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ResponseData<Object>> handleUnauthorizedException(UnauthorizedException e){
+    	log.error("권한이 오류", e.getMessage());
+    	return ResponseData.failure(e.getMessage(),HttpStatus.BAD_REQUEST);
+    }
 }

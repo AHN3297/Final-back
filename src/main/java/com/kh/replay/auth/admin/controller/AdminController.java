@@ -3,6 +3,7 @@ package com.kh.replay.auth.admin.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth/admin")
 public class AdminController {
 	private final AdminService adminService;
-
 
 	@GetMapping
 	public ResponseEntity<ResponseData<Map<String,Object>>> memberList(@RequestParam(name="page",defaultValue ="1") int page , @RequestParam(name="size",defaultValue= "10") int size){

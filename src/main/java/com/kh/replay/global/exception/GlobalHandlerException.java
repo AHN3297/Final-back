@@ -118,4 +118,10 @@ public class GlobalHandlerException {
         
         return createErrorResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    
+    @ExceptionHandler(LikeException.class)
+    public ResponseEntity<ResponseData<Object>> handleLikeException(LikeException e){
+    	log.error("좋아요 오류", e.getMessage());
+    	return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

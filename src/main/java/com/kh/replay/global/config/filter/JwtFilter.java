@@ -33,15 +33,13 @@ public class JwtFilter extends OncePerRequestFilter {
 	private final JwtUtil jwtUtil;
 	private final UserDetailsServiceImpl userDetailsService;
 
-	 @Override
-	    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-	        String uri = request.getRequestURI();
-	        return uri.startsWith("/oauth2/") || 
-	               uri.startsWith("/login/") || 
-	               uri.equals("/oauth-callback") ||
-	               uri.startsWith("/api/auth/") ||
-	               uri.equals("/api/members/login");
-	    }
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String uri = request.getRequestURI();
+		return uri.startsWith("/oauth2/") || uri.startsWith("/login/") || uri.equals("/oauth-callback")
+				|| uri.startsWith("/api/auth/") || uri.equals("/api/members/login");
+	}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -65,18 +63,29 @@ public class JwtFilter extends OncePerRequestFilter {
 				String email = claims.get("email", String.class);
 				String role = claims.get("role", String.class);
 
+				// 1. role 정제 및 기본값 설정
+				if (role == null || role.trim().isEmpty()) {
+					role = "ROLE_USER";
+				} else {
+					role = role.replace("[", "").replace("]", "").trim();
+				}
+
 				// OAuth 사용자인지 확인 (숫자만 있으면 소셜 로그인)
 				if (memberId.startsWith("#") || memberId.matches("^[0-9]+$")) {
-					// 소셜 로그인 사용자 - DB 조회 없이 바로 인증
+					// 소셜 사용자도 CustomUserDetails 객체로 생성
+					// VO 구조(username, authorities 등)에 맞게 빌더 사용
+					CustomUserDetails socialUser = CustomUserDetails.builder().username(memberId)
+							.memberName("Social User") // 필요시 claims에서 닉네임 추출 가능
+							.authorities(Collections.singleton(new SimpleGrantedAuthority(role))).build();
 
 					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-							memberId, null, Collections.singleton(new SimpleGrantedAuthority(role)));
+							socialUser, // Principal에 객체 전달
+							null, socialUser.getAuthorities());
 					authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 					SecurityContextHolder.getContext().setAuthentication(authentication);
 
 				} else {
 					// 일반 로그인 사용자 - DB 조회
-
 					CustomUserDetails user = (CustomUserDetails) userDetailsService.loadUserByUsername(memberId);
 					UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user,
 							null, user.getAuthorities());

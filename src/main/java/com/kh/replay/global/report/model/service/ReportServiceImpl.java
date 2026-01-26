@@ -46,7 +46,7 @@ public class ReportServiceImpl implements ReportService {
         
         Long generatedId = (Long) reportMap.get("reportId");
 
-        // 6. 응답 DTO 반환
+        // 응답 DTO 반환
         return ReportResponse.builder()
                 .reportId(generatedId)
                 .targetId(targetId)

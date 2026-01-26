@@ -20,6 +20,7 @@ public interface MemberService {
 	Map<String, Object> findAllMember(String memberId);
 	Map<String, Object> changeInfo(MemberDTO member);
 	void withdrawMember(LocalDTO local);
+	void withdrawSocial(MemberVO member);
 
 
 	

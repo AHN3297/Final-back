@@ -4,7 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.kh.replay.auth.local.model.dao.localMapper;
+import com.kh.replay.auth.local.model.dao.LocalMapper;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.global.exception.MemberJoinException;
 import com.kh.replay.member.model.vo.MemberVO;
@@ -16,27 +16,25 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class LocalServiceImpl implements LocalService {
-	private final localMapper localmapper;
+	private final LocalMapper localmapper;
 	private final PasswordEncoder passwordEncoder;
 
-	@Transactional 
+	@Transactional
 	@Override
 	public int signUp(LocalDTO local) {
-
 
 		String encodedPassword = passwordEncoder.encode(local.getPassword());
 
 		// 암호화된 비밀번호 로컬에 저장
 
 		local.setPassword(encodedPassword);
-		log.info("{}",local.getMemberDto());
 		MemberVO member = MemberVO.builder().memberId(local.getMemberDto().getMemberId())
 				.email(local.getMemberDto().getEmail()).name(local.getMemberDto().getName())
 				.nickName(local.getMemberDto().getNickName()).gender(local.getMemberDto().getGender())
 				.mbti(local.getMemberDto().getMbti()).phone(local.getMemberDto().getPhone())
 				.createdAt(local.getMemberDto().getCreatedAt()).updatedAt(local.getMemberDto().getUpdatedAt())
-				.genre(local.getMemberDto().getGenre()).role("ROLE_USER").job(local.getMemberDto().getJob())
-				.status("Y").build();
+				.genre(local.getMemberDto().getGenre()).role(local.getMemberDto().getRole() !=null ? local.getMemberDto().getRole() : "ROEL_USER").job(local.getMemberDto().getJob()).status("Y")
+				.build();
 
 		// 회원 공통 정보 insert
 		int result = localmapper.insertMember(member);
@@ -44,7 +42,9 @@ public class LocalServiceImpl implements LocalService {
 		if (result <= 0) {
 			throw new MemberJoinException("회원가입에 실패했습니다.");
 		}
-
+		
+		local.getMemberDto().setMemberId(member.getMemberId());
+		
 		result = localmapper.signUp(local);
 
 		if (result <= 0) {

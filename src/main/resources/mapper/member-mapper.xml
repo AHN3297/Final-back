@@ -2,32 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.replay.member.model.dao.MemberMapper">
 
-
-	<select id="loadByMemberId" resultType="map">
-		SELECT
-		TB_MEMBER.MEMBER_ID
-		, TB_MEMBER.EMAIL
-		, TB_LOCAL.PASSWORD
-		, TB_MEMBER.ROLE
-		FROM
-		TB_MEMBER
-		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
-		WHERE TB_MEMBER.MEMBER_ID = #{username}
-	</select>
-
-
 	<select id="loadUser" resultType="map">
 		SELECT
 		TB_MEMBER.MEMBER_ID
+		, TB_LOCAL.PASSWOBER_ID
+		, TB_MEMBER.EMAILRD
+		, TB_MEMBER.ROLE
+		FROM
+		TB_MEMBER
+		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
+		WHERE TB_MEMBER.ID = #{memberId}
+
+	</select>
+
+	<select id="loadByMemberEmail" resultType="map">
+		SELECT
+		TB_MEMBER.MEMBER_ID
 		, TB_MEMBER.EMAIL
 		, TB_LOCAL.PASSWORD
 		, TB_MEMBER.ROLE
 		FROM
 		TB_MEMBER
 		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
-		WHERE TB_MEMBER.EMAIL = #{email}
-
+		WHERE TB_MEMBER.EMAIL = #{membername}
 	</select>
+
+
 
 	<update id="changeInfo"
 		parameterType="com.kh.replay.member.model.dto.MemberDTO">
@@ -62,6 +62,19 @@
 		#{nickName}, PHONE = #{phone}, MBTI = #{mbti}, MEMBER_JOB = #{job},
 		GENRE = #{genre}, GENDER = #{gender}, UPDATED_AT = SYSDATE WHERE
 		MEMBER_ID = #{memberId} </update>
+
+	<select id="loadSocialUser" resultType="map">
+		SELECT
+		TB_SOCIAL.MEMBER_ID
+		, TB_SOCIAL.PROVIDER
+		, TB_MEMBER.EMAIL
+		, TB_MEMBER.ROLE
+		FROM
+		TB_MEMBER
+		INNER JOIN TB_SOCIAL ON TB_MEMBER.MEMBER_ID = TB_SOCIAL.MEMBER_ID
+		WHERE TB_MEMBER.ID = #{memberId}	
+	
+	</select>
 
 
 </mapper>

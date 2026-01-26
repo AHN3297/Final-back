@@ -11,9 +11,9 @@ import lombok.Value;
 @Builder
 //인증된 사용자의 정보
 public class CustomUserDetails implements UserDetails {
-	private String username;
+	private String username; //memberId
 	private String password;
-	private String memberName;
+	private String memberName;//Email
 	private Collection<? extends GrantedAuthority> authorities;
 	
 	

@@ -32,64 +32,45 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfigure {
-	
+
 	@Value("${instance.url}")
 	private String instance;
-	
+
 	private final JwtFilter jwtFilter;
-	 private final CustomOAuth2UserService oAuth2UserService;
-	 private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
-	
+	private final CustomOAuth2UserService oAuth2UserService;
+	private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-	    return httpSecurity
-	            .formLogin(AbstractHttpConfigurer::disable)
-	            .csrf(AbstractHttpConfigurer::disable)
-	            .cors(Customizer.withDefaults())
-	            .oauth2Login(oauth -> oauth
-	            	    .userInfoEndpoint(userInfo -> userInfo
-	            	        .userService(oAuth2UserService)  // 
-	            	    )
-	            	    .successHandler(oAuth2SuccessHandler)
-	            	)
-	            .authorizeHttpRequests(requests -> {
-	                requests.requestMatchers("/api/universes/**").permitAll();
-	                requests.requestMatchers("/oauth2/**", "/login/**").permitAll();
-	                requests.requestMatchers(HttpMethod.POST, "/api/member/playList/**").permitAll();
-	                requests.requestMatchers(HttpMethod.PATCH, "/api/member/playList/**").permitAll();
-	                requests.requestMatchers(HttpMethod.DELETE, "/api/member/playList/**").permitAll();
-	                requests.requestMatchers(HttpMethod.GET, "/api/member/playList/**").permitAll();
-	                requests.requestMatchers("/oauth-callback").permitAll();
-	                requests.requestMatchers(HttpMethod.GET, "/api/members", "/api/search").permitAll();
-	                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
-	                requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll();
-	                requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
-	                requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
-	                requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
-	                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
-
-
-	                requests.requestMatchers(HttpMethod.PUT).permitAll(); 
-	                
-	                requests.requestMatchers(HttpMethod.GET).authenticated();
-	                
-	                requests.requestMatchers(HttpMethod.DELETE).authenticated();
-	                
-	            })
-
-	            .exceptionHandling(ex -> 
-	                ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-	            )
-
-	            .sessionManagement(manager -> 
-	                manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-	            )
-
-	            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-	            .build();
+		return httpSecurity.formLogin(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
+				.cors(Customizer.withDefaults())
+				.oauth2Login(oauth -> oauth.userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
+						.successHandler(oAuth2SuccessHandler))
+				.authorizeHttpRequests(requests -> {
+					requests.requestMatchers("/api/universes/**").permitAll();
+					requests.requestMatchers("/oauth2/**", "/login/**").permitAll();
+					requests.requestMatchers(HttpMethod.POST, "/api/member/playList/**").permitAll();
+					requests.requestMatchers(HttpMethod.PATCH, "/api/member/playList/**").permitAll();
+					requests.requestMatchers(HttpMethod.DELETE, "/api/member/playList/**").permitAll();
+					requests.requestMatchers(HttpMethod.GET, "/api/member/playList/**").permitAll();
+					requests.requestMatchers("/oauth-callback").permitAll();
+					requests.requestMatchers(HttpMethod.GET, "/api/members", "/api/search").permitAll();
+					requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
+					requests.requestMatchers(HttpMethod.DELETE, "/api/members").permitAll();
+					requests.requestMatchers(HttpMethod.PATCH, "/api/members").permitAll();
+					requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").permitAll();
+					requests.requestMatchers(HttpMethod.POST, "/api/members/logout", "/api/oauth/social/logout")
+							.authenticated();
+					requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+					requests.requestMatchers(HttpMethod.PUT).permitAll();
+					requests.requestMatchers(HttpMethod.GET).authenticated();
+					requests.requestMatchers(HttpMethod.DELETE).authenticated();
+				})
+				.exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+				.sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
-	
+
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.auth.admin.dao.AdminMapper">
+	<select id="getMemberList" resultType="com.kh.replay.member.model.vo.MemberVO">
+		
+		SELECT
+			 MEMBER_ID,
+			 NAME,
+			 NICKNAME,
+			 CREATED_AT,
+			 ROLE,
+			 STATUS
+		FROM TB_MEMBER
+		WHWERE MEMBER_ID IS NOT NULL
+		AND STATUS= 'Y'
+		ORDER BY CREATED_AT DESC
+		LIMIT #{offset} ,#{size}
+	</select>
+	
+
+   
+
+</mapper>

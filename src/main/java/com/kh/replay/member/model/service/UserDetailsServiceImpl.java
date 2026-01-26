@@ -28,11 +28,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	    Map<String, String> local;
 	    
 	    if(username.contains("@")) {
-	        // 로그인: email로 조회
+	        // JWT로  memberId조회
 	        local = membermapper.loadUser(username);
 	    } else {
 	        // JWT 필터: memberId로 조회
-	        local = membermapper.loadByMemberId(username);
+	        local = membermapper.loadByMemberEmail(username);
 	    }
 	    
 	    if(local == null) {
@@ -48,7 +48,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	    CustomUserDetails userDetails = CustomUserDetails.builder()
 	            .username(memberId)  // MEMBER_ID
 	            .password(local.get("PASSWORD"))
-	            .memberName(local.get("MEMBER_NAME"))
+	            .memberName(local.get("EMAIL"))
 	            .authorities(Collections.singletonList(
 	                new SimpleGrantedAuthority(local.get("ROLE"))
 	            ))

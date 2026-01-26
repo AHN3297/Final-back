@@ -14,18 +14,13 @@ import com.kh.replay.member.model.dto.MemberDTO;
 @Mapper
 public interface MemberMapper {
 
-	@Select("SELECT MEMBER_ID FROM TB_MEMBER")
-	int CountMemberId(String memberId);
-	
-	@Select("SELECT PASSWORD FROM TB_LOCAL")
-	int CountPassword(String password);
 	
 	
 	//멤버 아이디로 조회
 	Map<String,String> loadUser(String memberId);
 	
 	//멤버 이메일로 로그인
-	Map<String,String> loadByMemberId(String email);
+	Map<String,String> loadByMemberEmail(String email);
 
 	@Update("UPDATE TB_MEMBER SET PASSWORD = #{newPassword} WHERE MEMBER_ID = #{memberId}")
 	int changePassword(Map<String, String> changeRequest);
@@ -44,6 +39,12 @@ public interface MemberMapper {
 	boolean existByEmail(String email);
 
 	void updateCompleteMember(AdditionalInfoRequest request);
+
+	
+	Map<String,String> loadSocialUser(String memberId);
+	
+	@Delete("UPDATE TB_MEMBER SET STATUS = 'N' WHERER MEMBER_ID = #{memberId}")
+	void withdrawSocial(String memberId);
 	
 	
 	

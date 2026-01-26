@@ -1,4 +1,4 @@
-package com.kh.replay.auth.admin.service;
+package com.kh.replay.auth.admin.model.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,10 +6,11 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.kh.replay.auth.admin.dao.AdminMapper;
+import com.kh.replay.auth.admin.model.dao.AdminMapper;
+import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.global.util.PageInfo;
 import com.kh.replay.global.util.Pagenation;
-import com.kh.replay.member.model.vo.MemberVO;
+import com.kh.replay.member.model.dto.MemberDTO;
 
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
@@ -29,10 +30,12 @@ public class AdminServiceImpl implements AdminService {
 				page, //currentPage
 				size, // 페이지당 회원 수
 				10 // 페이지 네비게이션 개수
-	);
-		int offset = (page-1)* size;
+				);
+		PageRequestDTO pageRequest = new PageRequestDTO((page-1)*size,size);
+		
+		
 		//회원 목록 조회
-		List<MemberVO> items = adminMapper.getMemberList(offset,size);
+		List<MemberDTO> items = adminMapper.getMemberList(pageRequest);
 		
 		//Map형태로 담아서
 		Map<String,Object> response = new HashMap<>();

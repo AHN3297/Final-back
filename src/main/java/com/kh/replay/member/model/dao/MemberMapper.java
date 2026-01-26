@@ -17,20 +17,20 @@ public interface MemberMapper {
 	
 	
 	//멤버 아이디로 조회
-	Map<String,String> loadUser(String memberId);
-	
-	//멤버 이메일로 로그인
 	Map<String,String> loadByMemberEmail(String email);
-
+	
+	//JWT검증
+	Map<String, String> findByMemberId(String memberId);
+	
 	@Update("UPDATE TB_MEMBER SET PASSWORD = #{newPassword} WHERE MEMBER_ID = #{memberId}")
 	int changePassword(Map<String, String> changeRequest);
 	
-	@Select("SELECT MEMBER_ID	, MBTI, MEMBER_JOB, GENDER , GENRE, MEMBER_NAME, NICKNAME, PHONE, EMAIL FROM TB_MEMBER WHERE MEMBER_ID =#{memberId}") 
-	Map<String, Object> findAllMember(String memberId);
+	@Select("SELECT MEMBER_ID memberId , MBTI mbti, MEMBER_JOB job, GENDER gender, GENRE genre, MEMBER_NAME name, NICKNAME nickName, PHONE phone, EMAIL email FROM TB_MEMBER WHERE MEMBER_ID =#{memberId}") 
+	Map<String, Object> findAllInfo(String memberId);
 	
 	int changeInfo(MemberDTO membermember);
 
-	@Delete("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
+	@Update("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
 	void withdrawMember(String memberId);
 
 	void insertOAuthBasicInfo(OAuthUserDTO oauthUser);
@@ -43,8 +43,9 @@ public interface MemberMapper {
 	
 	Map<String,String> loadSocialUser(String memberId);
 	
-	@Delete("UPDATE TB_MEMBER SET STATUS = 'N' WHERER MEMBER_ID = #{memberId}")
+	@Update("UPDATE TB_MEMBER SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
 	void withdrawSocial(String memberId);
+
 	
 	
 	

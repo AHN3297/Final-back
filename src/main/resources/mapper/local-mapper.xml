@@ -12,7 +12,8 @@
 		MEMBER_NAME,
 		NICKNAME,
 		PHONE,
-		EMAIL
+		EMAIL,
+		ROLE
 		)
 		VALUES(
 		#{memberId},
@@ -23,7 +24,8 @@
 		#{name},
 		#{nickName},
 		#{phone},
-		#{email}
+		#{email},
+		#{role}
 		)
 	</insert>
 	<insert id="signUp"

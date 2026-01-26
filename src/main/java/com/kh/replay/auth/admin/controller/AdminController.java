@@ -3,13 +3,12 @@ package com.kh.replay.auth.admin.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kh.replay.auth.admin.service.AdminService;
+import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
 
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,9 @@ import lombok.RequiredArgsConstructor;
 public class AdminController {
 	private final AdminService adminService;
 
+
 	@GetMapping
-	public ResponseEntity<ResponseData<Map<String,Object>>> memberList(@RequestParam(defaultValue ="1") int page , @RequestParam(defaultValue= "10") int size){
+	public ResponseEntity<ResponseData<Map<String,Object>>> memberList(@RequestParam(name="page",defaultValue ="1") int page , @RequestParam(name="size",defaultValue= "10") int size){
 		
 		Map<String,Object> result = adminService.memberList(page,size);
 		

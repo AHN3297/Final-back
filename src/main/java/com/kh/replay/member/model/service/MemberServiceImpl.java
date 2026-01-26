@@ -45,7 +45,8 @@ public class MemberServiceImpl implements MemberService{
 		Authentication auth = null;
 		try {
 			
-	auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(local.getMemberDto().getEmail(),local.getPassword()));
+			auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(local.getMemberDto().getEmail(),local.getPassword()));
+			
 		}catch(AuthenticationException e) {
 			throw new  CustomAuthenticationException("아이디 또는 비밀번호를 확인해주세요.");
 		}
@@ -100,18 +101,26 @@ public class MemberServiceImpl implements MemberService{
 		
 	}
 	@Override
-	public Map<String, Object> findAllMember(String memberId) {
-		
-		Map<String, Object> result =membermapper.findAllMember(memberId);
+	public Map<String, Object> findAllInfo(String memberId) {
+		 Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		    
+		    CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+		    String userMemberId= user.getUsername();
+		if(!memberId.equals(userMemberId) ) {
+			log.info("{}" ,"사용자를 찾을 수 없습니다.");
+		}
+
+		Map<String, Object> result =membermapper.findAllInfo(memberId);
 		
 		
 		return result;
 	}
 	@Transactional
 	@Override
-	public Map<String, Object> changeInfo(MemberDTO member) {
+	public Map<String,Object> changeInfo(MemberDTO member) {
 		int result = membermapper.changeInfo(member);
-		 Map<String, Object> updateMember =membermapper.findAllMember(member.getMemberId());
+		log.info("{}", member.getMemberId());
+		 Map<String, Object> updateMember =membermapper.findAllInfo(member.getMemberId());
 		return  updateMember;
 		
 		
@@ -120,7 +129,7 @@ public class MemberServiceImpl implements MemberService{
 	public void withdrawMember(LocalDTO local) {
 		String memberId = local.getMemberDto().getMemberId();
 		
-		Map<String,String> userInfo =membermapper.loadUser(local.getMemberDto().getMemberId());
+		Map<String,String> userInfo =membermapper.loadByMemberEmail(local.getMemberDto().getMemberId());
 		
 		String userPassword =userInfo.get("PASSWORD");
 		

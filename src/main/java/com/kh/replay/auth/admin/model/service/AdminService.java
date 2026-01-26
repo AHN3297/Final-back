@@ -1,4 +1,4 @@
-package com.kh.replay.auth.admin.service;
+package com.kh.replay.auth.admin.model.service;
 
 import java.util.Map;
 

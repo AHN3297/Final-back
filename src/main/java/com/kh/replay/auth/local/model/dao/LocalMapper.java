@@ -10,6 +10,7 @@ import com.kh.replay.member.model.vo.MemberVO;
 public interface LocalMapper {
 	
 	int insertMember(MemberVO member);		
+	
 	int signUp(LocalDTO local);
 	
 	@Insert("INSERT INTO TB_MEMBER (MEMBER_ID,MEMBER_NAME,EMAIL,NICKNAME,ROLE,STATUS) VALUES (#{memberId},#{name},{email},#{nickName}.#{role},#{status}" )

@@ -17,10 +17,10 @@ public interface MemberService {
 	Map<String, String> memberLogin(@Valid LocalDTO local);
 	void changePassword(ChangePasswordDTO password);
 	void memberLogout(LocalDTO local);
-	Map<String, Object> findAllMember(String memberId);
-	Map<String, Object> changeInfo(MemberDTO member);
+	Map<String,Object> changeInfo(MemberDTO member);
 	void withdrawMember(LocalDTO local);
 	void withdrawSocial(MemberVO member);
+	Map<String, Object> findAllInfo(String memberId);
 
 
 	

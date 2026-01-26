@@ -15,7 +15,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Data
-
 public class LocalDTO {
 	
 	@Valid

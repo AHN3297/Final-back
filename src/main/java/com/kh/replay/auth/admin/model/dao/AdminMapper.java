@@ -1,10 +1,13 @@
-package com.kh.replay.auth.admin.dao;
+package com.kh.replay.auth.admin.model.dao;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.data.domain.PageRequest;
 
+import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
+import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.vo.MemberVO;
 
 @Mapper
@@ -13,7 +16,9 @@ public interface AdminMapper {
 		int totalCount();
 		
 		
-		List<MemberVO> getMemberList(int offset, int size);
+
+
+		List<MemberDTO> getMemberList(PageRequestDTO pageRequest);
 
 		
 

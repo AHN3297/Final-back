@@ -32,22 +32,23 @@ public class LocalServiceImpl implements LocalService {
 				.email(local.getMemberDto().getEmail()).name(local.getMemberDto().getName())
 				.nickName(local.getMemberDto().getNickName()).gender(local.getMemberDto().getGender())
 				.mbti(local.getMemberDto().getMbti()).phone(local.getMemberDto().getPhone())
-				.createdAt(local.getMemberDto().getCreatedAt()).updatedAt(local.getMemberDto().getUpdatedAt())
-				.genre(local.getMemberDto().getGenre()).role(local.getMemberDto().getRole() !=null ? local.getMemberDto().getRole() : "ROEL_USER").job(local.getMemberDto().getJob()).status("Y")
+				.genre(local.getMemberDto().getGenre()).role(local.getMemberDto().getRole() !=null ? local.getMemberDto().getRole() : "ROEL_USER").job(local.getMemberDto().getJob())
 				.build();
 
 		// 회원 공통 정보 insert
 		int result = localmapper.insertMember(member);
-
+		
+		log.info("{}" ,result);
+		
 		if (result <= 0) {
 			throw new MemberJoinException("회원가입에 실패했습니다.");
 		}
 		
 		local.getMemberDto().setMemberId(member.getMemberId());
 		
-		result = localmapper.signUp(local);
+		int result2 = localmapper.signUp(local);
 
-		if (result <= 0) {
+		if (result2 <= 0) {
 			throw new MemberJoinException("로컬 인증 정보 등록에 실패했습니다.");
 		}
 

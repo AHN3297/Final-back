@@ -27,33 +27,47 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	    
 	    Map<String, String> local;
 	    
-	    if(username.contains("@")) {
-	        // JWT로  memberId조회
-	        local = membermapper.loadUser(username);
-	    } else {
-	        // JWT 필터: memberId로 조회
-	        local = membermapper.loadByMemberEmail(username);
+	    // JWT로  email로 사용자 조회(로그인)
+	    local = membermapper.loadByMemberEmail(username);
+	    if(local==null) {
+	    	throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+	    }
+	return createUserDetails(local);    
+	}
+	    
+	    //JWT 검증 (memberId로 조회)
+	    public UserDetails loadUserByMemberId(String memberId) throws UsernameNotFoundException{	    
+	    	Map<String,String> local = membermapper.findByMemberId(memberId);
+	    	if(local ==null) {
+	    		throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+	    		}
+	    	return createUserDetails(local);
 	    }
 	    
-	    if(local == null) {
-	        throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
-	    }
+	    private UserDetails createUserDetails(Map<String,String> local) {
 	    
 	  
 	    String memberId = local.get("MEMBER_ID");
+	    String password = local.get("PASSWORD");
+	    String role = local.get("ROLE");
+	    String name = local.get("NAME");
+	    String email = local.get("EMAIL");
+	    
 	    if(memberId == null) {
-	        throw new IllegalStateException("사용자 정보가 올바르지 않습니다.");
+	        throw new IllegalStateException("MEMBER_ID가 없습니다.");
+	    }
+	    if(password == null) {
+	    	throw new IllegalStateException("PASSWORD가 없습니다.");
 	    }
 	    
 	    CustomUserDetails userDetails = CustomUserDetails.builder()
 	            .username(memberId)  // MEMBER_ID
-	            .password(local.get("PASSWORD"))
-	            .memberName(local.get("EMAIL"))
+	            .password(password)
+	            .memberName(name != null ? name : email)
 	            .authorities(Collections.singletonList(
-	                new SimpleGrantedAuthority(local.get("ROLE"))
+	                new SimpleGrantedAuthority(role != null ? role: "ROLE_USER")
 	            ))
 	            .build();
-
 	    
 	    return userDetails;
 	

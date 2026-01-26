@@ -1,7 +1,5 @@
 package com.kh.replay.global.config;
-
 import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,22 +20,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import com.kh.replay.auth.oauth.model.sevice.CustomOAuth2UserService;
 import com.kh.replay.global.config.filter.JwtFilter;
-
 import lombok.RequiredArgsConstructor;
-
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfigure {
-
+	
 	@Value("${instance.url}")
 	private String instance;
-
+	
 	private final JwtFilter jwtFilter;
-
 	 private final CustomOAuth2UserService oAuth2UserService;
 	 private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
 	
@@ -47,7 +41,7 @@ public class SecurityConfigure {
 					.formLogin(AbstractHttpConfigurer::disable)
 					.csrf(AbstractHttpConfigurer::disable)
 					.cors(Customizer.withDefaults())
-					.oauth2Login(oauth -> oauth 
+					.oauth2Login(oauth -> oauth
 							.userInfoEndpoint(userInfo -> userInfo
 									.userService(oAuth2UserService)
 							)
@@ -56,11 +50,10 @@ public class SecurityConfigure {
 					.authorizeHttpRequests(requests -> {
 						// 1. 공통 비로그인 허용 경로 (유니버스, 소셜로그인, 검색)
 						requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
-						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
+						requests.requestMatchers(HttpMethod.POST, "/api/auth/**", "/api/members/login").permitAll();
 						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
-
 						// 2. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
-						requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated(); 
+						requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated();
 						requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
 						requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").authenticated();
 						requests.requestMatchers("/api/favorite/**").authenticated();
@@ -78,10 +71,10 @@ public class SecurityConfigure {
 						requests.requestMatchers(HttpMethod.DELETE).authenticated();
 						requests.requestMatchers(HttpMethod.PUT).permitAll();
 					})
-					.exceptionHandling(ex -> 
+					.exceptionHandling(ex ->
 						ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 					)
-					.sessionManagement(manager -> 
+					.sessionManagement(manager ->
 						manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 					)
 					.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -100,12 +93,10 @@ public class SecurityConfigure {
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
 	}
-
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
 		return authConfig.getAuthenticationManager();

@@ -110,7 +110,7 @@ public class LikeServiceImpl implements LikeService {
     
     // 좋아하는 노래 추가
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public LikeTrackVO likeTrack(MusicDTO musicDto, String memberId) { 
         LikeTrackVO trackVO = LikeTrackVO.builder()
                 .trackId(musicDto.getTrackId())     
@@ -138,6 +138,7 @@ public class LikeServiceImpl implements LikeService {
     }
     
     @Override
+    @Transactional(readOnly = true)
     public List<LikeTrackVO> getMyLikes(String memberId) {
         return trackLikeService.getFavoriteTracks(memberId);
     }

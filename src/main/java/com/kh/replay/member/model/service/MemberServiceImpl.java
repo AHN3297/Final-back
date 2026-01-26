@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,14 +54,18 @@ public class MemberServiceImpl implements MemberService{
 		
 	CustomUserDetails user = (CustomUserDetails)auth.getPrincipal();
 	
+	String role = user.getAuthorities().stream()
+			 .map(GrantedAuthority::getAuthority)
+			 .findFirst()
+			 .orElse("");
 	
 	//토큰 발급
 	
-	Map<String,String> loginResponse =tokenService.generateToken(user.getUsername());
+	Map<String,String> loginResponse =tokenService.generateToken(user.getUsername(),role);
 	
 	loginResponse.put("memberId",user.getUsername());
 	loginResponse.put("password", user.getPassword());
-	loginResponse.put("role", user.getAuthorities().toString());
+	loginResponse.put("role", role);
 	
 	
 	

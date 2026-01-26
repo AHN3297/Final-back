@@ -31,8 +31,17 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String uri = request.getRequestURI();
         // OAuth 관련 경로는 필터 제외
-        if (uri.startsWith("/oauth2/") || uri.startsWith("/login/") || uri.equals("/oauth-callback")) {
-            filterChain.doFilter(request, response);
+        if (uri.startsWith("/oauth2/") || 
+                uri.startsWith("/login/") || 
+                uri.equals("/oauth-callback") ||
+                uri.equals("/api/members/login") ||  // 추가
+                uri.equals("/api/auth/login") ||     // 추가
+                uri.equals("/members/login") ||      // 추가
+                uri.equals("/login") ||              // 추가
+                uri.startsWith("/api/members/signup") ||  // 추가
+                uri.startsWith("/test/"))         
+                {
+                	filterChain.doFilter(request, response);
             return;
         }
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);

@@ -50,7 +50,7 @@ public class SecurityConfigure {
 					.authorizeHttpRequests(requests -> {
 						// 1. 공통 비로그인 허용 경로 (유니버스, 소셜로그인, 검색)
 						requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
-						requests.requestMatchers(HttpMethod.POST, "/api/auth/**", "/api/members/login").permitAll();
+						requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
 						requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
 						// 2. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
 						requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated();

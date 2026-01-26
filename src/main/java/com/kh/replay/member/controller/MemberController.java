@@ -39,6 +39,7 @@ public class MemberController {
 		Map<String,String> loginResponse = memberService.memberLogin(local);
 		
 		
+		
 		return ResponseData.ok(loginResponse, "로그인에 성공하셨습니다.");
 	}
 

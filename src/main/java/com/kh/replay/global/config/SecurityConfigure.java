@@ -83,7 +83,7 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.PUT).permitAll();
 				
 					//7. 관리자 기능
-					requests.requestMatchers(HttpMethod.GET,"/api/admin/**").authenticated();
+					requests.requestMatchers(HttpMethod.GET,"/api/admin/**").hasRole("ADMIN");
 				})
 				.exceptionHandling(ex -> 
 					ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

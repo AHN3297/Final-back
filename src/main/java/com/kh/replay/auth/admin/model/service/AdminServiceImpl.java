@@ -32,16 +32,7 @@ public class AdminServiceImpl implements AdminService {
 	
 	@Override
 	public Map<String,Object> memberList(int page, int size) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String role = userDetails.getAuthorities().stream()
-								 .map(GrantedAuthority::getAuthority)
-								 .findFirst()
-								 .orElse("");
-		if(! "ROLE_ADMIN".equals(role)) {
-			throw new UnauthorizedException("관리자만 회원 목록을 조회할 수 있습니다.");
-		}
-		
+
 		int totalElements = adminMapper.totalCount(); 
 		
 		//pageInfo 생성
@@ -74,16 +65,7 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public DashboardSummaryDTO getDashboardSummary() {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String role = userDetails.getAuthorities().stream()
-								 .map(GrantedAuthority::getAuthority)
-								 .findFirst()
-								 .orElse("");
-		if(! "ROLE_ADMIN".equals(role)) {
-			throw new UnauthorizedException("관리자만 조회할 수 있습니다.");
-		}
-		
+
 		int totalAccount = adminMapper.getAllUsers();
 		int admins = adminMapper.getAllAdmins();
 		int user = adminMapper.getAllMembers();
@@ -103,17 +85,7 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public MemberStatusRatio getMemberStatusRatio() {
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String role = userDetails.getAuthorities().stream()
-								 .map(GrantedAuthority::getAuthority)
-								 .findFirst()
-								 .orElse("");
-		if(! "ROLE_ADMIN".equals(role)) {
-			throw new UnauthorizedException("관리자만 조회할 수 있습니다.");
-		}
-		
+
 		int active  = adminMapper.getActiveMembers();
 		int withdrawn = adminMapper.getInactiveMembers();
 		 

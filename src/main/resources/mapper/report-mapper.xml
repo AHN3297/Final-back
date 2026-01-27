@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.replay.global.report.model.dao.ReportMapper">
+
+    <select id="checkReport" resultType="_int">
+        <choose>
+            <when test="type == 'UNIVERSE'">
+                SELECT
+                       COUNT(1)
+                  FROM
+                       TB_UNIVERSE_REPORT
+                 WHERE
+                       UNIVERSE_ID = #{targetId}
+                   AND MEMBER_ID   = #{memberId}
+            </when>
+            <when test="type == 'SHORTFORM'">
+                SELECT
+                       COUNT(1)
+                  FROM
+                       TB_SHORT_FORM_REPORT
+                 WHERE
+                       SHORTS_ID = #{targetId}
+                   AND MEMBER_ID = #{memberId}
+            </when>
+        </choose>
+    </select>
+
+    <insert id="insertReport" parameterType="map">
+        <selectKey keyProperty="reportId" resultType="long" order="BEFORE">
+            SELECT
+                   SEQ_REPORT_ID.NEXTVAL
+              FROM
+                   DUAL
+        </selectKey>
+
+        <choose>
+            <when test="type == 'UNIVERSE'">
+                INSERT
+                  INTO
+                       TB_UNIVERSE_REPORT
+                       (
+                           REPORT_ID,
+                           REASON_CODE,
+                           DESCRIPTION,
+                           STATUS,
+                           CREATED_AT,
+                           MEMBER_ID,
+                           UNIVERSE_ID
+                       )
+                VALUES
+                       (
+                           #{reportId},
+                           #{reason},
+                           #{description},
+                           'Y',
+                           SYSDATE,
+                           #{memberId},
+                           #{targetId}
+                       )
+            </when>
+            <when test="type == 'SHORTFORM'">
+                INSERT
+                  INTO
+                       TB_SHORT_FORM_REPORT
+                       (
+                           REPORT_ID,
+                           REASON_CODE,
+                           DESCRIPTION,
+                           STATUS,
+                           CREATED_AT,
+                           MEMBER_ID,
+                           SHORTS_ID
+                       )
+                VALUES
+                       (
+                           #{reportId},
+                           #{reason},
+                           #{description},
+                           'Y',
+                           SYSDATE,
+                           #{memberId},
+                           #{targetId}
+                       )
+            </when>
+        </choose>
+    </insert>
+
+</mapper>

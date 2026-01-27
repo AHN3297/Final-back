@@ -7,8 +7,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.token.model.dao.TokenMapper;
-import com.kh.replay.auth.token.util.JwtUtil;
 import com.kh.replay.auth.token.model.vo.RefreshToken;
+import com.kh.replay.auth.token.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 public class TokenService {
 private final JwtUtil tokenUtil;
 private final TokenMapper tokenMapper;
-public Map<String,String> generateToken(String memberId){
+public Map<String,String> generateToken(String memberId,String role){
 	
- Map<String ,String> tokens = createTokens(memberId );
+ Map<String ,String> tokens = createTokens(memberId,role );
 
 
 saveToken(tokens.get("refreshToken"),memberId); 
@@ -29,8 +29,8 @@ saveToken(tokens.get("refreshToken"),memberId);
 	return tokens;
 
 }
-	private Map<String,String> createTokens( String memberId) {
-		String accessToken = tokenUtil.getAccessToken(memberId);
+	private Map<String,String> createTokens( String memberId,String role) {
+		String accessToken = tokenUtil.getAccessToken(memberId,role);
 	String refreshToken =tokenUtil.getRefreshToken(memberId);
 	 Map<String,String> tokens = new HashMap();
 		 tokens.put("accessToken", accessToken);

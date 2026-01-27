@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kh.replay.auth.local.model.dao.localMapper">
+<mapper namespace="com.kh.replay.auth.local.model.dao.LocalMapper">
 	<insert id="insertMember"
 		parameterType="com.kh.replay.member.model.vo.MemberVO">
 		INSERT INTO TB_MEMBER
@@ -12,7 +12,8 @@
 		MEMBER_NAME,
 		NICKNAME,
 		PHONE,
-		EMAIL
+		EMAIL,
+		ROLE
 		)
 		VALUES(
 		#{memberId},
@@ -23,7 +24,8 @@
 		#{name},
 		#{nickName},
 		#{phone},
-		#{email}
+		#{email},
+		#{role}
 		)
 	</insert>
 	<insert id="signUp"

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.global.comment.model.dao.CommentMapper">
+
+    <resultMap id="commentResultMap" type="com.kh.replay.global.comment.model.dto.CommentDTO">
+        <id     property="commentId"   column="COMMENT_ID"/>
+        <result property="content"     column="CONTENT"/>
+        <result property="targetType"  column="TARGET_TYPE"/>
+        <result property="targetId"    column="TARGET_ID"/>
+        <result property="memberId"    column="MEMBER_ID"/>
+        <result property="nickName"    column="NICKNAME"/>
+        <result property="status"      column="STATUS"/>
+        <result property="createdAt"   column="CREATED_AT"/>
+    </resultMap>
+
+    <select id="findAllComments" parameterType="map" resultMap="commentResultMap">
+        SELECT
+              C.COMMENT_ID
+            , C.CONTENT
+            , 'SHORTFORM' AS TARGET_TYPE
+            , C.SHORT_FORM_ID AS TARGET_ID
+            , C.MEMBER_ID
+            , M.NICKNAME
+            , C.STATUS
+            , C.CREATED_AT
+          FROM TB_SHORT_FORM_COMMENT C
+          JOIN TB_MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+         WHERE C.SHORT_FORM_ID = #{targetId}
+           AND C.STATUS = 'Y'
+        <if test="lastCommentId != null">
+           AND C.COMMENT_ID &lt; #{lastCommentId}
+        </if>
+         ORDER BY C.COMMENT_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="findByCommentId" parameterType="long" resultMap="commentResultMap">
+        SELECT
+              C.COMMENT_ID
+            , C.CONTENT
+            , 'SHORTFORM' AS TARGET_TYPE
+            , C.SHORT_FORM_ID AS TARGET_ID
+            , C.MEMBER_ID
+            , M.NICKNAME
+            , C.STATUS
+            , C.CREATED_AT
+          FROM TB_SHORT_FORM_COMMENT C
+          JOIN TB_MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+         WHERE C.COMMENT_ID = #{commentId}
+    </select>
+
+    <insert id="insertComment" parameterType="com.kh.replay.global.comment.model.dto.CommentDTO">
+        <selectKey keyProperty="commentId" resultType="long" order="BEFORE">
+            SELECT SEQ_COMMENT_ID.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO TB_SHORT_FORM_COMMENT (
+              COMMENT_ID
+            , CONTENT
+            , SHORT_FORM_ID
+            , MEMBER_ID
+            , STATUS
+            , CREATED_AT
+        ) VALUES (
+              #{commentId}
+            , #{content}
+            , #{targetId}
+            , #{memberId}
+            , 'Y'
+            , SYSDATE
+        )
+    </insert>
+
+    <update id="updateComment" parameterType="com.kh.replay.global.comment.model.dto.CommentDTO">
+        UPDATE TB_SHORT_FORM_COMMENT
+           SET CONTENT = #{content}
+         WHERE COMMENT_ID = #{commentId}
+    </update>
+
+    <update id="deleteComment" parameterType="long">
+        UPDATE TB_SHORT_FORM_COMMENT
+           SET STATUS = 'N'
+         WHERE COMMENT_ID = #{commentId}
+    </update>
+
+    <select id="findMyComments" parameterType="map" resultMap="commentResultMap">
+        SELECT
+              C.COMMENT_ID
+            , C.CONTENT
+            , 'SHORTFORM' AS TARGET_TYPE
+            , C.SHORT_FORM_ID AS TARGET_ID
+            , C.MEMBER_ID
+            , M.NICKNAME
+            , C.STATUS
+            , C.CREATED_AT
+          FROM TB_SHORT_FORM_COMMENT C
+          JOIN TB_MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+         WHERE C.MEMBER_ID = #{memberId}
+           AND C.STATUS = 'Y'
+        <if test="lastCommentId != null">
+           AND C.COMMENT_ID &lt; #{lastCommentId}
+        </if>
+         ORDER BY C.COMMENT_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+</mapper>

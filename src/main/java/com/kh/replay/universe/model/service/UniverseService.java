@@ -24,5 +24,11 @@ public interface UniverseService {
 	UniverseDTO updateUniverse(Long universeId, UniverseCreateRequest request, String userId);
 	
 	//유니버스 삭제
-	UniverseDTO deleteUniverse(Long universeId, String userId); 
+	UniverseDTO deleteUniverse(Long universeId, String userId);
+
+	//찜한 유니버스 목록 조회
+	UniverseListResponse findBookmarkedUniverses(String memberId, int size, Long lastUniverseId);
+
+	//좋아요한 유니버스 목록 조회
+	UniverseListResponse findLikedUniverses(String memberId, int size, Long lastUniverseId);
 }

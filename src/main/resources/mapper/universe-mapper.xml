@@ -6,13 +6,13 @@
     <resultMap id="universeResultMap" type="com.kh.replay.universe.model.dto.UniverseDTO">
         <id property="universeId" column="UNIVERSE_ID"/>
         <result property="memberId" column="MEMBER_ID"/>
-        <result property="nickname" column="NICKNAME"/> <result property="title" column="TITLE"/>
+        <result property="nickName" column="NICKNAME"/> <result property="title" column="TITLE"/>
         <result property="layoutData" column="LAYOUT_DATA"/>
         <result property="themeCode" column="THEME_CODE"/>
         <result property="thumbnailUrl" column="THUMBNAIL_URL"/>
         <result property="status" column="STATUS"/>
         <result property="like" column="LIKE_COUNT"/>
-        <result property="createDate" column="CREATE_DATE"/>
+        <result property="createAt" column="CREATED_AT"/>
     </resultMap>
 
     <sql id="baseCondition">
@@ -20,27 +20,30 @@
     </sql>
 
     <select id="findAllUniverse" parameterType="map" resultMap="universeResultMap">
-        SELECT 
+        SELECT
                U.UNIVERSE_ID,
                U.MEMBER_ID,
                M.NICKNAME,
                U.TITLE,
                U.THUMBNAIL_URL,
-               U.LIKE_COUNT,
-               U.CREATE_DATE
-          FROM 
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
+          FROM
                TB_UNIVERSE U
-          JOIN 
+          JOIN
                TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
-         WHERE 
+         WHERE
                U.STATUS = 'Y'
-         
+
          <if test="lastUniverseId != null">
              <choose>
                  <when test='sort == "popular"'>
                      AND (
-                         U.LIKE_COUNT &lt; #{lastLikeCount}
-                         OR (U.LIKE_COUNT = #{lastLikeCount} AND U.UNIVERSE_ID &lt; #{lastUniverseId})
+                         (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) &lt; #{lastLikeCount}
+                         OR (
+                             (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) = #{lastLikeCount}
+                             AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+                         )
                      )
                  </when>
                  <otherwise>
@@ -51,55 +54,55 @@
 
          <choose>
              <when test='sort == "popular"'>
-                 ORDER BY U.LIKE_COUNT DESC, U.UNIVERSE_ID DESC
+                 ORDER BY LIKE_COUNT DESC, U.UNIVERSE_ID DESC
              </when>
              <otherwise>
                  ORDER BY U.UNIVERSE_ID DESC
              </otherwise>
          </choose>
 
-         LIMIT #{limit}
+         FETCH NEXT #{limit} ROWS ONLY
     </select>
 
     <select id="findByKeyword" parameterType="map" resultMap="universeResultMap">
-        SELECT 
+        SELECT
                U.UNIVERSE_ID,
                U.MEMBER_ID,
                M.NICKNAME,
                U.TITLE,
                U.THUMBNAIL_URL,
-               U.LIKE_COUNT,
-               U.CREATE_DATE
-          FROM 
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
+          FROM
                TB_UNIVERSE U
-          JOIN 
+          JOIN
                TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
-         WHERE 
+         WHERE
                U.STATUS = 'Y'
-           
+
            <if test='keyword != null and keyword != ""'>
                <choose>
                    <when test='condition == "title"'>
-                       AND U.TITLE LIKE CONCAT('%', #{keyword}, '%')
+                       AND U.TITLE LIKE '%' || #{keyword} || '%'
                    </when>
                    <when test='condition == "nickname"'>
-                       AND M.NICKNAME LIKE CONCAT('%', #{keyword}, '%')
+                       AND M.NICKNAME LIKE '%' || #{keyword} || '%'
                    </when>
                    <when test='condition == "memberId"'>
-                       AND U.MEMBER_ID LIKE CONCAT('%', #{keyword}, '%')
+                       AND U.MEMBER_ID LIKE '%' || #{keyword} || '%'
                    </when>
                    <when test='condition == "hashtag"'>
                         AND U.UNIVERSE_ID IN (
-                            SELECT TH.UNIVERSE_ID 
-                            FROM TB_TAG_HISTORY TH 
+                            SELECT TH.UNIVERSE_ID
+                            FROM TB_TAG_HISTORY TH
                             JOIN TB_TAG T ON TH.TAG_ID = T.TAG_ID
-                            WHERE T.TAG_NAME LIKE CONCAT('%', #{keyword}, '%')
+                            WHERE T.TAG_NAME LIKE '%' || #{keyword} || '%'
                         )
                    </when>
                    <when test='condition == "all"'>
                        AND (
-                           U.TITLE LIKE CONCAT('%', #{keyword}, '%')
-                           OR M.NICKNAME LIKE CONCAT('%', #{keyword}, '%')
+                           U.TITLE LIKE '%' || #{keyword} || '%'
+                           OR M.NICKNAME LIKE '%' || #{keyword} || '%'
                        )
                    </when>
                </choose>
@@ -109,8 +112,11 @@
                <choose>
                    <when test='sort == "popular"'>
                        AND (
-                           U.LIKE_COUNT &lt; #{lastLikeCount}
-                           OR (U.LIKE_COUNT = #{lastLikeCount} AND U.UNIVERSE_ID &lt; #{lastUniverseId})
+                           (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) &lt; #{lastLikeCount}
+                           OR (
+                               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) = #{lastLikeCount}
+                               AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+                           )
                        )
                    </when>
                    <otherwise>
@@ -121,14 +127,14 @@
 
            <choose>
                <when test='sort == "popular"'>
-                   ORDER BY U.LIKE_COUNT DESC, U.UNIVERSE_ID DESC
+                   ORDER BY LIKE_COUNT DESC, U.UNIVERSE_ID DESC
                </when>
                <otherwise>
                    ORDER BY U.UNIVERSE_ID DESC
                </otherwise>
            </choose>
 
-           LIMIT #{limit}
+           FETCH NEXT #{limit} ROWS ONLY
     </select>
 
     <select id="findByUniverseId" resultMap="universeResultMap">
@@ -137,11 +143,14 @@
            AND STATUS = 'Y'
     </select>
 
-    <insert id="insertUniverse" useGeneratedKeys="true" keyProperty="universeId">
+    <insert id="insertUniverse">
+        <selectKey keyProperty="universeId" resultType="long" order="BEFORE">
+            SELECT SEQ_UNIVERSE_ID.NEXTVAL FROM DUAL
+        </selectKey>
         INSERT INTO TB_UNIVERSE (
-            TITLE, LAYOUT_DATA, THEME_CODE, MEMBER_ID, THUMBNAIL_URL, STATUS, LIKE_COUNT, CREATE_DATE
+            UNIVERSE_ID, TITLE, LAYOUT_DATA, THEME_CODE, MEMBER_ID, THUMBNAIL_URL, STATUS, CREATED_AT, UPDATED_AT
         ) VALUES (
-            #{title}, #{layoutData}, #{themeCode}, #{memberId}, #{thumbnailUrl}, 'Y', 0, NOW()
+            #{universeId}, #{title}, #{layoutData}, #{themeCode}, #{memberId}, #{thumbnailUrl}, 'Y', SYSDATE, SYSDATE
         )
     </insert>
 
@@ -151,7 +160,7 @@
                LAYOUT_DATA = #{layoutData},
                THEME_CODE = #{themeCode},
                STATUS = #{status},
-               UPDATE_DATE = NOW()
+               UPDATED_AT = SYSDATE
          WHERE UNIVERSE_ID = #{universeId}
     </update>
 
@@ -168,8 +177,8 @@
                M.NICKNAME,
                U.TITLE,
                U.THUMBNAIL_URL,
-               U.LIKE_COUNT,
-               U.CREATE_DATE
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
           FROM
                TB_UNIVERSE U
           JOIN
@@ -196,8 +205,8 @@
                M.NICKNAME,
                U.TITLE,
                U.THUMBNAIL_URL,
-               U.LIKE_COUNT,
-               U.CREATE_DATE
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L2 WHERE L2.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
           FROM
                TB_UNIVERSE U
           JOIN

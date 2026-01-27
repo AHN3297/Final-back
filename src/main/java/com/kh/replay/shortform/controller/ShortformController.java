@@ -242,4 +242,17 @@ public class ShortformController {
 		return ResponseData.ok(response, "내 댓글 조회 성공");
 	}
 
+	/**
+	 * 16. 내가 작성한 숏폼 목록 조회
+	 */
+	@GetMapping("/me")
+	public ResponseEntity<ResponseData<ShortformListResponse>> findMyShortforms(
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "lastShortFormId", required = false) Long lastShortFormId,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		ShortformListResponse response = shortformService.findMyShortforms(user.getUsername(), size, lastShortFormId);
+		return ResponseData.ok(response, "내 숏폼 조회 성공");
+	}
+
 }

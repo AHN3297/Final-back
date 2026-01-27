@@ -163,6 +163,18 @@ public class ShortformServiceImpl implements ShortformService {
 		return buildSimpleResponse(list, size);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public ShortformListResponse findMyShortforms(String memberId, int size, Long lastShortFormId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("lastShortFormId", lastShortFormId);
+		params.put("limit", size + 1);
+
+		List<ShortformDTO> list = shortformMapper.findMyShortforms(params);
+		return buildSimpleResponse(list, size);
+	}
+
 	private ShortformListResponse buildResponse(List<ShortformDTO> list, int size, String sort) {
 		boolean hasNext = false;
 		if (list.size() > size) {

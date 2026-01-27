@@ -190,7 +190,7 @@ public class UniverseController {
     /**
      * 12. 찜한 유니버스 목록 조회
      */
-    @GetMapping("/bookmarks")
+    @GetMapping("me/bookmarks")
     public ResponseEntity<ResponseData<UniverseListResponse>> findBookmarkedUniverses(
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "lastUniverseId", required = false) Long lastUniverseId,
@@ -203,7 +203,7 @@ public class UniverseController {
     /**
      * 13. 좋아요한 유니버스 목록 조회
      */
-    @GetMapping("/likes")
+    @GetMapping("me/likes")
     public ResponseEntity<ResponseData<UniverseListResponse>> findLikedUniverses(
             @RequestParam(value = "size", defaultValue = "10") int size,
             @RequestParam(value = "lastUniverseId", required = false) Long lastUniverseId,

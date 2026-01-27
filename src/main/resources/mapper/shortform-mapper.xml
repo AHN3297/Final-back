@@ -189,4 +189,18 @@
          FETCH NEXT #{limit} ROWS ONLY
     </select>
 
+    <select id="findMyShortforms" parameterType="map" resultMap="shortformResultMap">
+        SELECT
+            <include refid="commonColumns"/>
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER M ON S.MEMBER_ID = M.MEMBER_ID
+         WHERE S.MEMBER_ID = #{memberId}
+           AND S.STATUS = 'Y'
+         <if test="lastShortFormId != null">
+           AND S.SHORT_FORM_ID &lt; #{lastShortFormId}
+         </if>
+         ORDER BY S.SHORT_FORM_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
 </mapper>

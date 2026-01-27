@@ -24,4 +24,6 @@ public interface ShortformMapper {
 
 	List<ShortformDTO> findLikedShortforms(Map<String, Object> params);
 
+	List<ShortformDTO> findMyShortforms(Map<String, Object> params);
+
 }

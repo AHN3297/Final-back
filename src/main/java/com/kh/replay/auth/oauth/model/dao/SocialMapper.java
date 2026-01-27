@@ -15,6 +15,10 @@ public interface SocialMapper {
 	void insertOAuthUser(OAuthUserDTO oauthUser);
 
 	
+	
+
+
+	
 
 
 }

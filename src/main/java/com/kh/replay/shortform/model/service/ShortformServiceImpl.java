@@ -80,7 +80,10 @@ public class ShortformServiceImpl implements ShortformService {
 	@Override
 	public void createShortform(ShortformCreateRequest request, MultipartFile video, MultipartFile thumbnail, String userId) {
 
+<<<<<<< HEAD
 		
+=======
+>>>>>>> cef75b70aef8f96942e88c70be5ac79a7ffae64b
 		String videoUrl = null;
 		String thumbnailUrl = null;
 		Long duration = 0L; 
@@ -140,8 +143,11 @@ public class ShortformServiceImpl implements ShortformService {
 		ShortformDTO existing = validator.validateExisting(shortFormId);
 		validator.validateOwner(existing, userId);
 
+<<<<<<< HEAD
 		shortformMapper.deleteShortform(shortFormId);
 
+=======
+>>>>>>> cef75b70aef8f96942e88c70be5ac79a7ffae64b
 		try {
 			if (existing.getVideoUrl() != null) s3Service.deleteFile(existing.getVideoUrl());
 			if (existing.getThumbnailUrl() != null) s3Service.deleteFile(existing.getThumbnailUrl());

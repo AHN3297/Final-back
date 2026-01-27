@@ -30,10 +30,10 @@ public class S3Service {
     public String uploadFile(MultipartFile multipartFile) throws IOException {
         String originalFileName = multipartFile.getOriginalFilename();
         
-        // 1. 파일명 중복 방지 (UUID)
+        // 1. 파일명 중복 방지
         String fileName = UUID.randomUUID() + "_" + originalFileName;
 
-        // 2. 업로드 요청 객체 생성 (SDK v2 방식)
+        // 2. 업로드 요청 객체 생성
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileName)
@@ -41,7 +41,7 @@ public class S3Service {
                 .contentLength(multipartFile.getSize())
                 .build();
 
-        // 3. S3에 업로드 (RequestBody 사용)
+        // 3. S3에 업로드 
         s3Client.putObject(putObjectRequest, 
                 RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
         
@@ -58,11 +58,10 @@ public class S3Service {
         }
 
         try {
-            // 1. URL에서 Key(파일명) 추출
-            // 예: https://.../uuid_이미지.jpg -> uuid_이미지.jpg
+            // 1. URL에서 파일명 추출
             String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
             
-            // 2. URL 디코딩 (한글/특수문자 처리)
+            // 2. URL 디코딩 
             String decodedKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
 
             // 3. 삭제 요청 객체 생성
@@ -74,11 +73,8 @@ public class S3Service {
             // 4. S3 삭제 요청
             s3Client.deleteObject(deleteObjectRequest);
             
-            log.info("S3 File Deleted: {}", decodedKey);
-
         } catch (Exception e) {
-            log.error("S3 File Delete Failed: {}", fileUrl, e);
-            // 필요시 예외를 던지거나, 로그만 남기고 넘어감
+            throw new RuntimeException("S3 파일 삭제 중 오류가 발생했습니다.", e);
         }
     }
 }

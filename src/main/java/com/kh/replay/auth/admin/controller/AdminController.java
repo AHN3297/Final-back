@@ -41,4 +41,10 @@ public class AdminController {
 		return ResponseData.ok(response,"조회 성공"); 
 		
 	}
+	
+	@GetMapping("/dashboard/visitors")
+	public ResponseEntity<ResponseData<?>> ActiveVisitors(@RequestParam (name = "from") String from ,@RequestParam(name= "to") String to,
+			@RequestParam(defaultValue = "MONTH") String unit){
+		
+	}
 }

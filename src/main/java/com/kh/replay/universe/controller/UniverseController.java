@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+
 import com.kh.replay.global.bookmark.model.dto.BookmarkResponse;
 import com.kh.replay.global.bookmark.model.service.BookmarkService;
 import com.kh.replay.global.common.ResponseData;
@@ -92,9 +94,9 @@ public class UniverseController {
      */
     @PostMapping
     public ResponseEntity<ResponseData<Void>> createUniverse(
-            @RequestPart(value = "request") UniverseCreateRequest request, 
+            @Valid @RequestPart(value = "request") UniverseCreateRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @AuthenticationPrincipal CustomUserDetails user 
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         universeService.createUniverse(request, file, user.getUsername());
         return ResponseData.ok(null, "유니버스 생성 성공");
@@ -105,10 +107,10 @@ public class UniverseController {
      */
     @PatchMapping("{universeId}")
     public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(
-            @PathVariable("universeId")  Long universeId, 
-            @RequestBody UniverseCreateRequest universe,
-            @AuthenticationPrincipal CustomUserDetails user 
-            ) {
+            @PathVariable("universeId") Long universeId,
+            @Valid @RequestBody UniverseCreateRequest universe,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
         UniverseDTO resonse =  universeService.updateUniverse(universeId, universe, user.getUsername());
         return ResponseData.ok(resonse, "유니버스 수정 성공");
     }

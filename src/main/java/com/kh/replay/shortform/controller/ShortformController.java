@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.global.like.model.dto.LikeResponse;
 import com.kh.replay.global.like.model.service.LikeService;
@@ -85,7 +87,7 @@ public class ShortformController {
 	 */
 	@PostMapping
 	public ResponseEntity<ResponseData<Void>> createShortform(
-			@RequestPart(value = "request") ShortformCreateRequest request,
+			@Valid @RequestPart(value = "request") ShortformCreateRequest request,
 			@RequestPart(value = "video") MultipartFile video,
 			@RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
 			@AuthenticationPrincipal CustomUserDetails user
@@ -100,7 +102,7 @@ public class ShortformController {
 	@PatchMapping("/{shortFormId}")
 	public ResponseEntity<ResponseData<ShortformDTO>> updateShortform(
 			@PathVariable("shortFormId") Long shortFormId,
-			@RequestBody ShortformCreateRequest request,
+			@Valid @RequestBody ShortformCreateRequest request,
 			@AuthenticationPrincipal CustomUserDetails user
 	) {
 		ShortformDTO response = shortformService.updateShortform(shortFormId, request, user.getUsername());

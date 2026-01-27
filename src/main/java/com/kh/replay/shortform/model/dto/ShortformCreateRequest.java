@@ -1,20 +1,16 @@
 package com.kh.replay.shortform.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Setter
 public class ShortformCreateRequest {
 
-	private String shortFormTitle;
-	private String caption;
-	private String status;
+    @NotBlank(message = "숏폼 제목은 필수 입력 값입니다.")
+    private String shortFormTitle;
 
+    private String caption;
+    private String status;
 }

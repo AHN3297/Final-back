@@ -110,10 +110,6 @@ public class UniverseServiceImpl implements UniverseService {
 		UniverseDTO existing = validator.validateExisting(universeId);
 		validator.validateOwner(existing, userId);
 
-		if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
-			throw new IllegalArgumentException("유니버스 제목은 필수 입력 값입니다.");
-		}
-
 		UniverseDTO update = UniverseDTO.builder()
 				.universeId(universeId)
 				.title(request.getTitle())
@@ -134,19 +130,15 @@ public class UniverseServiceImpl implements UniverseService {
 
 		universeMapper.deleteUniverse(universeId);
 
-		// S3 파일 삭제 로직 추가 (필요 시)
-		deleteS3FileSafely(existing.getThumbnailUrl());
+		try {
+			if (existing.getThumbnailUrl() != null) {
+				s3Service.deleteFile(existing.getThumbnailUrl());
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("S3 파일 삭제 중 오류 발생", e);
+		}
 
 		return existing;
-	}
-
-	private void deleteS3FileSafely(String fileUrl) {
-		if (fileUrl != null) {
-			try {
-				s3Service.deleteFile(fileUrl);
-			} catch (Exception e) {
-			}
-		}
 	}
 
 	private UniverseListResponse buildResponse(List<UniverseDTO> list, int size, String sort) {

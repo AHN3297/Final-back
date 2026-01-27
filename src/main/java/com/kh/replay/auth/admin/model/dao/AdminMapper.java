@@ -28,9 +28,13 @@ public interface AdminMapper {
 	int getAllMembers();
 
 	@Select("SELECT COUNT(*) FROM TB_MEMBER WHERE MEMBER_ID IS NOT NULL AND STATUS = 'N'")
-	
-
 	int getInactiveMembers();
+
+	
+	@Select("SELECT COUNT (*) FROM TB_MEMBER WHERE MEMBER_ID IS NOT NULL AND STATUS = 'Y'")
+	int getActiveMembers();
+
+	
 
 
 }

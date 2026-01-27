@@ -11,7 +11,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.admin.model.dao.AdminMapper;
+import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
+import com.kh.replay.auth.admin.model.dto.StatusInfo;
 import com.kh.replay.global.exception.UnauthorizedException;
 import com.kh.replay.global.util.PageInfo;
 import com.kh.replay.global.util.Pagenation;
@@ -29,16 +32,7 @@ public class AdminServiceImpl implements AdminService {
 	
 	@Override
 	public Map<String,Object> memberList(int page, int size) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String role = userDetails.getAuthorities().stream()
-								 .map(GrantedAuthority::getAuthority)
-								 .findFirst()
-								 .orElse("");
-		if(! "ROLE_ADMIN".equals(role)) {
-			throw new UnauthorizedException("관리자만 회원 목록을 조회할 수 있습니다.");
-		}
-		
+
 		int totalElements = adminMapper.totalCount(); 
 		
 		//pageInfo 생성
@@ -69,28 +63,51 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void getDashboardSummary(int totalAccount, int admins, int user, Date asOf, int withdrawnAccounts) {
+	public DashboardSummaryDTO getDashboardSummary() {
 
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
-		String role = userDetails.getAuthorities().stream()
-								 .map(GrantedAuthority::getAuthority)
-								 .findFirst()
-								 .orElse("");
-		if(! "ROLE_ADMIN".equals(role)) {
-			throw new UnauthorizedException("관리자만 조회할 수 있습니다.");
-		}
+
+		int totalAccount = adminMapper.getAllUsers();
+		int admins = adminMapper.getAllAdmins();
+		int user = adminMapper.getAllMembers();
+		int withdrawnAccounts = adminMapper.getInactiveMembers();
+		Date asOf = new Date();
 		
-		totalAccount = adminMapper.getAllUsers();
-		admins = adminMapper.getAllAdmins();
-		user = adminMapper.getAllMembers();
-		withdrawnAccounts = adminMapper.getInactiveMembers();
-		asOf = new Date();
+		DashboardSummaryDTO dashboard = new DashboardSummaryDTO (totalAccount ,admins,user,withdrawnAccounts,asOf);
+		
+		return dashboard;
 		
 		
 		
+	}
+	
 		
-	}}	
+	
+
+	@Override
+	public MemberStatusRatio getMemberStatusRatio() {
+
+		int active  = adminMapper.getActiveMembers();
+		int withdrawn = adminMapper.getInactiveMembers();
+		 
+		int total = active+ withdrawn;
+		
+		 double activeRatio = (double) active / total * 100;
+		 double withdrawnRatio = (double) withdrawn/ total*100;
+		 
+		 
+		 
+		 
+		 return new MemberStatusRatio(
+				 
+		 new StatusInfo(active,activeRatio),
+		 new StatusInfo(withdrawn, withdrawnRatio)
+											
+				 );
+		
+	}
+
+
+}	
 		
 	
 

@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 
 import com.kh.replay.global.comment.model.dto.CommentCreateRequest;
 import com.kh.replay.global.comment.model.dto.CommentDTO;
+import com.kh.replay.global.comment.model.dto.CommentListResponse;
 import com.kh.replay.global.comment.model.service.CommentService;
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.global.like.model.dto.LikeResponse;
@@ -163,7 +164,20 @@ public class ShortformController {
 	}
 
 	/**
-	 * 10. 숏폼 댓글 생성
+	 * 10. 숏폼 댓글 조회
+	 */
+	@GetMapping("/{shortFormId}/comments")
+	public ResponseEntity<ResponseData<CommentListResponse>> findAllComments(
+			@PathVariable("shortFormId") Long shortFormId,
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "lastCommentId", required = false) Long lastCommentId
+	) {
+		CommentListResponse response = commentService.findAllComments("SHORTFORM", shortFormId, size, lastCommentId);
+		return ResponseData.ok(response, "댓글 조회 성공");
+	}
+
+	/**
+	 * 11. 숏폼 댓글 생성
 	 */
 	@PostMapping("/{shortFormId}/comments")
 	public ResponseEntity<ResponseData<CommentDTO>> createComment(
@@ -176,7 +190,7 @@ public class ShortformController {
 	}
 
 	/**
-	 * 11. 숏폼 댓글 수정
+	 * 12. 숏폼 댓글 수정
 	 */
 	@PatchMapping("/{shortFormId}/comments/{commentId}")
 	public ResponseEntity<ResponseData<CommentDTO>> updateComment(

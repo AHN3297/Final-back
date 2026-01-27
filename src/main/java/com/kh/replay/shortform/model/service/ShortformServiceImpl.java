@@ -79,15 +79,15 @@ public class ShortformServiceImpl implements ShortformService {
 
 	@Override
 	public void createShortform(ShortformCreateRequest request, MultipartFile video, MultipartFile thumbnail, String userId) {
-
+		
 		String videoUrl = null;
 		String thumbnailUrl = null;
-		Long duration = 0L; 
+		Long duration = 0L;
 
 		try {
 			videoUrl = s3Service.uploadFile(video);
 		} catch (IOException e) {
-			throw new RuntimeException("동영상 업로드 실패", e); // 예외를 먹지 않고 던짐
+			throw new RuntimeException("동영상 업로드 실패", e);
 		}
 
 		try {
@@ -105,7 +105,7 @@ public class ShortformServiceImpl implements ShortformService {
 				.videoUrl(videoUrl)
 				.thumbnailUrl(thumbnailUrl)
 				.caption(request.getCaption())
-				.duration(duration) 
+				.duration(duration)
 				.memberId(userId)
 				.build();
 
@@ -120,7 +120,6 @@ public class ShortformServiceImpl implements ShortformService {
 	public ShortformDTO updateShortform(Long shortFormId, ShortformCreateRequest request, String userId) {
 		ShortformDTO existing = validator.validateExisting(shortFormId);
 		validator.validateOwner(existing, userId);
-
 
 		ShortformDTO update = ShortformDTO.builder()
 				.shortFormId(shortFormId)
@@ -138,6 +137,9 @@ public class ShortformServiceImpl implements ShortformService {
 	public ShortformDTO deleteShortform(Long shortFormId, String userId) {
 		ShortformDTO existing = validator.validateExisting(shortFormId);
 		validator.validateOwner(existing, userId);
+
+		// [충돌 해결] DB 삭제 로직 유지
+		shortformMapper.deleteShortform(shortFormId);
 
 		try {
 			if (existing.getVideoUrl() != null) s3Service.deleteFile(existing.getVideoUrl());

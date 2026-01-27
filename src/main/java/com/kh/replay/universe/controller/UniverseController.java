@@ -33,9 +33,6 @@ import com.kh.replay.universe.model.service.UniverseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
-/**
- * */
 @Slf4j
 @RestController
 @RequiredArgsConstructor

@@ -2,31 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.replay.member.model.dao.MemberMapper">
 
-
-	<select id="loadByMemberId" resultType="map">
+	<select id="loadByMemberEmail" resultType="map">
 		SELECT
 		TB_MEMBER.MEMBER_ID
-		, TB_MEMBER.EMAIL
 		, TB_LOCAL.PASSWORD
-		, TB_MEMBER.ROLE
-		FROM
-		TB_MEMBER
-		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
-		WHERE TB_MEMBER.MEMBER_ID = #{username}
-	</select>
-
-
-	<select id="loadUser" resultType="map">
-		SELECT
-		TB_MEMBER.MEMBER_ID
 		, TB_MEMBER.EMAIL
-		, TB_LOCAL.PASSWORD
 		, TB_MEMBER.ROLE
+		, TB_MEMBER.MEMBER_NAME 
+		, TB_MEMBER.NICKNAME		
 		FROM
 		TB_MEMBER
 		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
 		WHERE TB_MEMBER.EMAIL = #{email}
+		AND TB_MEMBER.STATUS = 'Y'
 
+	</select>
+
+	<select id="findByMemberId" resultType="map">
+		SELECT
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_LOCAL.PASSWORD
+		, TB_MEMBER.ROLE
+		, TB_MEMBER.MEMBER_NAME 
+		, TB_MEMBER.NICKNAME
+		FROM
+		TB_MEMBER
+		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
+		WHERE TB_MEMBER.MEMBER_ID = #{memberId}
+		AND TB_MEMBER.STATUS = 'Y'
 	</select>
 
 	<update id="changeInfo"
@@ -39,8 +43,10 @@
 		EMAIL = #{email},
 		MBTI = #{mbti},
 		GENDER = #{gender},
-		JOB=#{job}
+		MEMBER_JOB= #{job},
+		ROLE = #{role}
 		WHERE MEMBER_ID = #{memberId}
+		AND STATUS = 'Y'
 	</update>
 	<update id="socialUpdate"
 		parameterType="com.kh.replay.member.model.vo.MemberVO">
@@ -62,6 +68,20 @@
 		#{nickName}, PHONE = #{phone}, MBTI = #{mbti}, MEMBER_JOB = #{job},
 		GENRE = #{genre}, GENDER = #{gender}, UPDATED_AT = SYSDATE WHERE
 		MEMBER_ID = #{memberId} </update>
+
+	<select id="loadSocialUser" resultType="map">
+		SELECT
+		TB_SOCIAL.MEMBER_ID
+		, TB_SOCIAL.PROVIDER
+		, TB_MEMBER.EMAIL
+		, TB_MEMBER.ROLE
+		FROM
+		TB_MEMBER
+		INNER JOIN TB_SOCIAL ON TB_MEMBER.MEMBER_ID = TB_SOCIAL.MEMBER_ID
+		WHERE TB_MEMBER.MEMBER_ID = #{memberId}	
+		AND TB_MEMBER.STATUS = 'Y'
+	
+	</select>
 
 
 </mapper>

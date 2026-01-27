@@ -32,9 +32,10 @@ public class JwtUtil {
     }
     
     // 기존 메서드 (일반 로그인용)
-    public String getAccessToken(String username) {
+    public String getAccessToken(String username,String role) {
         return Jwts.builder()
                     .subject(username)
+                    .claim("role", role)
                     .issuedAt(new Date())
                     .expiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60 * 24)))
                     .signWith(key)

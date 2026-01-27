@@ -21,6 +21,7 @@ import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.member.model.dto.ChangePasswordDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.service.MemberService;
+import com.kh.replay.member.model.vo.CustomUserDetails;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class MemberController {
 	@PostMapping("/login")
 	public ResponseEntity<ResponseData<Map<String,String>>> memberlogin(@Valid @RequestBody LocalDTO local) {
 		Map<String,String> loginResponse = memberService.memberLogin(local);
+		
 		
 		
 		return ResponseData.ok(loginResponse, "로그인에 성공하셨습니다.");
@@ -63,13 +65,14 @@ public class MemberController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<ResponseData<Map<String, Object>>> findAllMember(@RequestParam("memberId") String memberId){
-		Map<String, Object> memberInfo =memberService.findAllMember(memberId);
+	public ResponseEntity<ResponseData<Map<String, Object>>> findAllInfo(@RequestParam(name="memberId") String memberId){
+		Map<String, Object> memberInfo =memberService.findAllInfo(memberId);
 		return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
 	}
 	
 	@PatchMapping
-	public ResponseEntity<ResponseData<Map<String, Object>>> changeInfo(@RequestBody MemberDTO member){
+	public ResponseEntity<ResponseData<Map<String,Object>>> changeInfo(@RequestBody MemberDTO member
+																		){
 		
 		Map<String, Object> memberInfo =memberService.changeInfo(member);
 		

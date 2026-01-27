@@ -22,4 +22,8 @@ public interface ShortformMapper {
 
 	int deleteShortform(Long shortFormId);
 
+	List<ShortformDTO> findLikedShortforms(Map<String, Object> params);
+
+	List<ShortformDTO> findMyShortforms(Map<String, Object> params);
+
 }

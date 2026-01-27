@@ -203,4 +203,56 @@ public class ShortformController {
 		return ResponseData.ok(response, "댓글 수정 성공");
 	}
 
+	/**
+	 * 13. 숏폼 댓글 삭제
+	 */
+	@DeleteMapping("/{shortFormId}/comments/{commentId}")
+	public ResponseEntity<ResponseData<Void>> deleteComment(
+			@PathVariable("shortFormId") Long shortFormId,
+			@PathVariable("commentId") Long commentId,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		commentService.deleteComment(commentId, user.getUsername());
+		return ResponseData.ok(null, "댓글 삭제 성공");
+	}
+
+	/**
+	 * 14. 좋아요한 숏폼 목록 조회
+	 */
+	@GetMapping("/me/likes")
+	public ResponseEntity<ResponseData<ShortformListResponse>> findLikedShortforms(
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "lastShortFormId", required = false) Long lastShortFormId,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		ShortformListResponse response = shortformService.findLikedShortforms(user.getUsername(), size, lastShortFormId);
+		return ResponseData.ok(response, "좋아요한 숏폼 조회 성공");
+	}
+
+	/**
+	 * 15. 내가 작성한 댓글 목록 조회
+	 */
+	@GetMapping("/me/comments")
+	public ResponseEntity<ResponseData<CommentListResponse>> findMyComments(
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "lastCommentId", required = false) Long lastCommentId,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		CommentListResponse response = commentService.findMyComments(user.getUsername(), size, lastCommentId);
+		return ResponseData.ok(response, "내 댓글 조회 성공");
+	}
+
+	/**
+	 * 16. 내가 작성한 숏폼 목록 조회
+	 */
+	@GetMapping("/me")
+	public ResponseEntity<ResponseData<ShortformListResponse>> findMyShortforms(
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "lastShortFormId", required = false) Long lastShortFormId,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		ShortformListResponse response = shortformService.findMyShortforms(user.getUsername(), size, lastShortFormId);
+		return ResponseData.ok(response, "내 숏폼 조회 성공");
+	}
+
 }

@@ -68,6 +68,26 @@ public class CommentServiceImpl implements CommentService {
 		return commentMapper.findByCommentId(commentId);
 	}
 
+	@Override
+	public void deleteComment(Long commentId, String userId) {
+		CommentDTO existing = findByCommentId(commentId);
+		validateOwner(existing, userId);
+
+		commentMapper.deleteComment(commentId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public CommentListResponse findMyComments(String memberId, int size, Long lastCommentId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("lastCommentId", lastCommentId);
+		params.put("limit", size + 1);
+
+		List<CommentDTO> list = commentMapper.findMyComments(params);
+		return buildResponse(list, size);
+	}
+
 	private CommentDTO findByCommentId(Long commentId) {
 		CommentDTO comment = commentMapper.findByCommentId(commentId);
 		if (comment == null) {

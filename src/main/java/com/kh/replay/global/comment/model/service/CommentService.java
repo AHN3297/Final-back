@@ -12,4 +12,8 @@ public interface CommentService {
 
 	CommentDTO updateComment(Long commentId, CommentCreateRequest request, String userId);
 
+	void deleteComment(Long commentId, String userId);
+
+	CommentListResponse findMyComments(String memberId, int size, Long lastCommentId);
+
 }

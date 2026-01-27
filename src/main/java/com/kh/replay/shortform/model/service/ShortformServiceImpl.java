@@ -151,6 +151,30 @@ public class ShortformServiceImpl implements ShortformService {
 		return existing;
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public ShortformListResponse findLikedShortforms(String memberId, int size, Long lastShortFormId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("lastShortFormId", lastShortFormId);
+		params.put("limit", size + 1);
+
+		List<ShortformDTO> list = shortformMapper.findLikedShortforms(params);
+		return buildSimpleResponse(list, size);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ShortformListResponse findMyShortforms(String memberId, int size, Long lastShortFormId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("lastShortFormId", lastShortFormId);
+		params.put("limit", size + 1);
+
+		List<ShortformDTO> list = shortformMapper.findMyShortforms(params);
+		return buildSimpleResponse(list, size);
+	}
+
 	private ShortformListResponse buildResponse(List<ShortformDTO> list, int size, String sort) {
 		boolean hasNext = false;
 		if (list.size() > size) {
@@ -174,6 +198,30 @@ public class ShortformServiceImpl implements ShortformService {
 				.hasNext(hasNext)
 				.lastShortFormId(nextLastShortFormId)
 				.lastLikeCount(nextLastLikeCount)
+				.size(size)
+				.build();
+
+		return ShortformListResponse.builder()
+				.content(list)
+				.pagination(pagination)
+				.build();
+	}
+
+	private ShortformListResponse buildSimpleResponse(List<ShortformDTO> list, int size) {
+		boolean hasNext = false;
+		if (list.size() > size) {
+			hasNext = true;
+			list.remove(size);
+		}
+
+		Long nextLastShortFormId = null;
+		if (!list.isEmpty()) {
+			nextLastShortFormId = list.get(list.size() - 1).getShortFormId();
+		}
+
+		ShortformListResponse.Pagination pagination = ShortformListResponse.Pagination.builder()
+				.hasNext(hasNext)
+				.lastShortFormId(nextLastShortFormId)
 				.size(size)
 				.build();
 

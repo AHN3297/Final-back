@@ -141,6 +141,30 @@ public class UniverseServiceImpl implements UniverseService {
 		return existing;
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public UniverseListResponse findBookmarkedUniverses(String memberId, int size, Long lastUniverseId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("lastUniverseId", lastUniverseId);
+		params.put("limit", size + 1);
+
+		List<UniverseDTO> list = universeMapper.findBookmarkedUniverses(params);
+		return buildSimpleResponse(list, size);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UniverseListResponse findLikedUniverses(String memberId, int size, Long lastUniverseId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("memberId", memberId);
+		params.put("lastUniverseId", lastUniverseId);
+		params.put("limit", size + 1);
+
+		List<UniverseDTO> list = universeMapper.findLikedUniverses(params);
+		return buildSimpleResponse(list, size);
+	}
+
 	private UniverseListResponse buildResponse(List<UniverseDTO> list, int size, String sort) {
 		boolean hasNext = false;
 		if (list.size() > size) {
@@ -164,6 +188,30 @@ public class UniverseServiceImpl implements UniverseService {
 				.hasNext(hasNext)
 				.lastUniverseId(nextLastUniverseId)
 				.lastLikeCount(nextLastLikeCount)
+				.size(size)
+				.build();
+
+		return UniverseListResponse.builder()
+				.content(list)
+				.pagination(pagination)
+				.build();
+	}
+
+	private UniverseListResponse buildSimpleResponse(List<UniverseDTO> list, int size) {
+		boolean hasNext = false;
+		if (list.size() > size) {
+			hasNext = true;
+			list.remove(size);
+		}
+
+		Long nextLastUniverseId = null;
+		if (!list.isEmpty()) {
+			nextLastUniverseId = list.get(list.size() - 1).getUniverseId();
+		}
+
+		UniverseListResponse.Pagination pagination = UniverseListResponse.Pagination.builder()
+				.hasNext(hasNext)
+				.lastUniverseId(nextLastUniverseId)
 				.size(size)
 				.build();
 

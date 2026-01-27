@@ -1,4 +1,4 @@
-package com.kh.replay.shortform.model.dto;
+package com.kh.replay.global.comment.model.dto;
 
 import java.time.LocalDateTime;
 
@@ -13,11 +13,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShortformCommentDTO {
+public class CommentDTO {
 
 	private Long commentId;
 	private String content;
-	private Long shortFormId;
+	private String targetType;
+	private Long targetId;
 	private String memberId;
 	private String nickName;
 	private String status;

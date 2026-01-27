@@ -4,27 +4,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-
-import com.kh.replay.global.like.model.vo.LikeArtistVO; 
-
-
 import org.apache.ibatis.annotations.Param;
 
+import com.kh.replay.global.like.model.vo.LikeArtistVO; 
 import com.kh.replay.global.like.model.vo.LikeGenreVO;
 import com.kh.replay.global.like.model.vo.LikeTrackVO; 
-
 
 @Mapper
 public interface LikeMapper {
 
+    // 유니버스 좋아요
     int checkLike(Map<String, Object> params);
-    
     int insertLike(Map<String, Object> params);
-    
     int deleteLike(Map<String, Object> params);
-    
-    int countLikes(Long universeId);
-    
+    int countUniverseLikes(Long universeId);
+
+    // ==========================================
+    // [Upstream] 가수, 장르, 노래 관련 좋아요 기능
+    // ==========================================
 
     // apiId로 좋아하는 가수 조회
     Integer findSingerNoByApiId(Long apiSingerId);
@@ -52,7 +49,6 @@ public interface LikeMapper {
     
     int insertMemberGenre(LikeGenreVO vo);
     
-    
     // 노래 중복 확인
 	Long selectSongNoByApiId(Long track);
 	
@@ -68,13 +64,22 @@ public interface LikeMapper {
 
 	List<LikeTrackVO> selectFavoriteTracks(String memberId);
 
-	int deleteFavoriteSong(@Param("memberId") String memberId, @Param("songNo")Long songNo);
+	int deleteFavoriteSong(@Param("memberId") String memberId, @Param("songNo") Long songNo);
 
-	int updateTrackOrder(@Param("memberId")String memberId, @Param("songNo") Long songNo, @Param("newOrder")int newOrder);
-
-	
+	int updateTrackOrder(@Param("memberId") String memberId, @Param("songNo") Long songNo, @Param("newOrder") int newOrder);
 
 
+
+    // 숏폼 좋아요 여부 확인
+    int checkShortformLike(Map<String, Object> params);
     
+    // 숏폼 좋아요 추가
+    int insertShortformLike(Map<String, Object> params);
+    
+    // 숏폼 좋아요 취소
+    int deleteShortformLike(Map<String, Object> params);
+    
+    // 숏폼 좋아요 개수 카운트
+    int countShortformLikes(Long shortFormId);
 
 }

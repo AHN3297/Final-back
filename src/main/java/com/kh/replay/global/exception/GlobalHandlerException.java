@@ -2,6 +2,7 @@ package com.kh.replay.global.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -46,6 +47,17 @@ public class GlobalHandlerException {
     public ResponseEntity<ResponseData<Object>> handlerMemberJoinException(MemberJoinException e){
         log.warn("회원가입 에러(400): {}", e.getMessage());
         return createErrorResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    // @Valid 검증 실패
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseData<Object>> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("입력값이 올바르지 않습니다.");
+        log.warn("유효성 검증 실패(400): {}", errorMessage);
+        return createErrorResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
     // *******************401 Unauthorized*******************

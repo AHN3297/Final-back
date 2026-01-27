@@ -1,6 +1,8 @@
 package com.kh.replay.global.s3;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
@@ -27,10 +30,10 @@ public class S3Service {
     public String uploadFile(MultipartFile multipartFile) throws IOException {
         String originalFileName = multipartFile.getOriginalFilename();
         
-        // 1. 파일명 중복 방지 (UUID)
+        // 1. 파일명 중복 방지
         String fileName = UUID.randomUUID() + "_" + originalFileName;
 
-        // 2. 업로드 요청 객체 생성 (SDK v2 방식)
+        // 2. 업로드 요청 객체 생성
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileName)
@@ -38,7 +41,7 @@ public class S3Service {
                 .contentLength(multipartFile.getSize())
                 .build();
 
-        // 3. S3에 업로드 (RequestBody 사용)
+        // 3. S3에 업로드 
         s3Client.putObject(putObjectRequest, 
                 RequestBody.fromInputStream(multipartFile.getInputStream(), multipartFile.getSize()));
         
@@ -47,5 +50,31 @@ public class S3Service {
                 .bucket(bucket)
                 .key(fileName)
                 .build()).toExternalForm();
+    }
+
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return;
+        }
+
+        try {
+            // 1. URL에서 파일명 추출
+            String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+            
+            // 2. URL 디코딩 
+            String decodedKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+
+            // 3. 삭제 요청 객체 생성
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(decodedKey)
+                    .build();
+
+            // 4. S3 삭제 요청
+            s3Client.deleteObject(deleteObjectRequest);
+            
+        } catch (Exception e) {
+            throw new RuntimeException("S3 파일 삭제 중 오류가 발생했습니다.", e);
+        }
     }
 }

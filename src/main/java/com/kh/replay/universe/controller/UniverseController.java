@@ -14,11 +14,16 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+
 import com.kh.replay.global.bookmark.model.dto.BookmarkResponse;
 import com.kh.replay.global.bookmark.model.service.BookmarkService;
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.global.like.model.dto.LikeResponse;
 import com.kh.replay.global.like.model.service.LikeService;
+import com.kh.replay.global.report.model.dto.ReportRequestDTO;
+import com.kh.replay.global.report.model.dto.ReportResponse;
+import com.kh.replay.global.report.model.service.ReportService;
 import com.kh.replay.member.model.vo.CustomUserDetails;
 import com.kh.replay.universe.model.dto.UniverseCreateRequest;
 import com.kh.replay.universe.model.dto.UniverseDTO;
@@ -30,8 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 /**
- * 
- */
+ * */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -41,15 +45,11 @@ public class UniverseController {
     private final UniverseService universeService;
     private final LikeService likeService;
     private final BookmarkService bookmarkService;
+    private final ReportService reportService;
     
 
     /**
      * 1. 유니버스 목록 조회 (전체)
-     * @param size
-     * @param sort
-     * @param lastUniverseId
-     * @param lastLikeCount
-     * @return
      */
     @GetMapping
     public ResponseEntity<ResponseData<UniverseListResponse>> findAllUniverse(
@@ -58,21 +58,12 @@ public class UniverseController {
             @RequestParam(value = "lastUniverseId", required = false) Long lastUniverseId,
             @RequestParam(value = "lastLikeCount", required = false) Long lastLikeCount
     ) {
-        // 검증 및 로직은 서비스가 처리함
         UniverseListResponse response = universeService.findAllUniverse(size, sort, lastUniverseId, lastLikeCount);
-        
         return ResponseData.ok(response, "전체 조회 성공");
     }
 
     /**
-     *  2. 유니버스 키워드 검색 조회
-     * @param keyword
-     * @param condition
-     * @param size
-     * @param sort
-     * @param lastUniverseId
-     * @param lastLikeCount
-     * @return
+     * 2. 유니버스 키워드 검색 조회
      */
     @GetMapping("/search")
     public ResponseEntity<ResponseData<UniverseListResponse>> findByUniverse(
@@ -83,78 +74,57 @@ public class UniverseController {
             @RequestParam(value = "lastUniverseId", required = false) Long lastUniverseId,
             @RequestParam(value = "lastLikeCount", required = false) Long lastLikeCount 
     ) {
-        
         UniverseListResponse response = universeService.findByKeyword(keyword, condition, size, sort, lastUniverseId, lastLikeCount);
-        
         return ResponseData.ok(response, "검색 조회 성공");
     }
 
     /**
      * 3. 유니버스 상세 조회 
-     * @param universeId
-     * @return
      */
     @GetMapping("/{universeId}")
     public ResponseEntity<ResponseData<UniverseDTO>> findByUniverseId (
             @PathVariable("universeId") Long universeId
     ) {
         UniverseDTO response = universeService.findByUniverseId(universeId);
-        
         return ResponseData.ok(response, "상세 조회 성공");
     }
 
     /**
      * 4. 유니버스 생성
-     * @param request
-     * @param file
-     * @return
      */
     @PostMapping
     public ResponseEntity<ResponseData<Void>> createUniverse(
-            @RequestPart(value = "request") UniverseCreateRequest request, 
+            @Valid @RequestPart(value = "request") UniverseCreateRequest request,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @AuthenticationPrincipal CustomUserDetails user 
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
-        
         universeService.createUniverse(request, file, user.getUsername());
-        
-        // 데이터는 null, 메시지만 보냄
         return ResponseData.ok(null, "유니버스 생성 성공");
     }
     
     /**
      * 5.유니버스 수정
-     * @param universeId
-     * @param universe
-     * @return
      */
     @PatchMapping("{universeId}")
     public ResponseEntity<ResponseData<UniverseDTO>> updateUniverse(
-    		@PathVariable("universeId")  Long universeId, 
-    		@RequestBody UniverseCreateRequest universe,
-    		@AuthenticationPrincipal CustomUserDetails user 
-    		) {
-        
-    	UniverseDTO resonse =  universeService.updateUniverse(universeId, universe, user.getUsername());
-        
+            @PathVariable("universeId") Long universeId,
+            @Valid @RequestBody UniverseCreateRequest universe,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        UniverseDTO resonse =  universeService.updateUniverse(universeId, universe, user.getUsername());
         return ResponseData.ok(resonse, "유니버스 수정 성공");
     }
     
 
     /**
      * 6. 유니버스 삭제 
-     * @param universeId
-     * @param user
-     * @return
      */
     @DeleteMapping("/{universeId}")
     public ResponseEntity<ResponseData<UniverseDTO>> deleteUniverse(
             @PathVariable("universeId") Long universeId,
             @AuthenticationPrincipal CustomUserDetails user 
             ) {
-        
         UniverseDTO response = universeService.deleteUniverse(universeId, user.getUsername());
-        
         return ResponseData.ok(response, "유니버스 삭제 성공");
     }
     
@@ -166,9 +136,7 @@ public class UniverseController {
             @PathVariable("universeId") Long universeId,
             @AuthenticationPrincipal CustomUserDetails user 
     ) {
-        // 추가 서비스 
         LikeResponse response = likeService.likeUniverse(universeId, user.getUsername());
-        
         return ResponseData.ok(response, "좋아요를 눌렀습니다.");
     }
 
@@ -180,9 +148,7 @@ public class UniverseController {
             @PathVariable("universeId") Long universeId,
             @AuthenticationPrincipal CustomUserDetails user 
     ) {
-        //삭제서비스
         LikeResponse response = likeService.unlikeUniverse(universeId, user.getUsername());
-        
         return ResponseData.ok(response, "좋아요를 취소했습니다.");
     }
     
@@ -194,9 +160,7 @@ public class UniverseController {
             @PathVariable("universeId") Long universeId,
             @AuthenticationPrincipal CustomUserDetails user 
     ) {
-        // 추가 서비스 
-    	BookmarkResponse response = bookmarkService.bookmarkUniverse(universeId, user.getUsername());
-        
+        BookmarkResponse response = bookmarkService.bookmarkUniverse(universeId, user.getUsername());
         return ResponseData.ok(response, "찜하기를 눌렀습니다.");
     }
     
@@ -208,12 +172,22 @@ public class UniverseController {
             @PathVariable("universeId") Long universeId,
             @AuthenticationPrincipal CustomUserDetails user 
     ) {
-        //삭제서비스
-    	BookmarkResponse response = bookmarkService.unbookmarkUniverse(universeId, user.getUsername());
-        
+        BookmarkResponse response = bookmarkService.unbookmarkUniverse(universeId, user.getUsername());
         return ResponseData.ok(response, "찜하기를 취소했습니다.");
     }
     
-    
-    
+    /**
+     * 11. 유니버스 신고
+     */
+    @PostMapping("/{universeId}/report")
+    public ResponseEntity<ResponseData<ReportResponse>> reportUniverse(
+            @PathVariable("universeId") Long universeId,
+            @RequestBody ReportRequestDTO request, 
+            @AuthenticationPrincipal CustomUserDetails user 
+    ) {
+      
+        ReportResponse response = reportService.createReport("UNIVERSE", universeId, user.getUsername(), request);
+        return ResponseData.ok(response, "신고가 접수되었습니다.");
+    }
+
 }

@@ -16,6 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 
+import com.kh.replay.global.comment.model.dto.CommentCreateRequest;
+import com.kh.replay.global.comment.model.dto.CommentDTO;
+import com.kh.replay.global.comment.model.service.CommentService;
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.global.like.model.dto.LikeResponse;
 import com.kh.replay.global.like.model.service.LikeService;
@@ -38,6 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ShortformController {
 
 	private final ShortformService shortformService;
+	private final CommentService commentService;
 	private final LikeService likeService;
 	private final ReportService reportService;
 
@@ -156,6 +160,33 @@ public class ShortformController {
 	) {
 		ReportResponse response = reportService.createReport("SHORTFORM", shortFormId, user.getUsername(), request);
 		return ResponseData.ok(response, "신고가 접수되었습니다.");
+	}
+
+	/**
+	 * 10. 숏폼 댓글 생성
+	 */
+	@PostMapping("/{shortFormId}/comments")
+	public ResponseEntity<ResponseData<CommentDTO>> createComment(
+			@PathVariable("shortFormId") Long shortFormId,
+			@Valid @RequestBody CommentCreateRequest request,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		CommentDTO response = commentService.createComment("SHORTFORM", shortFormId, request, user.getUsername());
+		return ResponseData.ok(response, "댓글 생성 성공");
+	}
+
+	/**
+	 * 11. 숏폼 댓글 수정
+	 */
+	@PatchMapping("/{shortFormId}/comments/{commentId}")
+	public ResponseEntity<ResponseData<CommentDTO>> updateComment(
+			@PathVariable("shortFormId") Long shortFormId,
+			@PathVariable("commentId") Long commentId,
+			@Valid @RequestBody CommentCreateRequest request,
+			@AuthenticationPrincipal CustomUserDetails user
+	) {
+		CommentDTO response = commentService.updateComment(commentId, request, user.getUsername());
+		return ResponseData.ok(response, "댓글 수정 성공");
 	}
 
 }

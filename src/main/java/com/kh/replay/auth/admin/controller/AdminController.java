@@ -1,6 +1,5 @@
 package com.kh.replay.auth.admin.controller;
 
-import java.util.Date;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
 
@@ -42,9 +42,15 @@ public class AdminController {
 		
 	}
 	
-	@GetMapping("/dashboard/visitors")
-	public ResponseEntity<ResponseData<?>> ActiveVisitors(@RequestParam (name = "from") String from ,@RequestParam(name= "to") String to,
-			@RequestParam(defaultValue = "MONTH") String unit){
+	@GetMapping("/dashboard/statistics")
+	public ResponseEntity<ResponseData<MemberStatusRatio>> getMemberStatusRatio(){
+		
+		MemberStatusRatio memberStatus = adminService.getMemberStatusRatio();
+		
+		
+		
+		
+	return ResponseData.ok(memberStatus, "회원 상태 비율 조회 성공");
 		
 	}
 }

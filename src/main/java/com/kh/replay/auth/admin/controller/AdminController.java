@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
 import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
 
@@ -31,15 +32,13 @@ public class AdminController {
 		
 	}
 	@GetMapping("/dashboard")
-	public ResponseEntity<ResponseData<?>> getDashboardSummary(@RequestParam(name ="totalAccount")int totalAccount,@RequestParam(name="user") int user,
-															   @RequestParam(name="admins") int admins, @RequestParam(name="withdrawnAccounts") int withdrawnAccounts,
-															   @RequestParam(name="asOf")Date asOf){
+	public ResponseEntity<ResponseData<DashboardSummaryDTO>> getDashboardSummary(){
 																
 		
-		adminService.getDashboardSummary(totalAccount,admins,user,asOf,withdrawnAccounts);
+		DashboardSummaryDTO response = adminService.getDashboardSummary();
 		
 		
-		return null; 
+		return ResponseData.ok(response,"조회 성공"); 
 		
 	}
 }

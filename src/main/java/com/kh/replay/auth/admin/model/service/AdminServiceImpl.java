@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.admin.model.dao.AdminMapper;
+import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.global.exception.UnauthorizedException;
 import com.kh.replay.global.util.PageInfo;
@@ -69,7 +70,7 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void getDashboardSummary(int totalAccount, int admins, int user, Date asOf, int withdrawnAccounts) {
+	public DashboardSummaryDTO getDashboardSummary() {
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
@@ -81,12 +82,15 @@ public class AdminServiceImpl implements AdminService {
 			throw new UnauthorizedException("관리자만 조회할 수 있습니다.");
 		}
 		
-		totalAccount = adminMapper.getAllUsers();
-		admins = adminMapper.getAllAdmins();
-		user = adminMapper.getAllMembers();
-		withdrawnAccounts = adminMapper.getInactiveMembers();
-		asOf = new Date();
+		int totalAccount = adminMapper.getAllUsers();
+		int admins = adminMapper.getAllAdmins();
+		int user = adminMapper.getAllMembers();
+		int withdrawnAccounts = adminMapper.getInactiveMembers();
+		Date asOf = new Date();
 		
+		DashboardSummaryDTO dashboard = new DashboardSummaryDTO (totalAccount ,admins,user,withdrawnAccounts,asOf);
+		
+		return dashboard;
 		
 		
 		

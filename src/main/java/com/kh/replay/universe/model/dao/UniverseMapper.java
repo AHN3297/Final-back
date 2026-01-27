@@ -9,9 +9,9 @@ import com.kh.replay.universe.model.dto.UniverseDTO;
 @Mapper
 public interface UniverseMapper {
 
-    List<UniverseDTO> findAllUniverse(Map<String, Object> params);
+    List<UniverseDTO> findAllUniverse(Map<String, Object> universeSearch);
 
-    List<UniverseDTO> findByKeyword(Map<String, Object> params);
+    List<UniverseDTO> findByKeyword(Map<String, Object> universeSearch);
 
     UniverseDTO findByUniverseId(Long universeId);
 
@@ -19,6 +19,6 @@ public interface UniverseMapper {
 
     int updateUniverse(UniverseDTO update);
 
-    void deleteUniverse(Long universeId);
+    int deleteUniverse(Long universeId);
 
 }

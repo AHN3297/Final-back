@@ -11,6 +11,7 @@ import com.kh.replay.global.like.model.dao.LikeMapper;
 import com.kh.replay.global.like.model.dto.LikeResponse;
 import com.kh.replay.global.like.model.vo.LikeArtistVO;
 import com.kh.replay.global.like.model.vo.LikeTrackVO;
+import com.kh.replay.shortform.model.service.ShortformValidator;
 import com.kh.replay.universe.model.service.UniverseValidator;
 
 import lombok.RequiredArgsConstructor;
@@ -22,62 +23,104 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class LikeServiceImpl implements LikeService {
 
-    private final LikeMapper likeMapper; // 카운트 조회용
-    private final UniverseValidator validator;
-    private final UniverseLikeService universeLikeService; // 매니저 추가
+    private final LikeMapper likeMapper; 
+    
+    private final UniverseValidator universeValidator;
+    private final ShortformValidator shortformValidator;
+    
+    private final UniverseLikeService universeLikeService;
+    private final ShortformLikeService shortformLikeService;
     private final ArtistLikeService artistLikeService;
     private final TrackLikeService trackLikeService;
 
-    // 좋아요 추가
+    // 1. 유니버스 (Universe)
+    
     @Override
     public LikeResponse likeUniverse(Long universeId, String memberId) {
         // 1. 유니버스 존재 확인
-        validator.validateExisting(universeId);
+        universeValidator.validateExisting(universeId);
         
-        // 2. 매니저에게 위임
+        // 2. 유니버스 좋아요 생성 
         universeLikeService.createLike(universeId, memberId); 
         
         // 3. 총 개수 조회
-        int totalLikes = countLikes(universeId);
+        int totalLikes = likeMapper.countUniverseLikes(universeId);
         
         return LikeResponse.builder()
                 .targetId(universeId)
+                .type("UNIVERSE")
                 .isLiked(true)
                 .likeCount(totalLikes)
                 .build();
     }
 
-    // 좋아요 취소
     @Override
     public LikeResponse unlikeUniverse(Long universeId, String memberId) {
         // 1. 유니버스 존재 확인
-        validator.validateExisting(universeId);
+        universeValidator.validateExisting(universeId);
         
-        // 2. 매니저에게 위임
+        // 2. 유니버스 좋아요 삭제 
         universeLikeService.deleteLike(universeId, memberId);
         
         // 3. 총 개수 조회
-        int totalLikes = countLikes(universeId);
+        int totalLikes = likeMapper.countUniverseLikes(universeId);
         
         return LikeResponse.builder()
                 .targetId(universeId)
+                .type("UNIVERSE") 
+                .isLiked(false)
+                .likeCount(totalLikes)
+                .build();
+    }
+
+    // 2. 숏폼 (ShortForm)
+
+    @Override
+    public LikeResponse likeShortform(Long shortFormId, String memberId) {
+        // 1. 숏폼 존재 확인
+        shortformValidator.validateExisting(shortFormId);
+        
+        // 2. 숏폼 좋아요 생성
+        shortformLikeService.createLike(shortFormId, memberId);
+        
+        // 3. 총 개수 조회
+        int totalLikes = likeMapper.countShortformLikes(shortFormId);
+        
+        return LikeResponse.builder()
+                .targetId(shortFormId)
+                .type("SHORTFORM")
+                .isLiked(true)
+                .likeCount(totalLikes)
+                .build();
+    }
+
+    @Override
+    public LikeResponse unlikeShortform(Long shortFormId, String memberId) {
+        // 1. 숏폼 존재 확인
+        shortformValidator.validateExisting(shortFormId);
+        
+        // 2. 숏폼 좋아요 삭제
+        shortformLikeService.deleteLike(shortFormId, memberId);
+        
+        // 3. 총 개수 조회
+        int totalLikes = likeMapper.countShortformLikes(shortFormId);
+        
+        return LikeResponse.builder()
+                .targetId(shortFormId)
+                .type("SHORTFORM")
                 .isLiked(false)
                 .likeCount(totalLikes)
                 .build();
     }
     
-    // 좋아요 갯수 조회용 내부 메서드
-    private int countLikes(Long universeId) {
-        return likeMapper.countLikes(universeId);
-    }
-    
-    // 좋아하는 아티스트 추가
+    // 3. 아티스트 (Artist)
+
     @Override
     public LikeResponse likeArtist(ArtistDTO artistDto, String memberId) {
-        
+        // API 정보 저장 및 PK 반환
         int singerNo = artistLikeService.saveArtistApiInfo(artistDto);
-
         
+        // 좋아요 테이블에 추가
         artistLikeService.createFavoriteArtist(singerNo, memberId);
         
         return LikeResponse.builder()
@@ -87,18 +130,14 @@ public class LikeServiceImpl implements LikeService {
                 .build();
     }
     
-    // 좋아하는 아티스트 조회
     @Override
     @Transactional(readOnly = true)
     public List<LikeArtistVO> findAllFavoriteArtists(String memberId) {
-        // 이제 JwtFilter에서 정상적으로 전달된 memberId를 기반으로 조회합니다.
         return likeMapper.selectFavoriteArtists(memberId);
     }
     
-    // 좋아하는 아티스트 삭제
     @Override
     public LikeResponse unlikeArtist(int singerNo, String memberId) {
-      
         artistLikeService.deleteFavoriteArtist(singerNo, memberId);
         
         return LikeResponse.builder()
@@ -107,8 +146,8 @@ public class LikeServiceImpl implements LikeService {
                 .build();
     }
     
+    // 4. 노래 (Track)
     
-    // 좋아하는 노래 추가
     @Override
     @Transactional(rollbackFor = Exception.class)
     public LikeTrackVO likeTrack(MusicDTO musicDto, String memberId) { 
@@ -146,19 +185,18 @@ public class LikeServiceImpl implements LikeService {
     @Override
     @Transactional
     public int deleteLike(String memberId, Long songNo) {
-        int result = trackLikeService.removeFavorite(memberId, songNo);
-        return result;
+        return trackLikeService.removeFavorite(memberId, songNo);
     }
 
     @Override
     @Transactional
     public int reorderTracks(String memberId, List<LikeTrackVO> newOrderList) {
-    	int totalUpdatedRows = 0;
-        // 리액트에서 변경된 순서가 담긴 리스트를 보내주면 순차적으로 업데이트
+        int totalUpdatedRows = 0;
+        // 변경된 순서 리스트를 받아 순차 업데이트
         for (LikeTrackVO track : newOrderList) {
             int result = trackLikeService.changeOrder(memberId, track.getSongNo(), track.getTrackOrder());
             totalUpdatedRows += result;
         }
-		return totalUpdatedRows;
+        return totalUpdatedRows;
     }
 }

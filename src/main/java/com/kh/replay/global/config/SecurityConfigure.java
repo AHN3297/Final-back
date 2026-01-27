@@ -1,5 +1,7 @@
 package com.kh.replay.global.config;
+
 import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
 import com.kh.replay.auth.oauth.model.sevice.CustomOAuth2UserService;
 import com.kh.replay.global.config.filter.JwtFilter;
+
 import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableMethodSecurity
@@ -77,6 +81,9 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.GET).authenticated();
 					requests.requestMatchers(HttpMethod.DELETE).authenticated();
 					requests.requestMatchers(HttpMethod.PUT).permitAll();
+				
+					//7. 관리자 기능
+					requests.requestMatchers(HttpMethod.GET,"/api/admin/**").authenticated();
 				})
 				.exceptionHandling(ex -> 
 					ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

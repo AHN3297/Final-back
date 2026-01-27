@@ -186,5 +186,32 @@ public class UniverseController {
         ReportResponse response = reportService.createReport("UNIVERSE", universeId, user.getUsername(), request);
         return ResponseData.ok(response, "신고가 접수되었습니다.");
     }
+    
+    /**
+     * 12. 찜한 유니버스 목록 조회
+     */
+    @GetMapping("/bookmarks")
+    public ResponseEntity<ResponseData<UniverseListResponse>> findBookmarkedUniverses(
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "lastUniverseId", required = false) Long lastUniverseId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        UniverseListResponse response = universeService.findBookmarkedUniverses(user.getUsername(), size, lastUniverseId);
+        return ResponseData.ok(response, "찜한 유니버스 조회 성공");
+    }
+
+    /**
+     * 13. 좋아요한 유니버스 목록 조회
+     */
+    @GetMapping("/likes")
+    public ResponseEntity<ResponseData<UniverseListResponse>> findLikedUniverses(
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "lastUniverseId", required = false) Long lastUniverseId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        UniverseListResponse response = universeService.findLikedUniverses(user.getUsername(), size, lastUniverseId);
+        return ResponseData.ok(response, "좋아요한 유니버스 조회 성공");
+    }
+
 
 }

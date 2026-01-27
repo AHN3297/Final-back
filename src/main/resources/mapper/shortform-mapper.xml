@@ -171,4 +171,22 @@
          WHERE SHORT_FORM_ID = #{shortFormId}
     </update>
 
+    <select id="findLikedShortforms" parameterType="map" resultMap="shortformResultMap">
+        SELECT
+            <include refid="commonColumns"/>
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER M ON S.MEMBER_ID = M.MEMBER_ID
+          JOIN TB_FAV_SHORT_FORM L ON S.SHORT_FORM_ID = L.SHORTS_ID
+         WHERE L.MEMBER_ID = #{memberId}
+           AND S.STATUS = 'Y'
+         <if test="lastShortFormId != null">
+           AND L.LIKE_ID &lt; (
+               SELECT LIKE_ID FROM TB_FAV_SHORT_FORM
+                WHERE SHORTS_ID = #{lastShortFormId} AND MEMBER_ID = #{memberId}
+           )
+         </if>
+         ORDER BY L.LIKE_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
 </mapper>

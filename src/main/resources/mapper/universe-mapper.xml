@@ -161,4 +161,57 @@
          WHERE UNIVERSE_ID = #{universeId}
     </update>
 
+    <select id="findBookmarkedUniverses" parameterType="map" resultMap="universeResultMap">
+        SELECT
+               U.UNIVERSE_ID,
+               U.MEMBER_ID,
+               M.NICKNAME,
+               U.TITLE,
+               U.THUMBNAIL_URL,
+               U.LIKE_COUNT,
+               U.CREATE_DATE
+          FROM
+               TB_UNIVERSE U
+          JOIN
+               TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
+          JOIN
+               TB_FAV_UNIVERSE F ON U.UNIVERSE_ID = F.UNIVERSE_ID
+         WHERE
+               F.MEMBER_ID = #{memberId}
+           AND U.STATUS = 'Y'
+         <if test="lastUniverseId != null">
+           AND F.FAV_UNIVERSE_NO &lt; (
+               SELECT FAV_UNIVERSE_NO FROM TB_FAV_UNIVERSE
+                WHERE UNIVERSE_ID = #{lastUniverseId} AND MEMBER_ID = #{memberId}
+           )
+         </if>
+         ORDER BY F.FAV_UNIVERSE_NO DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="findLikedUniverses" parameterType="map" resultMap="universeResultMap">
+        SELECT
+               U.UNIVERSE_ID,
+               U.MEMBER_ID,
+               M.NICKNAME,
+               U.TITLE,
+               U.THUMBNAIL_URL,
+               U.LIKE_COUNT,
+               U.CREATE_DATE
+          FROM
+               TB_UNIVERSE U
+          JOIN
+               TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
+          JOIN
+               TB_UNIVERSE_LIKED L ON U.UNIVERSE_ID = L.UNIVERSE_ID
+         WHERE
+               L.MEMBER_ID = #{memberId}
+           AND U.STATUS = 'Y'
+         <if test="lastUniverseId != null">
+           AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+         </if>
+         ORDER BY U.UNIVERSE_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
 </mapper>

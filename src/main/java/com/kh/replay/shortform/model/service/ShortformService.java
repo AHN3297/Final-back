@@ -27,4 +27,7 @@ public interface ShortformService {
 	// 삭제
 	ShortformDTO deleteShortform(Long shortFormId, String userId);
 
+	// 좋아요한 숏폼 목록 조회
+	ShortformListResponse findLikedShortforms(String memberId, int size, Long lastShortFormId);
+
 }

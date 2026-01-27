@@ -23,6 +23,37 @@
     OFFSET #{offset} ROWS
     FETCH NEXT #{size} ROWS ONLY
 </select>
+
+<select id="getMemberDetails" resultType="map">
+	SELECT 
+	       MEMBER_ID AS memberID,
+	       EMAIL AS email,
+	       MEMBER_NAME AS name,
+	       PHONE AS phone,
+	       GENDER AS gender,
+	       MBTI AS mbti,
+	       UPDATED_AT AS updateAt,
+	       CREATED_AT AS createdAt,
+	       GENRE AS genre,
+	       MEMBER_JOB AS job,
+	       NICKNAME AS nickName,
+	       ROEL AS roel,
+	       STATUS AS status
+	       
+	       FROM TB_MEMBER
+	   		
+	       
+	       
+	       
+	
+	
+	
+	
+	
+	
+	
+	
+</select>
 	
 
    

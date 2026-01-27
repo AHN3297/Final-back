@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +14,7 @@ import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.member.model.dto.MemberDTO;
 
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
@@ -53,4 +56,27 @@ public class AdminController {
 	return ResponseData.ok(memberStatus, "회원 상태 비율 조회 성공");
 		
 	}
+	@GetMapping("/memberDetails")
+	public   ResponseEntity<ResponseData<?>> getMemberDetails(@RequestParam (name="memberId") String memberId){
+		
+		adminService.getMemberDetails(memberId);
+		
+		
+		
+		return null;
+			
+	}
+	
+	@PatchMapping
+	public ResponseEntity<ResponseData<?>> ChangePermissions(@RequestBody MemberDTO member  ){
+		
+		
+		adminService.ChangePermissions(member);
+		
+		
+		
+		return null;
+		
+	}
+	
 }

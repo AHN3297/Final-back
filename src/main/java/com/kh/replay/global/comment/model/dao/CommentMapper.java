@@ -18,4 +18,8 @@ public interface CommentMapper {
 
 	int updateComment(CommentDTO comment);
 
+	int deleteComment(Long commentId);
+
+	List<CommentDTO> findMyComments(Map<String, Object> params);
+
 }

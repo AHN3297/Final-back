@@ -78,4 +78,31 @@
          WHERE COMMENT_ID = #{commentId}
     </update>
 
+    <update id="deleteComment" parameterType="long">
+        UPDATE TB_SHORT_FORM_COMMENT
+           SET STATUS = 'N'
+         WHERE COMMENT_ID = #{commentId}
+    </update>
+
+    <select id="findMyComments" parameterType="map" resultMap="commentResultMap">
+        SELECT
+              C.COMMENT_ID
+            , C.CONTENT
+            , 'SHORTFORM' AS TARGET_TYPE
+            , C.SHORT_FORM_ID AS TARGET_ID
+            , C.MEMBER_ID
+            , M.NICKNAME
+            , C.STATUS
+            , C.CREATED_AT
+          FROM TB_SHORT_FORM_COMMENT C
+          JOIN TB_MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+         WHERE C.MEMBER_ID = #{memberId}
+           AND C.STATUS = 'Y'
+        <if test="lastCommentId != null">
+           AND C.COMMENT_ID &lt; #{lastCommentId}
+        </if>
+         ORDER BY C.COMMENT_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
 </mapper>

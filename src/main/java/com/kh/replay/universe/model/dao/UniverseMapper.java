@@ -21,4 +21,8 @@ public interface UniverseMapper {
 
     int deleteUniverse(Long universeId);
 
+    List<UniverseDTO> findBookmarkedUniverses(Map<String, Object> params);
+
+    List<UniverseDTO> findLikedUniverses(Map<String, Object> params);
+
 }

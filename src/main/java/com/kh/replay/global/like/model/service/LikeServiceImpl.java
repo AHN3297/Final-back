@@ -145,9 +145,12 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     @Transactional
-    public int deleteLike(String memberId, Long songNo) {
-        int result = trackLikeService.removeFavorite(memberId, songNo);
-        return result;
+    public LikeResponse deleteLike(String memberId, Long songNo) {
+        trackLikeService.removeFavorite(memberId, songNo);
+        return LikeResponse.builder()
+                .targetId((long)songNo)
+                .isLiked(false)
+                .build();
     }
 
     @Override

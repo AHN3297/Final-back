@@ -30,7 +30,7 @@ public interface LikeService {
 
 	List<LikeTrackVO> getMyLikes(String memberId);
 
-	int deleteLike(String memberId, Long songNo);
+	LikeResponse deleteLike(String memberId, Long songNo);
 
 	int reorderTracks(String memberId, List<LikeTrackVO> newOrderList);
     

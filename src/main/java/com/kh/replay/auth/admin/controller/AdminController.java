@@ -1,9 +1,9 @@
 package com.kh.replay.auth.admin.controller;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,5 +30,16 @@ public class AdminController {
 		return ResponseData.ok(result,"회원 목록 조회 성공");
 		
 	}
-
+	@GetMapping("/dashboard")
+	public ResponseEntity<ResponseData<?>> getDashboardSummary(@RequestParam(name ="totalAccount")int totalAccount,@RequestParam(name="user") int user,
+															   @RequestParam(name="admins") int admins, @RequestParam(name="withdrawnAccounts") int withdrawnAccounts,
+															   @RequestParam(name="asOf")Date asOf){
+																
+		
+		adminService.getDashboardSummary(totalAccount,admins,user,asOf,withdrawnAccounts);
+		
+		
+		return null; 
+		
+	}
 }

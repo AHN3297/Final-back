@@ -1,5 +1,6 @@
 package com.kh.replay.auth.admin.model.service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +67,31 @@ public class AdminServiceImpl implements AdminService {
 		//전체 회원 수 조회
 		
 	}
-			
+
+	@Override
+	public void getDashboardSummary(int totalAccount, int admins, int user, Date asOf, int withdrawnAccounts) {
+
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+		String role = userDetails.getAuthorities().stream()
+								 .map(GrantedAuthority::getAuthority)
+								 .findFirst()
+								 .orElse("");
+		if(! "ROLE_ADMIN".equals(role)) {
+			throw new UnauthorizedException("관리자만 조회할 수 있습니다.");
+		}
 		
-	}
+		totalAccount = adminMapper.getAllUsers();
+		admins = adminMapper.getAllAdmins();
+		user = adminMapper.getAllMembers();
+		withdrawnAccounts = adminMapper.getInactiveMembers();
+		asOf = new Date();
+		
+		
+	}}	
+		
+	
+
+
 	
 

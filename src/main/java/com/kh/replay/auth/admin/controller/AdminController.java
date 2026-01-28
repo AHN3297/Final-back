@@ -69,14 +69,14 @@ public class AdminController {
 	}
 	
 	@PatchMapping
-	public ResponseEntity<ResponseData<?>> ChangePermissions(@RequestBody MemberDTO member  ){
+	public ResponseEntity<ResponseData<MemberDTO>> ChangePermissions(@RequestBody MemberDTO member  ){
 		
 		
-		adminService.ChangePermissions(member);
+		MemberDTO user = adminService.ChangePermissions(member);
 		
 		
 		
-		return null;
+		return ResponseData.ok(user,"관리자 권한으로 변경되었습니다. ");
 		
 	}
 	

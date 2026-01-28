@@ -18,7 +18,7 @@ public interface AdminService {
 
 	MemberDetailDTO getMemberDetails(String memberId);
 
-	int ChangePermissions(MemberDTO member);
+	MemberDTO ChangePermissions(MemberDTO member);
 
 
 }

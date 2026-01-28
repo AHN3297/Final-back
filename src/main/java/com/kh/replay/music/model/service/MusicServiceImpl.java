@@ -16,6 +16,7 @@ import com.kh.replay.global.api.itunes.ItunesVO;
 import com.kh.replay.global.api.lyricsOvh.LyricsClient;
 import com.kh.replay.global.api.model.dto.ArtistDTO;
 import com.kh.replay.global.api.model.dto.MusicDTO;
+import com.kh.replay.global.exception.DateParseFalseException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -177,7 +178,7 @@ public class MusicServiceImpl implements MusicService {
                     LocalDate releaseDate = LocalDate.parse(item.getReleaseDate().substring(0, 10));
                     return releaseDate.isAfter(freshLimit); 
                 } catch (Exception e) {
-                    return false;
+                    throw new DateParseFalseException("날짜 파싱에 실패하였습니다.");
                 }
             })
             .sorted(Comparator.comparing(ItunesVO.ItunesItem::getReleaseDate).reversed())

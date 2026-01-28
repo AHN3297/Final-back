@@ -1,12 +1,12 @@
 package com.kh.replay.auth.admin.model.dao;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 
@@ -34,7 +34,7 @@ public interface AdminMapper {
 	@Select("SELECT COUNT (*) FROM TB_MEMBER WHERE MEMBER_ID IS NOT NULL AND STATUS = 'Y'")
 	int getActiveMembers();
 
-	Map<String,Object> getMemberDetails(String memberId);
+	MemberDetailDTO getMemberDetails(String memberId);
 
 	@Select("SELECT COUNT(*) FROM TB_MEMBER WHERE MEMBER_ID = #{memberId}")
 	int CountById(String memberId);

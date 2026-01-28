@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
@@ -57,13 +58,13 @@ public class AdminController {
 		
 	}
 	@GetMapping("/memberDetails")
-	public   ResponseEntity<ResponseData<?>> getMemberDetails(@RequestParam (name="memberId") String memberId){
+	public   ResponseEntity<ResponseData<MemberDetailDTO>> getMemberDetails(@RequestParam (name = "memberId") String memberId ){
 		
-		adminService.getMemberDetails(memberId);
+		MemberDetailDTO response =adminService.getMemberDetails(memberId);
 		
 		
 		
-		return null;
+		return ResponseData.ok(response, "회원 상세 조회 성공");
 			
 	}
 	

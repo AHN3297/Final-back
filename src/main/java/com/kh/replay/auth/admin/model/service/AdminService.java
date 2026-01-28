@@ -3,6 +3,7 @@ package com.kh.replay.auth.admin.model.service;
 import java.util.Map;
 
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.vo.MemberVO;
@@ -15,7 +16,7 @@ public interface AdminService {
 
 	MemberStatusRatio getMemberStatusRatio();
 
-	void getMemberDetails(String memberId);
+	MemberDetailDTO getMemberDetails(String memberId);
 
 	int ChangePermissions(MemberDTO member);
 

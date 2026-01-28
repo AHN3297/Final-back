@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.admin.model.dao.AdminMapper;
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.auth.admin.model.dto.StatusInfo;
@@ -20,6 +21,7 @@ import com.kh.replay.global.util.Pagenation;
 import com.kh.replay.member.model.dao.MemberMapper;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.vo.MemberVO;
+import com.kh.replay.shortform.model.dao.ShortformMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 	private final AdminMapper adminMapper;
 	private final Pagenation pagenation;
-	private final MemberVO member;
 	private final MemberMapper memberMapper;
+	private final ShortformMapper shorformtMapper;
 	
 	@Override
 	public Map<String,Object> memberList(int page, int size) {
@@ -109,12 +111,16 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void getMemberDetails(String memberId) {
-		
-		if(!member.getMemberId().equals(memberId)) {
+	public MemberDetailDTO getMemberDetails(String memberId) {
+		int result = adminMapper.CountById(memberId);
+		if(result<=0) {
 			throw new ResourceNotFoundException("존재하지 않는 회원입니다.");
 		}
-		adminMapper.getMemberDetails(memberId);
+		MemberDetailDTO  member = adminMapper.getMemberDetails(memberId);
+		if(member == null) {
+			throw new UserNotFoundException("회원을 찾을 수 없습니다.");
+		}
+		return member;
 		
 	}
 

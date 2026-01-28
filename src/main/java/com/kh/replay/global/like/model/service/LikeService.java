@@ -34,11 +34,20 @@ public interface LikeService {
     // 좋아하는 노래 조회 (내 좋아요 목록)
     List<LikeTrackVO> getMyLikes(String memberId);
 
+
+	LikeResponse deleteLike(String memberId, Long songNo);
+
+	int reorderTracks(String memberId, List<LikeTrackVO> newOrderList);
+    
+    
+    // 좋아하는 노래 조회
+    
+
     // 좋아하는 노래 삭제
-    int deleteLike(String memberId, Long songNo);
+
 
     // 노래 순서 변경
-    int reorderTracks(String memberId, List<LikeTrackVO> newOrderList);
+
     
 
     // 숏폼 좋아요 생성

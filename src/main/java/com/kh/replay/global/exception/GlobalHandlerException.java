@@ -59,6 +59,12 @@ public class GlobalHandlerException {
         log.warn("유효성 검증 실패(400): {}", errorMessage);
         return createErrorResponseEntity(errorMessage, HttpStatus.BAD_REQUEST);
     }
+    
+    @ExceptionHandler(DateParseFalseException.class)
+    public ResponseEntity<ResponseData<Object>> handleDateParseFalse(DateParseFalseException e) {
+    	log.warn("날자 파싱에 실패하였습니다.", e.getMessage());
+    	return createErrorResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     // *******************401 Unauthorized*******************
     
@@ -141,4 +147,8 @@ public class GlobalHandlerException {
     	log.error("권한이 오류", e.getMessage());
     	return ResponseData.failure(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
-}
+    @ExceptionHandler(UpdateFailedException.class)
+    public ResponseEntity<ResponseData<Object>> handleUpdateFailedException(UpdateFailedException e){
+    	return ResponseData.failure(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+}  

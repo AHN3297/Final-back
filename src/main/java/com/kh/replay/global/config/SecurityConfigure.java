@@ -75,8 +75,8 @@ public class SecurityConfigure {
 					// (2) 그 외(작성, 수정, 삭제, 좋아요, 신고 등)는 로그인 필요
 					requests.requestMatchers("/api/shortforms/**").authenticated();
 
-					// 5. 음악/아티스트 상세조회 로그인 필요
-					requests.requestMatchers(HttpMethod.GET, "/api/music/**", "/api/artist/**").authenticated();
+					// 5. 음악/아티스트 상세조회 로그인 필요(test permiAll 앞단 로그인 구현 되면 authenticated()로 변경)
+					requests.requestMatchers(HttpMethod.GET, "/api/music/**", "/api/artist/**").permitAll();
 					
 					// 6. 기타 기본 보안 정책 (가장 마지막에 위치)
 					requests.requestMatchers(HttpMethod.GET).authenticated();
@@ -84,7 +84,8 @@ public class SecurityConfigure {
 					requests.requestMatchers(HttpMethod.PUT).permitAll();
 				
 					//7. 관리자 기능
-					requests.requestMatchers(HttpMethod.GET,"/api/admin/**").hasRole("ADMIN");
+					requests.requestMatchers(HttpMethod.GET,"/api/auth/admin/**").hasRole("ADMIN");
+					requests.requestMatchers(HttpMethod.PATCH,"/api/auth/admin/**").hasRole("ADMIN");
 				})
 				.exceptionHandling(ex -> 
 					ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

@@ -1,6 +1,8 @@
 package com.kh.replay.music.model.service;
 
+import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,7 @@ import com.kh.replay.global.api.itunes.ItunesVO;
 import com.kh.replay.global.api.lyricsOvh.LyricsClient;
 import com.kh.replay.global.api.model.dto.ArtistDTO;
 import com.kh.replay.global.api.model.dto.MusicDTO;
+import com.kh.replay.global.exception.DateParseFalseException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -153,6 +156,66 @@ public class MusicServiceImpl implements MusicService {
         }
 
         return dto;
+    }
+    
+    //최신 노래
+    @Override
+    public List<MusicDTO> getNewMusic() {
+        LocalDate now = LocalDate.now();
+        // 1년 내의 올라온 K-pop노래
+        LocalDate freshLimit = now.minusMonths(12); 
+        // Itunes에서 자체적으로 인기순으로 끊기 때문에 100개를 불러와서 그 중에 최신노래들로 걸러서 보내는거
+        ItunesVO response = itunesClient.findAllSearch("K-Pop", "song", 100); 
+
+        if (response == null || response.getResults() == null) {
+            return Collections.emptyList();
+        }
+
+        List<MusicDTO> filteredList = response.getResults().stream()
+            .filter(item -> {
+                try {
+                	// yyyy-MM-dd 총 10글자
+                    LocalDate releaseDate = LocalDate.parse(item.getReleaseDate().substring(0, 10));
+                    return releaseDate.isAfter(freshLimit); 
+                } catch (Exception e) {
+                    throw new DateParseFalseException("날짜 파싱에 실패하였습니다.");
+                }
+            })
+            .sorted(Comparator.comparing(ItunesVO.ItunesItem::getReleaseDate).reversed())
+            .limit(5)
+            .map(item -> MusicDTO.builder()
+                .trackId(item.getTrackId())
+                .title(item.getTrackName())
+                .artistName(item.getArtistName())
+                .coverImgUrl(item.getArtworkUrl100())
+                .releaseDate(item.getReleaseDate())
+                .build())
+            .collect(Collectors.toList());
+        
+        return filteredList;
+    }
+    
+    // 인기노래
+    @Override
+    public List<MusicDTO> getTopMusic() {
+        // findAllSearch의 반환 타입이 ItunesVO(결과 리스트를 품은 객체)인 경우
+        ItunesVO response = itunesClient.findAllSearch("K-Pop", "song", 5); 
+
+        if (response == null || response.getResults() == null) {
+            return Collections.emptyList();
+        }
+
+        // 2. MusicDTO로 변환 및 TOP 5 추출
+        return response.getResults().stream()
+                .limit(5)
+                .map(vo -> MusicDTO.builder()
+                        .trackId(vo.getTrackId())
+                        .title(vo.getTrackName())
+                        .artistName(vo.getArtistName())
+                        .coverImgUrl(vo.getArtworkUrl100())
+                        .releaseDate(vo.getReleaseDate())
+                        .build())
+                .collect(Collectors.toList());
     }
     
 

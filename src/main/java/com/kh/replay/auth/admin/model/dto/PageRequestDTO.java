@@ -11,4 +11,5 @@ public class PageRequestDTO {
 
 	private int offset;
 	private int size;
+	private String likeKw;
 }

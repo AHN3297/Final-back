@@ -44,7 +44,7 @@ public class ItunesClient {
     }
     
     /**
-     * 가수 상세보기 관려 노래
+     * 가수 상세보기 관련 노래
      */
     public ItunesVO findArtistWithSongs(Long artistId, int limit) {
         // lookup 주소를 사용하며, 가수의 노래 목록을 함께 요청

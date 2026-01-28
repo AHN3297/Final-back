@@ -1,30 +1,210 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.kh.replay.auth.admin.model.dao.AdminMapper">
-	<select id="getMemberList" resultType="com.kh.replay.member.model.dto.MemberDTO">
-    SELECT 
-         MEMBER_ID AS memberId,
-         REGEXP_REPLACE(EMAIL, '(.{3})(.*)(@.*)', '\1***\3') AS email,
-         REGEXP_REPLACE(MEMBER_NAME, '(.)(.+)', '\1' || RPAD('*', LENGTH('\2'), '*')) AS name,
-         GENDER AS gender,
-         MBTI AS mbti,
-         UPDATED_AT AS updatedAt,
-      	 REGEXP_REPLACE(PHONE, '([0-9]{3})([0-9]{4})([0-9]{4})', '\1-****-\3') AS phone,
-         GENRE AS genre,
-         MEMBER_JOB AS job,
-         NICKNAME AS nickName,
-         CREATED_AT AS createdAt,
-         ROLE AS role,
-         STATUS AS status
-    FROM TB_MEMBER
-    WHERE MEMBER_ID IS NOT NULL
-    AND STATUS = 'Y'
-    ORDER BY CREATED_AT DESC
-    OFFSET #{offset} ROWS
-    FETCH NEXT #{size} ROWS ONLY
-</select>
-	
+	<select id="getMemberList"
+		resultType="com.kh.replay.member.model.dto.MemberDTO">
+		SELECT
+		MEMBER_ID AS memberId,
+		REGEXP_REPLACE(EMAIL, '(.{3})(.*)(@.*)', '\1***\3') AS email,
+		REGEXP_REPLACE(MEMBER_NAME, '(.)(.+)', '\1' || RPAD('*', LENGTH('\2'),
+		'*')) AS name,
+		GENDER AS gender,
+		MBTI AS mbti,
+		UPDATED_AT AS updatedAt,
+		REGEXP_REPLACE(PHONE, '([0-9]{3})([0-9]{4})([0-9]{4})', '\1-****-\3') AS
+		phone,
+		GENRE AS genre,
+		MEMBER_JOB AS job,
+		NICKNAME AS nickName,
+		CREATED_AT AS createdAt,
+		ROLE AS role,
+		STATUS AS status
+		FROM TB_MEMBER
+		WHERE MEMBER_ID IS NOT NULL
+		AND STATUS = 'Y'
+		ORDER BY CREATED_AT DESC
+		OFFSET #{offset} ROWS
+		FETCH NEXT #{size} ROWS ONLY
+	</select>
 
-   
+	<select id="getMemberDetails" resultMap="memberDetailMap">
+		SELECT
+			M.MEMBER_ID,
+			M.EMAIL,
+			M.MEMBER_NAME,
+			M.PHONE,
+			M.GENDER,
+			M.MBTI,
+			M.UPDATED_AT AS MEMBER_UPDATED_AT,
+			M.CREATED_AT AS MEMBER_CREATED_AT,
+			M.GENRE,
+			M.MEMBER_JOB,
+			M.NICKNAME,
+			M.ROLE,
+			M.STATUS AS MEMBER_STATUS,
+			
+			U.TITLE AS UNIVERSE_TITLE,
+			U.LAYOUT_DATA,
+			U.THEME_CODE,
+			U.STATUS AS UNIVERSE_STATUS,
+			U.CREATED_AT AS UNIVERSE_CREATED_AT,
+			U.UPDATED_AT AS UNIVERSE_UPDATED_AT,
+			
+			FS.SINGER_NO,
+			FS.CREATED_AT AS FAV_SINGER_CREATED_AT,
+			FS.UPDATED_AT AS FAV_SINGER_UPDATED_AT,
+			TS.API_SINGER_NAME,
+			TS.SINGER_GENRE,
+			TS.SINGER_IMG_URL,
+			
+			FTS.TRACK_ORDER AS FAV_TRACK_ORDER,
+			FTS.CREATE_AT AS FAV_SONG_CREATED_AT,
+			FTS.UPDATE_AT AS FAV_SONG_UPDATED_AT,
+			TAS.ALBUM AS FAV_ALBUM,
+			TAS.DURATION AS FAV_DURATION,
+			TAS.PREVIEW_URL AS FAV_PREVIEW_URL,
+			TAS.RELEASE_DATE AS FAV_RELEASE_DATE,
+			TAS.COVERIMG_URL AS FAV_COVERIMG_URL,
+			TAS.TITLE AS FAV_TITLE,
+			TAS.ARTIST_NAME AS FAV_ARTIST_NAME,
+			TAS.GENRE_NAME AS FAV_GENRE_NAME,
+			
+			TG.GENRE_NAME,
+			
+			TP.PLAYLIST_NAME,
+			TP.CREATED_AT AS PLAYLIST_CREATED_AT,
+			TP.UPDATED_AT AS PLAYLIST_UPDATED_AT,
+			
+			TPSL.TRACK_ORDER,
+			TPSL.CREATED_AT AS TRACK_CREATED_AT,
+			TPSL.UPDATE_AT AS TRACK_UPDATED_AT,
+			TPR.ALBUM AS TRACK_ALBUM,
+			TPR.DURATION AS TRACK_DURATION,
+			TPR.PREVIEW_URL AS TRACK_PREVIEW_URL,
+			TPR.RELEASE_DATE AS TRACK_RELEASE_DATE,
+			TPR.COVERIMG_URL AS TRACK_COVERIMG_URL,
+			TPR.TITLE AS TRACK_TITLE,
+			TPR.ARTIST_NAME AS TRACK_ARTIST_NAME,
+			TPR.GENRE_NAME AS TRACK_GENRE_NAME
+			
+		FROM TB_MEMBER M
+		LEFT JOIN TB_UNIVERSE U ON M.MEMBER_ID = U.MEMBER_ID
+		LEFT JOIN TB_UNIVERSE_LIKED UK ON M.MEMBER_ID = UK.MEMBER_ID
+		LEFT JOIN TB_FAV_UNIVERSE UF ON M.MEMBER_ID = UF.MEMBER_ID
+		LEFT JOIN TB_FAV_SINGER FS ON M.MEMBER_ID = FS.MEMBER_ID
+		LEFT JOIN TB_API_SINGER TS ON TS.SINGER_NO = FS.SINGER_NO
+		LEFT JOIN TB_FAVORITE_SONG FTS ON M.MEMBER_ID = FTS.MEMBER_ID
+		LEFT JOIN TB_API_SONG TAS ON FTS.SONG_NO = TAS.SONG_NO
+		LEFT JOIN TB_MEMBER_GENRE MG ON M.MEMBER_ID = MG.MEMBER_ID
+		LEFT JOIN TB_GENRE TG ON TG.GENRE_ID = MG.GENRE_ID
+		LEFT JOIN TB_FAV_PLAYLIST TFP ON M.MEMBER_ID = TFP.MEMBER_ID
+		LEFT JOIN TB_PLAYLIST TP ON M.MEMBER_ID = TP.MEMBER_ID
+		LEFT JOIN TB_PLAYLIST_SONG_LIST TPSL ON TPSL.PLAYLIST_ID = TP.PLAYLIST_ID
+		LEFT JOIN TB_PLAYLIST_TRACK TPR ON TPSL.SONG_ID = TPR.SONG_NO
+		WHERE M.MEMBER_ID = #{memberId}
+	</select>
+	
+	<!-- ResultMap 정의: 모든 DTO 필드를 정확하게 매핑 -->
+	<resultMap id="memberDetailMap" type="com.kh.replay.auth.admin.model.dto.MemberDetailDTO">
+		
+		<!-- MemberDTO 매핑 -->
+		<association property="member" javaType="com.kh.replay.member.model.dto.MemberDTO">
+			<result property="memberId" column="MEMBER_ID"/>
+			<result property="email" column="EMAIL"/>
+			<result property="gender" column="GENDER"/>
+			<result property="mbti" column="MBTI"/>
+			<result property="updatedAt" column="MEMBER_UPDATED_AT"/>
+			<result property="createdAt" column="MEMBER_CREATED_AT"/>
+			<result property="name" column="MEMBER_NAME"/>
+			<result property="nickName" column="NICKNAME"/>
+			<result property="phone" column="PHONE"/>
+			<result property="genre" column="GENRE"/>
+			<result property="job" column="MEMBER_JOB"/>
+			<result property="role" column="ROLE"/>
+			<result property="status" column="MEMBER_STATUS"/>
+		</association>
+		
+		<!-- ShortformDTO 매핑 -->
+		<association property="shortform" javaType="com.kh.replay.shortform.model.dto.ShortformDTO">
+			<!-- 
+			ShortformDTO는 현재 SELECT에 없는 필드들이므로 
+			필요하다면 SELECT 절에 추가하거나, 별도 쿼리로 조회 필요
+			<result property="shortFormId" column="SHORTFORM_ID"/>
+			<result property="shortFormTitle" column="SHORTFORM_TITLE"/>
+			<result property="videoUrl" column="VIDEO_URL"/>
+			<result property="thumbnailUrl" column="THUMBNAIL_URL"/>
+			<result property="caption" column="CAPTION"/>
+			<result property="duration" column="SHORTFORM_DURATION"/>
+			<result property="memberId" column="MEMBER_ID"/>
+			<result property="nickName" column="NICKNAME"/>
+			<result property="status" column="SHORTFORM_STATUS"/>
+			<result property="like" column="SHORTFORM_LIKE"/>
+			<result property="createdAt" column="SHORTFORM_CREATED_AT"/>
+			-->
+		</association>
+		
+		<!-- PlayListDTO 매핑 -->
+		<association property="playList" javaType="com.kh.replay.playList.model.dto.PlayListDTO">
+			<!-- 
+			PlayListDTO의 필드명 확인:
+			- playListId (int)
+			- playListName (String)
+			- createdAt (Date)
+			- memberId (String)
+			- updateAt (Date)
+			-->
+			<result property="playListName" column="PLAYLIST_NAME"/>
+			<result property="createdAt" column="PLAYLIST_CREATED_AT"/>
+			<result property="updateAt" column="PLAYLIST_UPDATED_AT"/>
+			<result property="memberId" column="MEMBER_ID"/>
+			<!-- playListId는 SELECT에 없으므로 추가 필요 시 SELECT 절 수정 -->
+		</association>
+		
+		<!-- ArtistDTO 매핑 -->
+		<association property="artist" javaType="com.kh.replay.global.api.model.dto.ArtistDTO">
+			<!-- 
+			ArtistDTO의 필드명 확인:
+			- apiSingerId (Long)
+			- apiSingerName (String)
+			- singerGenre (String)
+			- singerImgUrl (String)
+			- topSongs (List<MusicDTO>)
+			- description (String)
+			-->
+			<result property="apiSingerId" column="SINGER_NO"/>
+			<result property="apiSingerName" column="API_SINGER_NAME"/>
+			<result property="singerGenre" column="SINGER_GENRE"/>
+			<result property="singerImgUrl" column="SINGER_IMG_URL"/>
+			<!-- topSongs와 description은 SELECT에 없으므로 필요시 별도 처리 -->
+		</association>
+		
+		<!-- MusicDTO 매핑 -->
+		<association property="music" javaType="com.kh.replay.global.api.model.dto.MusicDTO">
+			<!-- 
+			MusicDTO의 필드명 확인:
+			- trackId (Long)
+			- artistId (Long)
+			- title (String)
+			- artistName (String)
+			- album (String)
+			- genreName (String)
+			- coverImgUrl (String)
+			- previewUrl (String)
+			- releaseDate (String)
+			- duration (Long)
+			- lyrics (String)
+			-->
+			<result property="title" column="FAV_TITLE"/>
+			<result property="artistName" column="FAV_ARTIST_NAME"/>
+			<result property="album" column="FAV_ALBUM"/>
+			<result property="genreName" column="FAV_GENRE_NAME"/>
+			<result property="coverImgUrl" column="FAV_COVERIMG_URL"/>
+			<result property="previewUrl" column="FAV_PREVIEW_URL"/>
+			<result property="releaseDate" column="FAV_RELEASE_DATE"/>
+			<result property="duration" column="FAV_DURATION"/>
+			<!-- trackId, artistId, lyrics는 SELECT에 없으므로 필요시 추가 -->
+		</association>
+		
+	</resultMap>
 
 </mapper>

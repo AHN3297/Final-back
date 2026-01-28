@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/auth/admin")
 public class AdminController {
 	private final AdminService adminService;
-
+//
 	@GetMapping
 	public ResponseEntity<ResponseData<Map<String,Object>>> memberList(@RequestParam(name="page",defaultValue ="1") int page , @RequestParam(name="size",defaultValue= "10") int size ,String keyword){
 		

@@ -10,7 +10,7 @@ import com.kh.replay.member.model.vo.MemberVO;
 
 public interface AdminService {
 
-	Map<String, Object> memberList(int page, int size);
+	Map<String, Object> searchMemberList(int page, int size,String keyword);
 
 	DashboardSummaryDTO getDashboardSummary();
 
@@ -21,6 +21,10 @@ public interface AdminService {
 	MemberDTO ChangePermissions(MemberDTO member);
 
 	MemberDTO withdrawUser(MemberDTO member);
+
+	Map<String, Object> findReportList(int page, int size, String keyword);
+
+
 
 
 }

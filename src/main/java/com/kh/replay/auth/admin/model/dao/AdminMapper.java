@@ -8,14 +8,15 @@ import org.apache.ibatis.annotations.Update;
 
 import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
+import com.kh.replay.auth.admin.model.dto.ReportCommentDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 
 @Mapper
 public interface AdminMapper {
 	@Select("SELECT COUNT(*) FROM TB_MEMBER WHERE MEMBER_ID IS NOT NULL AND STATUS = 'Y' ")
-	int totalCount();
+	int totalMemberCount(Object object);
 
-	List<MemberDTO> getMemberList(PageRequestDTO pageRequest);
+	List<MemberDTO> searchMemberList(PageRequestDTO pageRequest);
 
 	
 	@Select("SELECT COUNT(*) FROM TB_MEMBER WHERE MEMBER_ID IS NOT NULL" )
@@ -50,6 +51,16 @@ public interface AdminMapper {
 
 	@Update("UPDATE TB_MEMBER SET STATUS = 'N' ,UPDATED_AT = SYSDATE WHERE MEMBER_ID = #{memberId}")
 	int withdrawUser(MemberDTO member);
+	
+	
+	
+	List<ReportCommentDTO> findReportList(PageRequestDTO pageRequest);
+	
+	
+	@Select("SELECT COUNT(*) FROM TB_COMMENT_REPORT WHERE REPORT_ID IS NOT NULL AND STATUS = 'Y' AND (REPORT_ID LIKE #{keyword} OR DESCRIPTION LIKE #{keyword} OR REASON_CODE LIKE #{keyword})")
+	int totalCounted(String likeKw);
+
+	
 
 	
 

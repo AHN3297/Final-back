@@ -44,6 +44,11 @@ public interface AdminMapper {
 	int ChangePermissions(MemberDTO member);
 
 	
+	
+	@Select("SELECT MEMBER_ID , MEMBER_NAME,MBTI,MEMBER_JOB,GENDER,GENRE,ROLE, STATUS,NICKNAME,PHONE,EMAIL FROM TB_MEMBER")
+	MemberDTO getMemberInfo(String memberId);
+
+	
 
 
 }

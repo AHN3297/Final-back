@@ -20,9 +20,9 @@ import com.kh.replay.global.util.PageInfo;
 import com.kh.replay.global.util.Pagenation;
 import com.kh.replay.member.model.dao.MemberMapper;
 import com.kh.replay.member.model.dto.MemberDTO;
-import com.kh.replay.member.model.vo.MemberVO;
 import com.kh.replay.shortform.model.dao.ShortformMapper;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
@@ -124,8 +124,9 @@ public class AdminServiceImpl implements AdminService {
 		
 	}
 
+	@Transactional
 	@Override
-	public int ChangePermissions(MemberDTO member) {
+	public MemberDTO ChangePermissions(MemberDTO member) {
 		
 		int result =adminMapper.CountById(member.getMemberId());
 		
@@ -138,9 +139,9 @@ public class AdminServiceImpl implements AdminService {
 			throw new UpdateFailedException("수정을 하지 못했습니다.");
 		}
 		
-		adminMapper.getMemberDetails(member.getMemberId());
+		MemberDTO user = adminMapper.getMemberInfo(member.getMemberId());
 		
-		return response;
+		return user;
 	
 	}
 

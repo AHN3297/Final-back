@@ -56,6 +56,7 @@ public class SecurityConfigure {
 					requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
 					requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
 					requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
+					requests.requestMatchers(HttpMethod.GET, "/api/news").permitAll();
 
 					// 2. 회원 관련 설정 (탈퇴, 소셜 정보 수정 등)
 					requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated(); 

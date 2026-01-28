@@ -4,14 +4,18 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
+import com.kh.replay.member.model.dto.MemberDTO;
 
 import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
@@ -53,4 +57,27 @@ public class AdminController {
 	return ResponseData.ok(memberStatus, "회원 상태 비율 조회 성공");
 		
 	}
+	@GetMapping("/memberDetails")
+	public   ResponseEntity<ResponseData<MemberDetailDTO>> getMemberDetails(@RequestParam (name = "memberId") String memberId ){
+		
+		MemberDetailDTO response =adminService.getMemberDetails(memberId);
+		
+		
+		
+		return ResponseData.ok(response, "회원 상세 조회 성공");
+			
+	}
+	
+	@PatchMapping
+	public ResponseEntity<ResponseData<MemberDTO>> ChangePermissions(@RequestBody MemberDTO member  ){
+		
+		
+		MemberDTO user = adminService.ChangePermissions(member);
+		
+		
+		
+		return ResponseData.ok(user,"관리자 권한으로 변경되었습니다. ");
+		
+	}
+	
 }

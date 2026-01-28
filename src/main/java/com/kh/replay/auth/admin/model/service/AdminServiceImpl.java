@@ -5,22 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.kh.replay.auth.admin.model.dao.AdminMapper;
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.auth.admin.model.dto.StatusInfo;
-import com.kh.replay.global.exception.UnauthorizedException;
+import com.kh.replay.global.exception.ResourceNotFoundException;
+import com.kh.replay.global.exception.UpdateFailedException;
+import com.kh.replay.global.exception.UserNotFoundException;
 import com.kh.replay.global.util.PageInfo;
 import com.kh.replay.global.util.Pagenation;
+import com.kh.replay.member.model.dao.MemberMapper;
 import com.kh.replay.member.model.dto.MemberDTO;
-import com.kh.replay.member.model.vo.CustomUserDetails;
+import com.kh.replay.shortform.model.dao.ShortformMapper;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
@@ -29,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminServiceImpl implements AdminService {
 	private final AdminMapper adminMapper;
 	private final Pagenation pagenation;
+	private final MemberMapper memberMapper;
+	private final ShortformMapper shorformtMapper;
 	
 	@Override
 	public Map<String,Object> memberList(int page, int size) {
@@ -104,6 +108,41 @@ public class AdminServiceImpl implements AdminService {
 											
 				 );
 		
+	}
+
+	@Override
+	public MemberDetailDTO getMemberDetails(String memberId) {
+		int result = adminMapper.CountById(memberId);
+		if(result<=0) {
+			throw new ResourceNotFoundException("존재하지 않는 회원입니다.");
+		}
+		MemberDetailDTO  member = adminMapper.getMemberDetails(memberId);
+		if(member == null) {
+			throw new UserNotFoundException("회원을 찾을 수 없습니다.");
+		}
+		return member;
+		
+	}
+
+	@Transactional
+	@Override
+	public MemberDTO ChangePermissions(MemberDTO member) {
+		
+		int result =adminMapper.CountById(member.getMemberId());
+		
+		if(result <= 0) {
+			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
+		}
+		
+		int response = adminMapper.ChangePermissions(member);
+		if(response<=0) {
+			throw new UpdateFailedException("수정을 하지 못했습니다.");
+		}
+		
+		MemberDTO user = adminMapper.getMemberInfo(member.getMemberId());
+		
+		return user;
+	
 	}
 
 

@@ -16,7 +16,7 @@ public interface MemberMapper {
 
 	
 	
-	//멤버 아이디로 조회
+	//멤버 이메일로 조회
 	Map<String,String> loadByMemberEmail(String email);
 	
 	//JWT검증

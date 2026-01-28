@@ -141,4 +141,8 @@ public class GlobalHandlerException {
     	log.error("권한이 오류", e.getMessage());
     	return ResponseData.failure(e.getMessage(),HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(UpdateFailedException.class)
+    public ResponseEntity<ResponseData<Object>> handleUpdateFailedException(UpdateFailedException e){
+    	return ResponseData.failure(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

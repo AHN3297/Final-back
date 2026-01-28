@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.data.domain.PageRequest;
+import org.apache.ibatis.annotations.Update;
 
+import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
-import com.kh.replay.member.model.vo.MemberVO;
 
 @Mapper
 public interface AdminMapper {
@@ -33,6 +33,20 @@ public interface AdminMapper {
 	
 	@Select("SELECT COUNT (*) FROM TB_MEMBER WHERE MEMBER_ID IS NOT NULL AND STATUS = 'Y'")
 	int getActiveMembers();
+
+	MemberDetailDTO getMemberDetails(String memberId);
+
+	@Select("SELECT COUNT(*) FROM TB_MEMBER WHERE MEMBER_ID = #{memberId}")
+	int CountById(String memberId);
+
+	
+	@Update("UPDATE TB_MEMBER SET ROLE = 'ROLE_USER' , UPDATED_AT = 'SYSDATE'")
+	int ChangePermissions(MemberDTO member);
+
+	
+	
+	@Select("SELECT MEMBER_ID , MEMBER_NAME,MBTI,MEMBER_JOB,GENDER,GENRE,ROLE, STATUS,NICKNAME,PHONE,EMAIL FROM TB_MEMBER")
+	MemberDTO getMemberInfo(String memberId);
 
 	
 

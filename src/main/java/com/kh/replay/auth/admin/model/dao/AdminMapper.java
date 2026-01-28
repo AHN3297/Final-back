@@ -45,7 +45,7 @@ public interface AdminMapper {
 
 	
 	
-	@Select("SELECT MEMBER_ID AS memberId ,MEMBER_NAME AS name ,MBTI AS mbti ,MEMBER_JOB AS job,GENDER AS gender,GENRE AS genre ,ROLE AS role , STATUS AS status ,NICKNAME AS nickName ,PHONE AS phone ,EMAIL AS email FROM TB_MEMBER 	WHERE MEMBER_ID = #{memberId}")
+	@Select("SELECT MEMBER_ID AS memberId ,MEMBER_NAME AS name ,MBTI AS mbti ,MEMBER_JOB AS job,GENDER AS gender,GENRE AS genre ,ROLE AS role , STATUS AS status ,NICKNAME AS nickName ,PHONE AS phone ,EMAIL AS email ,UPDATED_AT AS updatedAt,CREATED_AT AS createdAt FROM TB_MEMBER 	WHERE MEMBER_ID = #{memberId}")
 	MemberDTO getMemberInfo(String memberId);
 
 	@Update("UPDATE TB_MEMBER SET STATUS = 'N' ,UPDATED_AT = SYSDATE WHERE MEMBER_ID = #{memberId}")

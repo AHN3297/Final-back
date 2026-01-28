@@ -145,4 +145,4 @@ public class GlobalHandlerException {
     public ResponseEntity<ResponseData<Object>> handleUpdateFailedException(UpdateFailedException e){
     	return ResponseData.failure(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
-}
+}  

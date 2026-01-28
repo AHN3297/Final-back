@@ -206,5 +206,26 @@
 		</association>
 		
 	</resultMap>
+	
+	
+	<select id="findReportList"
+		resultType="com.kh.replay.auth.admin.model.dto.ReportCommentDTO">
+		SELECT
+		REPORT_ID AS reportId,
+		REASON_CODE AS reasonCode,
+		DESCRIPTION AS description,
+		STATUS AS status,
+		CREATED_AT AS createdAt,
+		MEMBER_ID AS memberId
+		FROM 
+		TB_COMMENT_REPORT
+		WHERE REPORT_ID IS NOT NULL
+		AND STATUS = 'Y'
+		AND( DESCRIPTION LIKE #{likeKw}
+		OR REASON_CODE LIKE #{likeKw})
+		ORDER BY CREATED_AT DESC
+		OFFSET #{offset} ROWS
+		FETCH NEXT #{size} ROWS ONLY
+	</select>
 
 </mapper>

@@ -79,5 +79,13 @@ public class AdminController {
 		return ResponseData.ok(user,"관리자 권한으로 변경되었습니다. ");
 		
 	}
+	@PatchMapping("/withdraw")
+	public ResponseEntity<ResponseData<MemberDTO>> withdrawUser(@RequestBody MemberDTO member){
+		
+		MemberDTO user = adminService.withdrawUser(member);
+		
+		
+		return ResponseData.ok(user, "회원 탈퇴 성공");
+	}
 	
 }

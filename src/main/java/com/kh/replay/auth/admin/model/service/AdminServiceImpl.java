@@ -134,6 +134,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 		
+		
 		int response = adminMapper.ChangePermissions(member);
 		if(response<=0) {
 			throw new UpdateFailedException("수정을 하지 못했습니다.");
@@ -144,6 +145,28 @@ public class AdminServiceImpl implements AdminService {
 		return user;
 	
 	}
+	@Transactional
+	@Override
+	public MemberDTO withdrawUser(MemberDTO member) {
+		
+		int result =adminMapper.CountById(member.getMemberId());
+		
+		if(result <= 0) {
+			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
+		}
+		
+		int response = adminMapper.withdrawUser(member);
+	
+		if(response<=0) {
+			throw new UpdateFailedException("수정을 하지 못했습니다.");
+		}
+		
+		
+		MemberDTO user = adminMapper.getMemberInfo(member.getMemberId());
+	
+		return user;
+	}
+	
 
 
 }	

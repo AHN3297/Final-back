@@ -40,13 +40,16 @@ public interface AdminMapper {
 	int CountById(String memberId);
 
 	
-	@Update("UPDATE TB_MEMBER SET ROLE = 'ROLE_USER' , UPDATED_AT = 'SYSDATE'")
+	@Update("UPDATE TB_MEMBER SET ROLE = #{role} , UPDATED_AT = SYSDATE WHERE MEMBER_ID = #{memberId}")
 	int ChangePermissions(MemberDTO member);
 
 	
 	
-	@Select("SELECT MEMBER_ID , MEMBER_NAME,MBTI,MEMBER_JOB,GENDER,GENRE,ROLE, STATUS,NICKNAME,PHONE,EMAIL FROM TB_MEMBER")
+	@Select("SELECT MEMBER_ID AS memberId ,MEMBER_NAME AS name ,MBTI AS mbti ,MEMBER_JOB AS job,GENDER AS gender,GENRE AS genre ,ROLE AS role , STATUS AS status ,NICKNAME AS nickName ,PHONE AS phone ,EMAIL AS email FROM TB_MEMBER 	WHERE MEMBER_ID = #{memberId}")
 	MemberDTO getMemberInfo(String memberId);
+
+	@Update("UPDATE TB_MEMBER SET STATUS = 'N' ,UPDATED_AT = SYSDATE WHERE MEMBER_ID = #{memberId}")
+	int withdrawUser(MemberDTO member);
 
 	
 

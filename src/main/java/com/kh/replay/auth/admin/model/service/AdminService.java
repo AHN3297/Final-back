@@ -20,5 +20,7 @@ public interface AdminService {
 
 	MemberDTO ChangePermissions(MemberDTO member);
 
+	MemberDTO withdrawUser(MemberDTO member);
+
 
 }

@@ -1,5 +1,7 @@
 package com.kh.replay.music.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,6 +49,19 @@ public class MusicController {
     public ResponseEntity<ResponseData<ArtistDTO>> artistDetail(@PathVariable(value = "artistId") Long artistId) {
         ArtistDTO result = musicService.artistDetail(artistId);
         return ResponseData.ok(result, "가수 상세 정보 조회 성공");
+    }
+    
+    // 최신 노래 목록
+    @GetMapping("/music/new")
+    public ResponseEntity<ResponseData<List<MusicDTO>>> getNewMusic() {
+        List<MusicDTO> newMusic = musicService.getNewMusic();
+        return ResponseData.ok(newMusic, "최신 노래 조회 성공");
+    }
+    
+    @GetMapping("/music/top-music")
+    public ResponseEntity<ResponseData<List<MusicDTO>>> getTopMusic(){
+    	List<MusicDTO> top = musicService.getTopMusic();
+    	return ResponseData.ok(top,"인기 노래 조회 성공");
     }
     
 }

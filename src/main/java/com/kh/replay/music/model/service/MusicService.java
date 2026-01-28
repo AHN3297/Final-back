@@ -1,5 +1,7 @@
 package com.kh.replay.music.model.service;
 
+import java.util.List;
+
 import com.kh.replay.global.api.model.dto.ArtistDTO;
 import com.kh.replay.global.api.model.dto.MusicDTO;
 
@@ -12,4 +14,8 @@ public interface MusicService {
     
     // 가수 상세 조회
     ArtistDTO artistDetail(Long artistId);
+
+	List<MusicDTO> getNewMusic();
+
+	List<MusicDTO> getTopMusic();
 }

@@ -63,10 +63,6 @@
 		WHERE
 		MEMBER_ID =#{memberId}
 	</update>
-	<insert id="insertOAuthBasicInfo"> INSERT INTO TB_MEMBER ( MEMBER_ID, EMAIL,
-		MEMBER_NAME, NICKNAME, PHONE, MBTI, MEMBER_JOB, GENRE, GENDER ) VALUES (
-		#{memberId}, #{email}, #{name}, 'TEMP', 'TEMP', 'UNKNOWN', 'UNKNOWN',
-		'UNKNOWN', 'U' ) </insert>
 	<update id="updateCompleteMember"> UPDATE TB_MEMBER SET NICKNAME =
 		#{nickName}, PHONE = #{phone}, MBTI = #{mbti}, MEMBER_JOB = #{job},
 		GENRE = #{genre}, GENDER = #{gender}, UPDATED_AT = SYSDATE WHERE
@@ -86,5 +82,28 @@
 	
 	</select>
 
+<insert id="insertOAuthBasicInfo" parameterType="com.kh.replay.member.model.dto.MemberDTO">
+    INSERT INTO TB_MEMBER (
+      MEMBER_ID,
+      EMAIL,
+      MEMBER_NAME,
+      NICKNAME,
+      PHONE,
+      MBTI,
+      MEMBER_JOB,
+      GENRE,
+      GENDER
+    ) VALUES (
+      #{memberId},
+      #{email},
+      #{name},
+      'TEMP',
+      'TEMP',
+      'UNKNOWN',
+      'UNKNOWN',
+      'UNKNOWN',
+      'U'
+    )
 
+</insert>
 </mapper>

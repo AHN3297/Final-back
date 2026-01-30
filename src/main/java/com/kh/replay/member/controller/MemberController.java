@@ -35,9 +35,9 @@ public class MemberController {
 	private final MemberService memberService;
 	
 	@PostMapping("/login")
-	public ResponseEntity<ResponseData<Map<String,String>>> memberlogin(@Valid @RequestBody LocalDTO local) {
+	public ResponseEntity<ResponseData<Map<String,String>>> memberlogin(@RequestBody LocalDTO local) {
 		Map<String,String> loginResponse = memberService.memberLogin(local);
-		
+		log.info("{}", local);
 		
 		
 		return ResponseData.ok(loginResponse, "로그인에 성공하셨습니다.");

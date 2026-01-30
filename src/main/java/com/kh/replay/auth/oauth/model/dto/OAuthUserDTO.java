@@ -17,4 +17,5 @@ public class OAuthUserDTO {
     private String email;           // 회원가입 시 member 테이블 저장
     private String name;            // 회원 name
     private boolean isNewUser;      // 신규 회원 여부 판단용
+    private boolean profileCompleted;
 }

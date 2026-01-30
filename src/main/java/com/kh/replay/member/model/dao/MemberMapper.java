@@ -45,8 +45,11 @@ public interface MemberMapper {
 	
 	@Update("UPDATE TB_MEMBER SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
 	void withdrawSocial(String memberId);
-
+	@Select("SELECT CASE WHEN EXISTS(SEELCT 1 FROM TB_LOCAL L JOIN TB_MEMBER M ON M.MEMBER_ID = L.MEMBER_ID WHERE M.EMAIL= #{email})THEN 1 ELSE 0 END FROM DUAL")
+	boolean existsLocalByEmail(String email);
 	
+    String findMemberIdByEmail(String email);
+
 	
 	
 }

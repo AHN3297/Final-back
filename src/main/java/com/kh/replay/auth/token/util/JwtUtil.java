@@ -59,7 +59,7 @@ public class JwtUtil {
         return Jwts.builder()
                     .subject(username)
                     .issuedAt(new Date())
-                    .expiration(Date.from(Instant.now().plus(Duration.ofDays(3))))
+                    .expiration(Date.from(Instant.now().plus(Duration.ofDays(14))))
                     .signWith(key)
                     .compact();
     }

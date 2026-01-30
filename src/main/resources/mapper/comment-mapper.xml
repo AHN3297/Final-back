@@ -4,14 +4,15 @@
 <mapper namespace="com.kh.replay.global.comment.model.dao.CommentMapper">
 
     <resultMap id="commentResultMap" type="com.kh.replay.global.comment.model.dto.CommentDTO">
-        <id     property="commentId"   column="COMMENT_ID"/>
-        <result property="content"     column="CONTENT"/>
-        <result property="targetType"  column="TARGET_TYPE"/>
-        <result property="targetId"    column="TARGET_ID"/>
-        <result property="memberId"    column="MEMBER_ID"/>
-        <result property="nickName"    column="NICKNAME"/>
-        <result property="status"      column="STATUS"/>
-        <result property="createdAt"   column="CREATED_AT"/>
+        <id     property="commentId"      column="COMMENT_ID"/>
+        <result property="content"        column="CONTENT"/>
+        <result property="targetType"     column="TARGET_TYPE"/>
+        <result property="targetId"       column="TARGET_ID"/>
+        <result property="shortFormTitle" column="SHORT_FORM_TITLE"/>
+        <result property="memberId"       column="MEMBER_ID"/>
+        <result property="nickName"       column="NICKNAME"/>
+        <result property="status"         column="STATUS"/>
+        <result property="createdAt"      column="CREATED_AT"/>
     </resultMap>
 
     <select id="findAllComments" parameterType="map" resultMap="commentResultMap">
@@ -90,12 +91,14 @@
             , C.CONTENT
             , 'SHORTFORM' AS TARGET_TYPE
             , C.SHORT_FORM_ID AS TARGET_ID
+            , S.SHORT_FORM_TITLE
             , C.MEMBER_ID
             , M.NICKNAME
             , C.STATUS
             , C.CREATED_AT
           FROM TB_SHORT_FORM_COMMENT C
           JOIN TB_MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+          JOIN TB_SHORT_FORM S ON C.SHORT_FORM_ID = S.SHORT_FORM_ID
          WHERE C.MEMBER_ID = #{memberId}
            AND C.STATUS = 'Y'
         <if test="lastCommentId != null">

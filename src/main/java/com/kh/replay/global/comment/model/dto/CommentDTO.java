@@ -19,6 +19,7 @@ public class CommentDTO {
 	private String content;
 	private String targetType;
 	private Long targetId;
+	private String shortFormTitle;
 	private String memberId;
 	private String nickName;
 	private String status;

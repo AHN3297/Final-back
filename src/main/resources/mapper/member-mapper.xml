@@ -3,16 +3,14 @@
 <mapper namespace="com.kh.replay.member.model.dao.MemberMapper">
 
 
-
-
 	<select id="loadByMemberEmail" resultType="map">
 		SELECT
 		TB_MEMBER.MEMBER_ID
 		, TB_LOCAL.PASSWORD
 		, TB_MEMBER.EMAIL
 		, TB_MEMBER.ROLE
-		, TB_MEMBER.MEMBER_NAME 
-		, TB_MEMBER.NICKNAME		
+		, TB_MEMBER.MEMBER_NAME
+		, TB_MEMBER.NICKNAME
 		FROM
 		TB_MEMBER
 		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
@@ -27,7 +25,7 @@
 		, TB_MEMBER.EMAIL
 		, TB_LOCAL.PASSWORD
 		, TB_MEMBER.ROLE
-		, TB_MEMBER.MEMBER_NAME 
+		, TB_MEMBER.MEMBER_NAME
 		, TB_MEMBER.NICKNAME
 		FROM
 		TB_MEMBER
@@ -36,21 +34,17 @@
 		AND TB_MEMBER.STATUS = 'Y'
 	</select>
 
-	<update id="changeInfo"
-		parameterType="com.kh.replay.member.model.dto.MemberDTO">
-		UPDATE TB_MEMBER
-		SET
-		NICKNAME = #{nickName},
-		PHONE = #{phone},
-		GENRE = #{genre},
-		EMAIL = #{email},
-		MBTI = #{mbti},
-		GENDER = #{gender},
-		MEMBER_JOB= #{job},
-		ROLE = #{role}
-		WHERE MEMBER_ID = #{memberId}
-		AND STATUS = 'Y'
-	</update>
+	<update id="changeInfo" parameterType="com.kh.replay.member.model.dto.MemberUpdateRequest"> UPDATE
+		TB_MEMBER <set>
+			<if test="nickName != null">NICKNAME = #{nickName},</if>
+			<if test="phone != null">PHONE = #{phone},</if>
+			<if test="email != null">EMAIL = #{email},</if>
+			<if test="mbti != null">MBTI = #{mbti},</if>
+			<if test="gender != null">GENDER = #{gender},</if>
+			<if test="job != null">MEMBER_JOB = #{job},</if>
+		</set> WHERE
+		MEMBER_ID = #{memberId} AND STATUS = 'Y' </update>
+
 	<update id="socialUpdate"
 		parameterType="com.kh.replay.member.model.vo.MemberVO">
 		UPDATE TB_MEMBER
@@ -65,7 +59,7 @@
 	</update>
 	<update id="updateCompleteMember"> UPDATE TB_MEMBER SET NICKNAME =
 		#{nickName}, PHONE = #{phone}, MBTI = #{mbti}, MEMBER_JOB = #{job},
-		GENRE = #{genre}, GENDER = #{gender}, UPDATED_AT = SYSDATE WHERE
+		GENDER = #{gender}, UPDATED_AT = SYSDATE WHERE
 		MEMBER_ID = #{memberId} </update>
 
 	<select id="loadSocialUser" resultType="map">
@@ -77,33 +71,72 @@
 		FROM
 		TB_MEMBER
 		INNER JOIN TB_SOCIAL ON TB_MEMBER.MEMBER_ID = TB_SOCIAL.MEMBER_ID
-		WHERE TB_MEMBER.MEMBER_ID = #{memberId}	
+		WHERE TB_MEMBER.MEMBER_ID = #{memberId}
 		AND TB_MEMBER.STATUS = 'Y'
-	
+
 	</select>
 
-<insert id="insertOAuthBasicInfo" parameterType="com.kh.replay.member.model.dto.MemberDTO">
-    INSERT INTO TB_MEMBER (
-      MEMBER_ID,
-      EMAIL,
-      MEMBER_NAME,
-      NICKNAME,
-      PHONE,
-      MBTI,
-      MEMBER_JOB,
-      GENRE,
-      GENDER
-    ) VALUES (
-      #{memberId},
-      #{email},
-      #{name},
-      'TEMP',
-      'TEMP',
-      'UNKNOWN',
-      'UNKNOWN',
-      'UNKNOWN',
-      'U'
-    )
+	<insert id="insertOAuthBasicInfo"
+		parameterType="com.kh.replay.member.model.dto.MemberDTO">
+		INSERT INTO TB_MEMBER (
+		MEMBER_ID,
+		EMAIL,
+		MEMBER_NAME,
+		NICKNAME,
+		PHONE,
+		MBTI,
+		MEMBER_JOB,
+		GENDER
+		) VALUES (
+		#{memberId},
+		#{email},
+		#{name},
+		'TEMP',
+		'TEMP',
+		'UNKNOWN',
+		'UNKNOWN',
+		'U'
+		)
 
-</insert>
+	</insert>
+	<select id="findAllInfo" parameterType="string" resultMap="MemberInfoMap">
+		SELECT M.MEMBER_ID ,
+		MBTI AS mbti, MEMBER_JOB AS job, GENDER AS gender,
+		MEMBER_NAME AS name, NICKNAME AS nickName, PHONE AS phone, EMAIL AS
+		email,MG.GENRE_ID,
+		GENRE_NAME
+		FROM TB_MEMBER M JOIN TB_MEMBER_GENRE MG ON M.MEMBER_ID = MG.MEMBER_ID
+		JOIN TB_GENRE G ON MG.GENRE_ID = G.GENRE_ID WHERE M.MEMBER_ID =
+		#{memberId}
+	</select>
+	<resultMap id="MemberInfoMap"
+		type="com.kh.replay.member.model.dto.MemberInfoDTO">
+
+		<association property="memberDto"
+			javaType="com.kh.replay.member.model.dto.MemberDTO">
+			<id property="memberId" column="MEMBER_ID" />
+			<result property="email" column="EMAIL" />
+			<result property="gender" column="GENDER" />
+			<result property="mbti" column="MBTI" />
+			<result property="nickName" column="NICKNAME" />
+			<result property="phone" column="PHONE" />
+			<result property="job" column="MEMBER_JOB" />
+		</association>
+
+		<collection property="genreDto"
+			javaType="java.util.ArrayList"
+			ofType="com.kh.replay.member.model.dto.GenreDTO">
+			<id property="genreId" column="GENRE_ID" />
+			<result property="genreName" column="GENRE_NAME" />
+		</collection>
+
+	</resultMap>
+
+	<insert id="insertMemberGenres"> INSERT INTO TB_MEMBER_GENRE (MEMBER_ID,
+		GENRE_ID) VALUES <foreach collection="genres" item="genreId">
+		(#{memberId}, #{genreId})
+		</foreach>
+	</insert>
+
+
 </mapper>

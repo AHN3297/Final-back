@@ -1,6 +1,7 @@
 package com.kh.replay.member.model.dto;
 
 import java.sql.Date;
+import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -22,8 +23,8 @@ public class MemberDTO {
 	@NotBlank(message = "이메일을 입력해주세요.")
 	@Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "올바른 이메일 형식이 아닙니다.")
 	private String email;
-	
-	@Pattern(regexp="^(남성|여성|기타)$", message="올바른 성별 값이 아닙니다.")
+
+	@Pattern(regexp = "^(남성|여성|기타)$", message = "올바른 성별 값이 아닙니다.")
 	@NotBlank(message = "성별을 선택해주세요.")
 	private String gender;
 
@@ -47,14 +48,16 @@ public class MemberDTO {
 	@Pattern(regexp = "^01[0-9]-\\d{3,4}-\\d{4}$", message = "올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)")
 	private String phone;
 
-	@NotBlank(message = "장르를 선택해주세요.")
-	private String genre;
-	@Size(max = 30, message="직업은 30자 이내로 입력해주세요.")
+	@Size(max = 30, message = "직업은 30자 이내로 입력해주세요.")
 	@NotBlank(message = "직업을 입력해주세요.")
 	private String job;
 
 	private String role;
 
 	private String status;
+
+	private List<Long> genres;
+	
+	private List<String> genreName;
 
 }

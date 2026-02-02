@@ -2,11 +2,11 @@ package com.kh.replay.auth.local.model.dto;
 
 
 
+import java.util.List;
+
 import com.kh.replay.member.model.dto.MemberDTO;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,6 +24,8 @@ public class LocalDTO {
 //	@NotBlank(message="비밀번호를 입력해주세요.")
 //	@Pattern(regexp="^(?=.*[A-Za-z])(?=.*\\\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",message="비밀번호는 8자 이상, 영문/숫자/특수문자를 포함해야 합니다.")
 	private String password;
+	
+	private List<Long> genreIds;
 	
 	
 }

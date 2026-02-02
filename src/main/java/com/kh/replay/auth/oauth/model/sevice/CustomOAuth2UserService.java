@@ -39,9 +39,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String email = oAuth2Response.getEmail();
         String name = oAuth2Response.getName();
 
-        /* =====================================================
-           1️⃣ 이미 소셜 계정이 존재하는 경우 (provider + providerId)
-           ===================================================== */
         OAuthUserDTO probe = new OAuthUserDTO();
         probe.setProvider(provider);
         probe.setProviderId(providerId);
@@ -61,19 +58,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return new CustomOAuth2User(existingSocial);
         }
 
-        /* =====================================================
-           2️⃣ 이메일은 있는데, 소셜 계정은 없는 경우
-           ===================================================== */
         boolean emailExists = memberMapper.existByEmail(email);
         if (emailExists) {
 
             boolean isLocal = memberMapper.existsLocalByEmail(email);
             if (isLocal) {
-                // 로컬 회원 → 소셜 로그인 차단
                 throw new OAuth2AuthenticationException("이미 일반 회원으로 가입된 이메일입니다.");
             }
 
-            // 기존 MEMBER_ID 재사용해서 소셜만 연결
             String memberId = memberMapper.findMemberIdByEmail(email);
             if (memberId == null) {
                 throw new OAuth2AuthenticationException("회원 정보가 일치하지 않습니다.");
@@ -92,9 +84,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return new CustomOAuth2User(linkUser);
         }
 
-        /* =====================================================
-           3️⃣ 완전 신규 회원 (email 없음)
-           ===================================================== */
         String newMemberId = "#" + providerId;
 
         OAuthUserDTO newUser = new OAuthUserDTO();

@@ -102,7 +102,6 @@ public class SecurityConfigure {
                 // 숏폼: 조회 외 전부 인증 필요
                 requests.requestMatchers("/api/shortforms/**").authenticated();
 
-                // ✅ 그 외 /api/** 는 기본 인증 필요
                 requests.anyRequest().authenticated();
             })
             .build();

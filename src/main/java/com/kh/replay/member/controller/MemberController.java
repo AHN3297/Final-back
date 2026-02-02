@@ -1,11 +1,10 @@
 package com.kh.replay.member.controller;
 
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -19,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.member.model.dto.ChangePasswordDTO;
-import com.kh.replay.member.model.dto.MemberDTO;
+import com.kh.replay.member.model.dto.MemberInfoDTO;
+import com.kh.replay.member.model.dto.MemberUpdateRequest;
 import com.kh.replay.member.model.service.MemberService;
-import com.kh.replay.member.model.vo.CustomUserDetails;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -65,18 +64,18 @@ public class MemberController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<ResponseData<Map<String, Object>>> findAllInfo(@RequestParam(name="memberId") String memberId){
-		Map<String, Object> memberInfo =memberService.findAllInfo(memberId);
-		return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
+	public ResponseEntity<ResponseData<MemberInfoDTO>> findAllInfo(
+	        @RequestParam(name="memberId") String memberId) {
+
+	    MemberInfoDTO memberInfo = memberService.findAllInfo(memberId);
+	    return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
 	}
-	
 	@PatchMapping
-	public ResponseEntity<ResponseData<Map<String,Object>>> changeInfo(@RequestBody MemberDTO member
+	public ResponseEntity<ResponseData<List<MemberInfoDTO>>> changeInfo(@RequestBody MemberUpdateRequest request
 																		){
+		List<MemberInfoDTO> result =memberService.changeInfo(request);
 		
-		Map<String, Object> memberInfo =memberService.changeInfo(member);
-		
-		return ResponseData.ok(memberInfo,"회원정보 수정에 성공하셨습니다.");
+		return ResponseData.ok(result,"회원정보 수정에 성공하셨습니다.");
 		
 	}
 	@DeleteMapping

@@ -11,7 +11,7 @@ public class AdditionalInfoRequest {
 	private String phone;
 	private String mbti;
 	private String job;
-	private List<String> genre;
+	private List<String> genres;
 	private String gender;
 	private String email;
 	private String name;

@@ -51,7 +51,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 ? "ROLE_USER"
                 : authorities.iterator().next().getAuthority();
 
-        // ✅ 토큰 발급
+      
         String accessToken = jwtUtil.getAccessToken(memberId, email, role, name);
         String refreshTokenValue = jwtUtil.getRefreshToken(memberId);
 

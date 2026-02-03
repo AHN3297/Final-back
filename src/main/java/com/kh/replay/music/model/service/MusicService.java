@@ -18,4 +18,8 @@ public interface MusicService {
 	List<MusicDTO> getNewMusic();
 
 	List<MusicDTO> getTopMusic();
+
+	String getLyricsOnly(String artistName, String title);
+
+	String getLyricsByTrackId(Long trackId);
 }

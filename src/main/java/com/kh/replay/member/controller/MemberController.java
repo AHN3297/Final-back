@@ -66,7 +66,9 @@ public class MemberController {
 	
 	@GetMapping
 	public ResponseEntity<ResponseData<Map<String, Object>>> findAllInfo(@RequestParam(name="memberId") String memberId){
+		log.info("회원아이디 조회{}", memberId);
 		Map<String, Object> memberInfo =memberService.findAllInfo(memberId);
+	
 		return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
 	}
 	

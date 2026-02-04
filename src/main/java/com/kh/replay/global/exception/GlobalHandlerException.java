@@ -99,7 +99,12 @@ public class GlobalHandlerException {
         log.warn("사용자 찾기 실패(404): {}", e.getMessage());
         return createErrorResponseEntity(e.getMessage(), HttpStatus.NOT_FOUND);
     }   
-    
+    @ExceptionHandler(ReportNotFoundException.class)
+    public ResponseEntity<ResponseData<Object>> handlerReportNotFoundException(ReportNotFoundException e){
+    	
+    log.warn("신고내역을 찾을 수 없습니다.{}",e.getMessage());
+    return createErrorResponseEntity(e.getMessage(),HttpStatus.NOT_FOUND);
+    }
     // 노래 없음
     @ExceptionHandler(NotFoundTracksException.class)
     public ResponseEntity<ResponseData<Object>> handlerNotFoundTracksException(NotFoundTracksException e){

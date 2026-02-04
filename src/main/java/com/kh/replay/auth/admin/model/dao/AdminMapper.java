@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Update;
 import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.auth.admin.model.dto.ReportCommentDTO;
+import com.kh.replay.auth.admin.model.dto.ReportDetailDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 
 @Mapper
@@ -59,6 +60,19 @@ public interface AdminMapper {
 	
 	@Select("SELECT COUNT(*) FROM TB_COMMENT_REPORT WHERE REPORT_ID IS NOT NULL AND STATUS = 'Y' AND (REPORT_ID LIKE #{keyword} OR DESCRIPTION LIKE #{keyword} OR REASON_CODE LIKE #{keyword})")
 	int totalCounted(String likeKw);
+
+	int countByReport(Long reportNo);
+	
+	
+	
+	ReportDetailDTO getReportDetails(Long reportNo);
+
+
+	int updateShortFormReportStatus(Long reportNo);
+
+	int updateCommentReportStatus(Long reportNo);
+
+	int updateUniverseReportStatus(Long reportNo);
 
 	
 

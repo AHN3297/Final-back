@@ -5,6 +5,7 @@ import java.util.Map;
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
 import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
+import com.kh.replay.auth.admin.model.dto.ReportDetailDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.vo.MemberVO;
 
@@ -23,6 +24,10 @@ public interface AdminService {
 	MemberDTO withdrawUser(MemberDTO member);
 
 	Map<String, Object> findReportList(int page, int size, String keyword);
+
+	ReportDetailDTO findReportDetail(Long reportNo);
+
+	void ChangeStatus(ReportDetailDTO reportDetail);
 
 
 

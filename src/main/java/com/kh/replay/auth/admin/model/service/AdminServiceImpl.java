@@ -13,7 +13,9 @@ import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
 import com.kh.replay.auth.admin.model.dto.ReportCommentDTO;
+import com.kh.replay.auth.admin.model.dto.ReportDetailDTO;
 import com.kh.replay.auth.admin.model.dto.StatusInfo;
+import com.kh.replay.global.exception.ReportNotFoundException;
 import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.exception.UpdateFailedException;
 import com.kh.replay.global.exception.UserNotFoundException;
@@ -100,6 +102,7 @@ public class AdminServiceImpl implements AdminService {
 
 	}
 
+	// 회원 상세 조회
 	@Override
 	public MemberDetailDTO getMemberDetails(String memberId) {
 		int result = adminMapper.CountById(memberId);
@@ -183,6 +186,49 @@ public class AdminServiceImpl implements AdminService {
 
 		return response;
 
+	}
+
+	@Override
+	public ReportDetailDTO findReportDetail(Long reportNo) {
+		int result = adminMapper.countByReport(reportNo);
+		if (result <= 0) {
+			throw new ReportNotFoundException("신고 내역을 찾을 수 없습니다.");
+		}
+		ReportDetailDTO reportDetail = adminMapper.getReportDetails(reportNo);
+		
+		return reportDetail;
+
+	}
+
+	@Override
+	public void ChangeStatus(ReportDetailDTO reportDetail) {
+		int result = adminMapper.countByReport(reportDetail.getReportNo());
+		if (result <= 0) {
+			throw new ReportNotFoundException("신고 내역을 찾을 수 없습니다.");
+		}
+		if("N".equals(reportDetail.getStatus())) {
+			throw new IllegalStateException("이미 처리된 신고입니다.");
+		}
+		switch (reportDetail.getReportType()) {
+        case "SHORT_FORM":
+            int shortFormResult = adminMapper.updateShortFormReportStatus(reportDetail.getReportNo());
+            break;
+
+        case "COMMENT":
+            int commentResult = adminMapper.updateCommentReportStatus(reportDetail.getReportNo());
+            break;
+
+        case "UNIVERSE":
+           int universeResult = adminMapper.updateUniverseReportStatus(reportDetail.getReportNo());
+            break;
+
+        default:
+            throw new IllegalArgumentException("알 수 없는 신고 타입입니다.");
+    }
+		
+		
+		
+		
 	}
 
 }

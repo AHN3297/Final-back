@@ -36,27 +36,22 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        // OAuth2 흐름(여기는 절대 JWT로 건드리면 안 됨)
+        // OAuth2 흐름 (Spring Security OAuth2가 처리)
         if (uri.startsWith("/oauth2/")) return true;
         if (uri.startsWith("/login/oauth2/")) return true;
         if (uri.startsWith("/login/")) return true;
-        if (uri.equals("/oauth-callback")) return true;
 
-        // 공개 엔드포인트(당신 프로젝트 기준으로 정리)
-        if (uri.equals("/api/members/login")) return true;
-        if (uri.equals("/api/auth/login")) return true;     // 실제로 쓰는지 확인 필요
-        if (uri.startsWith("/api/auth/signUp")) return true;
-        if (uri.startsWith("/api/members/signup")) return true; // 대소문자/경로 통일 권장
-        if (uri.startsWith("/test/")) return true;
+        // 정적 리소스
+        if (uri.equals("/favicon.ico")) return true;
+        if (uri.startsWith("/.well-known/")) return true;
+        if (uri.equals("/error")) return true;
+        if (uri.startsWith("/css/")) return true;
+        if (uri.startsWith("/js/")) return true;
+        if (uri.startsWith("/images/")) return true;
 
-        return uri.equals("/favicon.ico")
-        || uri.startsWith("/.well-known/")
-        || uri.equals("/error")
-        || uri.startsWith("/css/")
-        || uri.startsWith("/js/")
-        || uri.startsWith("/images/");
+        // API는 모두 필터를 거침 (SecurityFilterChain에서 permitAll 처리)
+        return false;
     }
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -66,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // ✅ 토큰이 없으면: 막지 말고 그대로 통과
+        // 토큰이 없으면 그대로 통과
         if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -80,31 +75,20 @@ public class JwtFilter extends OncePerRequestFilter {
             String memberId = claims.getSubject();
             String role = claims.get("role", String.class);
 
-            // role 기본값 + 정제
-            if (!StringUtils.hasText(role)) role = "ROLE_USER";
-            role = role.replace("[", "").replace("]", "").trim();
-            boolean isSocialLike = (memberId != null) && (memberId.startsWith("#") || memberId.matches("^[0-9]+$"));
-
-            UsernamePasswordAuthenticationToken authentication;
-
-            if (isSocialLike) {
-                CustomUserDetails socialUser = CustomUserDetails.builder()
-                        .username(memberId)
-                        .memberName("Social User")
-                        .authorities(Collections.singleton(new SimpleGrantedAuthority(role)))
-                        .build();
-
-                authentication = new UsernamePasswordAuthenticationToken(
-                        socialUser, null, socialUser.getAuthorities()
-                );
-
-            } else {
-                CustomUserDetails user = (CustomUserDetails) userDetailsService.loadUserByUsername(memberId);
-
-                authentication = new UsernamePasswordAuthenticationToken(
-                        user, null, user.getAuthorities()
-                );
+            // role 기본값 및 정제
+            if (!StringUtils.hasText(role)) {
+                role = "ROLE_USER";
             }
+            role = role.replace("[", "").replace("]", "").trim();
+
+            // memberId로 사용자 정보 조회
+            CustomUserDetails user = (CustomUserDetails) userDetailsService.loadUserByMemberId(memberId);
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    user, 
+                    null, 
+                    user.getAuthorities()
+            );
 
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -113,8 +97,12 @@ public class JwtFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
-        	}
+        } catch (Exception e) {
+            // DB 조회 실패 등
+            SecurityContextHolder.clearContext();
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         filterChain.doFilter(request, response);
-    }
-}
+    }}

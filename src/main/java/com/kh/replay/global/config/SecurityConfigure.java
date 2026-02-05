@@ -63,7 +63,7 @@ public class SecurityConfigure {
     @Order
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         return http
-            .securityMatcher("/api/**") // API만 이 체인으로 들어옴
+            .securityMatcher("/api/**")
             .formLogin(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
@@ -72,36 +72,49 @@ public class SecurityConfigure {
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(requests -> {
 
-                //  공개(permitAll)
+                // === 공개 API ===
+                
+                // 인증 관련 공개
+                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp").permitAll();
+                requests.requestMatchers(HttpMethod.POST, "/api/members/login").permitAll();
+                
+                // Universe, Search 공개
                 requests.requestMatchers("/api/universes/**").permitAll();
                 requests.requestMatchers("/api/search").permitAll();
-
-                requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
-                requests.requestMatchers(HttpMethod.GET, "/api/members").permitAll();
 
                 // 숏폼 조회만 공개
                 requests.requestMatchers(HttpMethod.GET, "/api/shortforms/**").permitAll();
 
-                // 음악/아티스트 조회 공개(원하면 나중에 authenticated로 바꾸기)
-                requests.requestMatchers(HttpMethod.GET, "/api/music/**", "/api/artist/**").permitAll();
+                // 음악/아티스트 조회 공개
+                requests.requestMatchers(HttpMethod.GET, "/api/music/**").permitAll();
+                requests.requestMatchers(HttpMethod.GET, "/api/artist/**").permitAll();
 
-                //  관리자
-                requests.requestMatchers(HttpMethod.GET, "/api/auth/admin/**").hasRole("ADMIN");
-                requests.requestMatchers(HttpMethod.PATCH, "/api/auth/admin/**").hasRole("ADMIN");
+                // === 관리자 전용 ===
+                requests.requestMatchers("/api/auth/admin/**").hasRole("ADMIN");
 
-                //  인증 필요(authenticated)
-                requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated();
-                requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
+                // === 인증 필요 ===
+                
+                // 회원 정보 관련
+                requests.requestMatchers(HttpMethod.GET, "/api/members").authenticated();  // 회원 정보 조회
+                requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated(); // 회원 정보 수정
+                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();   // 비밀번호 변경
+                requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated(); // 회원 탈퇴
                 requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
-                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
-
-                requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").authenticated();
+                
+                // OAuth 관련
+                requests.requestMatchers("/api/oauth/**").authenticated();
+                
+                // 좋아요, 플레이리스트
                 requests.requestMatchers("/api/favorite/**").authenticated();
                 requests.requestMatchers("/api/member/playList/**").authenticated();
 
                 // 숏폼: 조회 외 전부 인증 필요
-                requests.requestMatchers("/api/shortforms/**").authenticated();
+                requests.requestMatchers(HttpMethod.POST, "/api/shortforms/**").authenticated();
+                requests.requestMatchers(HttpMethod.PUT, "/api/shortforms/**").authenticated();
+                requests.requestMatchers(HttpMethod.PATCH, "/api/shortforms/**").authenticated();
+                requests.requestMatchers(HttpMethod.DELETE, "/api/shortforms/**").authenticated();
 
+                // 나머지 모든 API는 인증 필요
                 requests.anyRequest().authenticated();
             })
             .build();

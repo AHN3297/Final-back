@@ -92,7 +92,7 @@ public class AdminController {
 	@GetMapping("/report")
 	public ResponseEntity<ResponseData<Map<String,Object>>> findReportList(@RequestParam(name="page",defaultValue ="1") int page ,
 																		 @RequestParam(name="size",defaultValue= "10")int size,
-																		 @RequestParam(name="keywordr",required = false)String keyword){
+																		 @RequestParam(name="keyword",required = false)String keyword){
 		
 		Map<String,Object> response = adminService.findReportList(page,size,keyword);
 		
@@ -126,6 +126,8 @@ public class AdminController {
 		
 		return ResponseData.ok(null,"신고 수정에 성공하셨습니다.");
 	}
+	
+	
 
 
 }

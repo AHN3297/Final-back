@@ -202,33 +202,38 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public void ChangeStatus(ReportDetailDTO reportDetail) {
-		int result = adminMapper.countByReport(reportDetail.getReportNo());
-		if (result <= 0) {
-			throw new ReportNotFoundException("신고 내역을 찾을 수 없습니다.");
-		}
-		if("N".equals(reportDetail.getStatus())) {
-			throw new IllegalStateException("이미 처리된 신고입니다.");
-		}
-		switch (reportDetail.getReportType()) {
-        case "SHORT_FORM":
-            int shortFormResult = adminMapper.updateShortFormReportStatus(reportDetail.getReportNo());
-            break;
+	    int result = adminMapper.countByReport(reportDetail.getReportNo());
+	    if (result <= 0) {
+	        throw new ReportNotFoundException("신고 내역을 찾을 수 없습니다.");
+	    }
+	    
+	    ReportDetailDTO existingReport = adminMapper.getReportDetails(reportDetail.getReportNo());
+	    
+	    if ("N".equals(existingReport.getStatus())) {
+	        throw new IllegalStateException("이미 처리된 신고입니다.");
+	    }
+	    
+	    int updateResult = 0;
+	    switch (existingReport.getReportType()) {  
+	        case "SHORT_FORM":
+	            updateResult = adminMapper.updateShortFormReportStatus(reportDetail.getReportNo());
+	            break;
 
-        case "COMMENT":
-            int commentResult = adminMapper.updateCommentReportStatus(reportDetail.getReportNo());
-            break;
+	        case "COMMENT":
+	            updateResult = adminMapper.updateCommentReportStatus(reportDetail.getReportNo());
+	            break;
 
-        case "UNIVERSE":
-           int universeResult = adminMapper.updateUniverseReportStatus(reportDetail.getReportNo());
-            break;
+	        case "UNIVERSE":
+	            updateResult = adminMapper.updateUniverseReportStatus(reportDetail.getReportNo());
+	            break;
 
-        default:
-            throw new IllegalArgumentException("알 수 없는 신고 타입입니다.");
-    }
-		
-		
-		
-		
+	        default:
+	            throw new IllegalArgumentException("알 수 없는 신고 타입입니다: " + existingReport.getReportType());
+	    }
+	    
+	    if (updateResult <= 0) {
+	        throw new UpdateFailedException("신고 상태 변경에 실패했습니다.");
+	    }
 	}
 
 }

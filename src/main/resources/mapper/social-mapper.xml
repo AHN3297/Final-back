@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.replay.auth.oauth.model.dao.SocialMapper">
+
+	<!-- OAuth 사용자 조회 (Provider + ProviderId) -->
+	<select id="findByProviderAndProviderId"
+		parameterType="com.kh.replay.auth.oauth.model.dto.OAuthUserDTO"
+		resultType="com.kh.replay.auth.oauth.model.dto.OAuthUserDTO">
+		SELECT
+		S.PROVIDER,
+		S.PROVIDER_ID AS providerId,
+		S.CREATED_AT AS createdAt,
+		S.MEMBER_ID AS memberId,
+		M.EMAIL,
+		M.MEMBER_NAME AS name,
+		M.NICKNAME
+		FROM TB_SOCIAL S
+		INNER JOIN TB_MEMBER M ON S.MEMBER_ID = M.MEMBER_ID
+		WHERE S.PROVIDER = #{provider}
+		AND S.PROVIDER_ID = #{providerId}
+	</select>
+
+	<!-- OAuth 사용자 추가 -->
+	<insert id="insertOAuthUser"
+		parameterType="com.kh.replay.auth.oauth.model.dto.OAuthUserDTO">
+		INSERT INTO TB_SOCIAL (
+		PROVIDER,
+		PROVIDER_ID,
+		CREATED_AT,
+		MEMBER_ID
+		) VALUES (
+		#{provider},
+		#{providerId},
+		SYSDATE,
+		#{memberId}
+		)
+	</insert>
+</mapper>

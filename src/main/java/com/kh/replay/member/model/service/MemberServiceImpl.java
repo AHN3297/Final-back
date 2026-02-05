@@ -94,12 +94,16 @@ public class MemberServiceImpl implements MemberService {
 		}
 
 		Map<String, String> changeRequest = Map.of("memberId", username, "newPassword", newPassword);
+		
+		membermapper.changePassword(changeRequest);
+		
 	}
 
 	@Override
 	public void memberLogout(LocalDTO local) {
 
 		tokenMapper.memberLogout(local.getMemberDto().getMemberId());
+		
 
 	}
 
@@ -118,19 +122,20 @@ public class MemberServiceImpl implements MemberService {
 	        throw new CustomAuthenticationException("회원 정보를 찾을 수 없습니다.");
 	    }
 
-	    // 기준 객체 (회원 정보는 전부 동일)
+	
 	    MemberInfoDTO result = rows.get(0);
 
-	    // 장르 병합
+	   
 	    List<GenreDTO> genres =
 	    	    rows.stream()
 	    	        .flatMap(r -> {
 	    	            List<GenreDTO> g = r.getGenreDto();
 	    	            return g == null ? Stream.empty() : g.stream();
 	    	        })
+	    	        .filter(genre -> genre.getGenreId() != null)
 	    	        .toList();
 
-	    	result.setGenreDto(genres);
+	    	result.setGenreDto(genres.isEmpty() ? null : genres);
 			return result;
 
 	}
@@ -138,21 +143,23 @@ public class MemberServiceImpl implements MemberService {
 
 
 	@Transactional
-    @Override
-    public List<MemberInfoDTO> changeInfo(MemberUpdateRequest request) {
-
-		 membermapper.changeInfo(request);
-        membermapper.deleteMemberGenres(request.getMemberId());
-
-        if (request.getGenres() != null && !request.getGenres().isEmpty()) {
-            membermapper.insertMemberGenres(
-                request.getMemberId(),
-                request.getGenres()
-            );
-        }
-
-        return membermapper.findAllInfo(request.getMemberId());
-    }
+	@Override
+	public List<MemberInfoDTO> changeInfo(MemberUpdateRequest request) {
+	    membermapper.changeInfo(request);
+	    
+	    if (request.getGenres() != null) {
+	        membermapper.deleteMemberGenres(request.getMemberId());
+	        
+	        if (!request.getGenres().isEmpty()) {
+	            membermapper.insertMemberGenres(
+	                request.getMemberId(),
+	                request.getGenres()
+	            );
+	        }
+	    }
+	    
+	    return membermapper.findAllInfo(request.getMemberId());
+	}
 
 
 	@Override

@@ -22,5 +22,6 @@ public class PlayListDTO {
 	private Date createdAt;
 	private String memberId;
 	private Date updateAt;
+	private String isMain;
 
 }

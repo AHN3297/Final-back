@@ -17,7 +17,7 @@ public class PlayListVO {
 	private Date createdAt;
 	private String memberId;
 	private Date updateAt;
-	
+	private String isMain;
 	
 
 }

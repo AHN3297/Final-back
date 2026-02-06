@@ -40,8 +40,18 @@ public class MusicController {
     // 노래 상세 조회
     @GetMapping("/music/{trackId}")
     public ResponseEntity<ResponseData<MusicDTO>> musicDetail(@PathVariable(value = "trackId") Long trackId) {
-        MusicDTO result = musicService.musicDetail(trackId);
+        // Service에서 lyricsClient 호출 로직을 제거한 버전을 사용하세요.
+        MusicDTO result = musicService.musicDetail(trackId); 
         return ResponseData.ok(result, "노래 상세 정보 조회 성공");
+    }
+
+    // 가사 정보만 따로 조회 (외부 API 호출/크롤링용)
+    @GetMapping("/music/{trackId}/lyrics")
+    public ResponseEntity<ResponseData<String>> musicLyrics(@PathVariable (value = "trackId") Long trackId) {
+        // @RequestParam artistName, title 이 있다면 무조건 삭제하세요!
+        // 그래야 프론트엔드에서 파라미터 없이 호출해도 400 에러가 안 납니다.
+        String lyrics = musicService.getLyricsByTrackId(trackId);
+        return ResponseData.ok(lyrics, "가사 조회 성공");
     }
 
     // 가수 상세 조회

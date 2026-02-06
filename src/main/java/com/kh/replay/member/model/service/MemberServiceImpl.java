@@ -111,10 +111,13 @@ public class MemberServiceImpl implements MemberService{
 		    
 		    CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
 		    String userMemberId= user.getUsername();
+		    log.info("userMemberId : {}", userMemberId);
+		    log.info("memberId : {}", memberId);
+		    /*
 		if(!memberId.equals(userMemberId) ) {
 			log.info("{}" ,"사용자를 찾을 수 없습니다.");
 		}
-
+		*/
 		Map<String, Object> result =membermapper.findAllInfo(memberId);
 		
 		

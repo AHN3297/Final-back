@@ -36,14 +36,19 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfigure {
 
     @Value("${instance.url}")
-    private String instance; 
+    private String instance;
 
     private final JwtFilter jwtFilter;
     private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
     private final CustomOAuth2UserService oAuth2UserService;
-  
+
+    /**
+     * ===============================
+     * OAuth2 로그인 전용 체인
+     * ===============================
+     */
     @Bean
-    @Order
+    @Order(1)
     public SecurityFilterChain oauth2Chain(HttpSecurity http) throws Exception {
         return http
             .securityMatcher("/oauth2/**", "/login/oauth2/**", "/login/**")
@@ -58,9 +63,13 @@ public class SecurityConfigure {
             .build();
     }
 
-   
+    /**
+     * ===============================
+     * API (JWT) 전용 체인
+     * ===============================
+     */
     @Bean
-    @Order
+    @Order(2)
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         return http
             .securityMatcher("/api/**")
@@ -68,68 +77,62 @@ public class SecurityConfigure {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+            .exceptionHandling(ex ->
+                ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+            )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(requests -> {
 
                 // === 공개 API ===
-                
-                // 인증 관련 공개
                 requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp").permitAll();
                 requests.requestMatchers(HttpMethod.POST, "/api/members/login").permitAll();
-                
-                // Universe, Search 공개
                 requests.requestMatchers("/api/universes/**").permitAll();
                 requests.requestMatchers("/api/search").permitAll();
-
-                // 숏폼 조회만 공개
                 requests.requestMatchers(HttpMethod.GET, "/api/shortforms/**").permitAll();
-
-                // 음악/아티스트 조회 공개
                 requests.requestMatchers(HttpMethod.GET, "/api/music/**").permitAll();
                 requests.requestMatchers(HttpMethod.GET, "/api/artist/**").permitAll();
 
-                // === 관리자 전용 ===
+                // === 관리자 ===
                 requests.requestMatchers("/api/auth/admin/**").hasRole("ADMIN");
 
                 // === 인증 필요 ===
-                
-                // 회원 정보 관련
-                requests.requestMatchers(HttpMethod.GET, "/api/members").authenticated();  // 회원 정보 조회
-                requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated(); // 회원 정보 수정
-                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();   // 비밀번호 변경
-                requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated(); // 회원 탈퇴
+                requests.requestMatchers(HttpMethod.GET, "/api/members").authenticated();
+                requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
+                requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
+                requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
-                
-                // OAuth 관련
+
                 requests.requestMatchers("/api/oauth/**").authenticated();
-                
-                // 좋아요, 플레이리스트
                 requests.requestMatchers("/api/favorite/**").authenticated();
                 requests.requestMatchers("/api/member/playList/**").authenticated();
 
-                // 숏폼: 조회 외 전부 인증 필요
                 requests.requestMatchers(HttpMethod.POST, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.PUT, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.PATCH, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.DELETE, "/api/shortforms/**").authenticated();
 
-                // 나머지 모든 API는 인증 필요
                 requests.anyRequest().authenticated();
             })
             .build();
     }
 
+    /**
+     * ===============================
+     * CORS 설정
+     * ===============================
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // instance 예: http://localhost:5173
         configuration.setAllowedOrigins(List.of(instance));
-
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowedMethods(
+            Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+        );
+        configuration.setAllowedHeaders(
+            Arrays.asList("Authorization", "Content-Type", "X-Requested-With")
+        );
+        configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -143,7 +146,8 @@ public class SecurityConfigure {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 }

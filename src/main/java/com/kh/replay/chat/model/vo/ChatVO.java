@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class ChatVO {
     private long chatNo;
-    private long memberId;
+    private String memberId;
     private String chatContent;
     private String createDate;  
     private String nickname; 

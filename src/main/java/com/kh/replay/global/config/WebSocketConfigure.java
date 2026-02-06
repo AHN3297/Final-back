@@ -12,7 +12,6 @@ public class WebSocketConfigure implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // 채팅방 입장 주소: ws://localhost:8081/ws-chat
         registry.addEndpoint("/ws-chat").setAllowedOriginPatterns("*").withSockJS();
     }
 

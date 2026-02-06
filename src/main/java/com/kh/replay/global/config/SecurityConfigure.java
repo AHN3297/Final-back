@@ -52,6 +52,9 @@ public class SecurityConfigure {
 						.successHandler(oAuth2SuccessHandler)
 				)
 				.authorizeHttpRequests(requests -> {
+					// 채팅
+					requests.requestMatchers("/ws-chat/**").permitAll();
+					
 					// 1. 공통 비로그인 허용 경로 (유니버스, 소셜로그인, 검색)
 					requests.requestMatchers("/api/universes/**", "/oauth2/**", "/login/**", "/oauth-callback", "/api/search").permitAll();
 					requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp", "/api/members/login").permitAll();
@@ -88,6 +91,9 @@ public class SecurityConfigure {
 					//7. 관리자 기능
 					requests.requestMatchers(HttpMethod.GET,"/api/auth/admin/**").hasRole("ADMIN");
 					requests.requestMatchers(HttpMethod.PATCH,"/api/auth/admin/**").hasRole("ADMIN");
+					
+					
+					
 				})
 				.exceptionHandling(ex -> 
 					ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

@@ -12,6 +12,7 @@ import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
 import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
 import com.kh.replay.auth.admin.model.dto.PageRequestDTO;
+import com.kh.replay.auth.admin.model.dto.ReportCommentDTO;
 import com.kh.replay.auth.admin.model.dto.StatusInfo;
 import com.kh.replay.global.exception.ResourceNotFoundException;
 import com.kh.replay.global.exception.UpdateFailedException;
@@ -35,9 +36,9 @@ public class AdminServiceImpl implements AdminService {
 	private final ShortformMapper shorformtMapper;
 	
 	@Override
-	public Map<String,Object> memberList(int page, int size) {
+	public Map<String,Object> searchMemberList(int page, int size,String keyword) {
 
-		int totalElements = adminMapper.totalCount(); 
+		int totalElements = adminMapper.totalMemberCount(null); 
 		
 		//pageInfo 생성
 		PageInfo pageInfo = pagenation.getPageInfo(
@@ -46,10 +47,10 @@ public class AdminServiceImpl implements AdminService {
 				size, // 페이지당 회원 수
 				10 // 페이지 네비게이션 개수
 				);
-		PageRequestDTO pageRequest = new PageRequestDTO((page-1)*size,size);
+		PageRequestDTO pageRequest = new PageRequestDTO((page-1)*size,size,null);
 		
 		//회원 목록 조회
-		List<MemberDTO> items = adminMapper.getMemberList(pageRequest);
+		List<MemberDTO> items = adminMapper.searchMemberList(pageRequest);
 		
 		//Map형태로 담아서
 		Map<String,Object> response = new HashMap<>();
@@ -134,6 +135,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
 		}
 		
+		
 		int response = adminMapper.ChangePermissions(member);
 		if(response<=0) {
 			throw new UpdateFailedException("수정을 하지 못했습니다.");
@@ -144,6 +146,62 @@ public class AdminServiceImpl implements AdminService {
 		return user;
 	
 	}
+	@Transactional
+	@Override
+	public MemberDTO withdrawUser(MemberDTO member) {
+		
+		int result =adminMapper.CountById(member.getMemberId());
+		
+		if(result <= 0) {
+			throw new UserNotFoundException("사용자를 찾을 수 없습니다.");
+		}
+		
+		int response = adminMapper.withdrawUser(member);
+	
+		if(response<=0) {
+			throw new UpdateFailedException("수정을 하지 못했습니다.");
+		}
+		
+		
+		MemberDTO user = adminMapper.getMemberInfo(member.getMemberId());
+	
+		return user;
+	}
+
+	@Override
+	public Map<String, Object> findReportList(int page, int size, String keyword) {
+		
+		String kw = (keyword == null) ? null : keyword.trim();
+		String likeKw = (kw == null || kw.isEmpty()) ? null : "%" + kw + "%";
+		
+		
+		int totalElements = adminMapper.totalCounted(likeKw); 
+		//pageInfo 생성
+				PageInfo pageInfo = pagenation.getPageInfo(
+						totalElements,
+						page, //currentPage
+						size, // 페이지당 회원 수
+						10 // 페이지 네비게이션 개수
+						);
+				PageRequestDTO pageRequest = new PageRequestDTO((page-1)*size,size,likeKw);
+				
+				List<ReportCommentDTO> items = adminMapper.findReportList(pageRequest);
+				
+				Map<String,Object> response = new HashMap<>();
+				response.put("page", page);
+				response.put("size", size);
+				response.put("totalElements", totalElements);
+				response.put("totalPages", pageInfo.getMaxPage());
+				response.put("startPage", pageInfo.getStartPage());
+				response.put("endPage", pageInfo.getEndPage());
+				response.put("items",items);
+				
+				return response;
+				
+	}
+
+	
+	
 
 
 }	

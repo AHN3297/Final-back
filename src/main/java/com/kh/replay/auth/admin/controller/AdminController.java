@@ -3,6 +3,7 @@ package com.kh.replay.auth.admin.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +26,9 @@ public class AdminController {
 	private final AdminService adminService;
 
 	@GetMapping
-	public ResponseEntity<ResponseData<Map<String,Object>>> memberList(@RequestParam(name="page",defaultValue ="1") int page , @RequestParam(name="size",defaultValue= "10") int size){
+	public ResponseEntity<ResponseData<Map<String,Object>>> memberList(@RequestParam(name="page",defaultValue ="1") int page , @RequestParam(name="size",defaultValue= "10") int size ,String keyword){
 		
-		Map<String,Object> result = adminService.memberList(page,size);
+		Map<String,Object> result = adminService.searchMemberList(page,size,keyword);
 		
 		
 		
@@ -79,5 +80,31 @@ public class AdminController {
 		return ResponseData.ok(user,"관리자 권한으로 변경되었습니다. ");
 		
 	}
-	
+	@DeleteMapping("/withdraw")
+	public ResponseEntity<ResponseData<MemberDTO>> withdrawUser(@RequestBody MemberDTO member){
+		
+		MemberDTO user = adminService.withdrawUser(member);
+		
+		
+		return ResponseData.ok(user, "회원 탈퇴 성공");
+	}
+	@GetMapping("/report")
+	public ResponseEntity<ResponseData<Map<String,Object>>> findReportList(@RequestParam(name="page",defaultValue ="1") int page ,
+																		 @RequestParam(name="size",defaultValue= "10")int size,
+																		 @RequestParam(name="keywordr",required = false)String keyword){
+		
+		Map<String,Object> response = adminService.findReportList(page,size,keyword);
+		
+		
+		
+		
+		return ResponseData.ok(response,"신고목록 조회 성공");
+		
+
+
+
+}
+
+
+
 }

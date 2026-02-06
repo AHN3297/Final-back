@@ -51,6 +51,9 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	//의존성 추가 
+	implementation 'org.jsoup:jsoup:1.15.4'
 
 	//Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

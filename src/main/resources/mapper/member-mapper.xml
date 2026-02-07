@@ -36,13 +36,23 @@
 	<update id="changeInfo"
 		parameterType="com.kh.replay.member.model.dto.MemberUpdateRequest">
 		UPDATE TB_MEMBER <set>
-			<if test="nickName != null">NICKNAME = #{nickName},</if>
-			<if test="phone != null">PHONE = #{phone},</if>
-			<if test="mbti != null">MBTI = #{mbti},</if>
-			<if test="gender != null">GENDER = #{gender},</if>
-			<if test="job != null">MEMBER_JOB = #{job},</if>
-		</set> WHERE
-		MEMBER_ID = #{memberId} AND STATUS = 'Y' </update>
+			<if test="nickName != null and nickName != ''">
+				NICKNAME = #{nickName},
+			</if>
+			<if test="phone != null and phone != ''">
+				PHONE = #{phone},
+			</if>
+			<if test="mbti != null and mbti != ''">
+				MBTI = #{mbti},
+			</if>
+			<if test="gender != null and gender != ''">
+				GENDER = #{gender},
+			</if>
+			<if test="job != null and job != ''">
+				MEMBER_JOB = #{job},
+			</if>
+		</set> WHERE MEMBER_ID =
+		#{memberId} AND STATUS = 'Y' </update>
 
 
 	<update id="socialUpdate"
@@ -93,51 +103,75 @@
 		)
 	</insert>
 	<select id="findAllInfo" parameterType="string" resultMap="MemberInfoMap">
-		SELECT
-		M.MEMBER_ID,
-		M.MBTI AS mbti,
-		M.MEMBER_JOB AS job,
-		M.GENDER AS gender,
-		M.MEMBER_NAME AS name,
-		M.NICKNAME AS nickName,
-		M.PHONE AS phone,
-		M.EMAIL AS email,
-		MG.GENRE_ID,
-		G.GENRE_NAME
-		FROM TB_MEMBER M
-		LEFT JOIN TB_MEMBER_GENRE MG ON M.MEMBER_ID = MG.MEMBER_ID
-		LEFT JOIN TB_GENRE G ON MG.GENRE_ID = G.GENRE_ID
-		WHERE M.MEMBER_ID = #{memberId}
-	</select>
+    SELECT
+        M.MEMBER_ID,
+        M.EMAIL,
+        M.MBTI            AS mbti,
+        M.MEMBER_JOB      AS job,
+        M.GENDER          AS gender,
+        M.MEMBER_NAME     AS name,
+        M.NICKNAME        AS nickName,
+        M.PHONE           AS phone,
+        M.ROLE            AS role,
+        M.STATUS          AS status,
+        M.CREATED_AT      AS createdAt,
+        M.UPDATED_AT      AS updatedAt,
+        MG.GENRE_ID,
+        G.GENRE_NAME
+    FROM TB_MEMBER M
+    LEFT JOIN TB_MEMBER_GENRE MG ON M.MEMBER_ID = MG.MEMBER_ID
+    LEFT JOIN TB_GENRE G ON MG.GENRE_ID = G.GENRE_ID
+    WHERE M.MEMBER_ID = #{memberId}
+      AND M.STATUS = 'Y'
+</select>
+
 	<resultMap id="MemberInfoMap"
-		type="com.kh.replay.member.model.dto.MemberInfoDTO">
+    type="com.kh.replay.member.model.dto.MemberInfoDTO">
 
-		<association property="memberDto"
-			javaType="com.kh.replay.member.model.dto.MemberDTO">
-			<id property="memberId" column="MEMBER_ID" />
-			<result property="email" column="EMAIL" />
-			<result property="gender" column="GENDER" />
-			<result property="mbti" column="MBTI" />
-			<result property="nickName" column="NICKNAME" />
-			<result property="phone" column="PHONE" />
-			<result property="job" column="MEMBER_JOB" />
-		</association>
+    <association property="memberDto"
+        javaType="com.kh.replay.member.model.dto.MemberDTO">
 
-		<collection property="genreDto"
-			javaType="java.util.ArrayList"
-			ofType="com.kh.replay.member.model.dto.GenreDTO">
-			<id property="genreId" column="GENRE_ID" />
-			<result property="genreName" column="GENRE_NAME" />
-		</collection>
+        <id property="memberId" column="MEMBER_ID" />
 
-	</resultMap>
+        <result property="email"     column="EMAIL" />
+        <result property="gender"    column="gender" />
+        <result property="mbti"      column="mbti" />
+        <result property="name"      column="name" />
+        <result property="nickName"  column="nickName" />
+        <result property="phone"     column="phone" />
+        <result property="job"       column="job" />
+        <result property="role"      column="role" />
+        <result property="status"    column="status" />
+        <result property="createdAt" column="createdAt" />
+        <result property="updatedAt" column="updatedAt" />
 
-	<insert id="insertMemberGenres"> INSERT INTO TB_MEMBER_GENRE (MEMBER_ID,
-		GENRE_ID) VALUES <foreach collection="genres" item="genreId"
-			separator=",">
-			(#{memberId}, #{genreId})
-		</foreach>
-	</insert>
+    </association>
+
+    <collection property="genreDto"
+        javaType="java.util.ArrayList"
+        ofType="com.kh.replay.member.model.dto.GenreDTO">
+        <id property="genreId" column="GENRE_ID" />
+        <result property="genreName" column="GENRE_NAME" />
+    </collection>
+
+</resultMap>
+
+	<insert id="insertMemberGenres">
+  INSERT INTO TB_MEMBER_GENRE (MEMBER_ID, GENRE_ID)
+  SELECT #{memberId}, GENRE_ID
+  FROM TB_GENRE
+  WHERE GENRE_ID IN
+  <foreach collection="genreIds"
+           item="genreId"
+           open="("
+           separator=","
+           close=")">
+    #{genreId}
+  </foreach>
+</insert>
+
+
+
 
 	<select id="findMemberIdByEmail" parameterType="string" resultType="string">
 		SELECT MEMBER_ID
@@ -146,81 +180,95 @@
 		AND STATUS = 'Y'
 	</select>
 
-<select id="findByMemberId" resultType="map">
-    SELECT
-        TB_MEMBER.MEMBER_ID
-        , TB_MEMBER.EMAIL
-        , TB_LOCAL.PASSWORD
-        , TB_MEMBER.ROLE
-        , TB_MEMBER.MEMBER_NAME
-        , TB_MEMBER.NICKNAME
-        , LISTAGG(TB_GENRE.GENRE_NAME, ', ') WITHIN GROUP (ORDER BY TB_GENRE.GENRE_NAME) AS GENRE_NAMES
-    FROM TB_MEMBER
-        INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
-        LEFT JOIN TB_MEMBER_GENRE ON TB_MEMBER.MEMBER_ID = TB_MEMBER_GENRE.MEMBER_ID
-        LEFT JOIN TB_GENRE ON TB_MEMBER_GENRE.GENRE_ID = TB_GENRE.GENRE_ID
-    WHERE TB_MEMBER.MEMBER_ID = #{memberId}
-        AND TB_MEMBER.STATUS = 'Y'
-    GROUP BY
-        TB_MEMBER.MEMBER_ID
-        , TB_MEMBER.EMAIL
-        , TB_LOCAL.PASSWORD
-        , TB_MEMBER.ROLE
-        , TB_MEMBER.MEMBER_NAME
-        , TB_MEMBER.NICKNAME
-</select>
+	<select id="findByMemberId" resultType="map">
+		SELECT
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_LOCAL.PASSWORD
+		, TB_MEMBER.ROLE
+		, TB_MEMBER.MEMBER_NAME
+		, TB_MEMBER.NICKNAME
+		, LISTAGG(TB_GENRE.GENRE_NAME, ', ') WITHIN GROUP (ORDER BY
+		TB_GENRE.GENRE_NAME) AS GENRE_NAMES
+		FROM TB_MEMBER
+		INNER JOIN TB_LOCAL ON TB_MEMBER.MEMBER_ID = TB_LOCAL.MEMBER_ID
+		LEFT JOIN TB_MEMBER_GENRE ON TB_MEMBER.MEMBER_ID =
+		TB_MEMBER_GENRE.MEMBER_ID
+		LEFT JOIN TB_GENRE ON TB_MEMBER_GENRE.GENRE_ID = TB_GENRE.GENRE_ID
+		WHERE TB_MEMBER.MEMBER_ID = #{memberId}
+		AND TB_MEMBER.STATUS = 'Y'
+		GROUP BY
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_LOCAL.PASSWORD
+		, TB_MEMBER.ROLE
+		, TB_MEMBER.MEMBER_NAME
+		, TB_MEMBER.NICKNAME
+	</select>
 
 
-<select id="findSocialByMemberId" resultType="map">
-    SELECT
-        TB_MEMBER.MEMBER_ID
-        , TB_MEMBER.EMAIL
-        , TB_MEMBER.ROLE
-        , TB_MEMBER.MEMBER_NAME
-        , TB_MEMBER.NICKNAME
-        , TB_SOCIAL.PROVIDER
-        , LISTAGG(TB_GENRE.GENRE_NAME, ', ') WITHIN GROUP (ORDER BY TB_GENRE.GENRE_NAME) AS GENRE_NAMES
-    FROM TB_MEMBER
-        INNER JOIN TB_SOCIAL ON TB_MEMBER.MEMBER_ID = TB_SOCIAL.MEMBER_ID
-        LEFT JOIN TB_MEMBER_GENRE ON TB_MEMBER.MEMBER_ID = TB_MEMBER_GENRE.MEMBER_ID
-        LEFT JOIN TB_GENRE ON TB_MEMBER_GENRE.GENRE_ID = TB_GENRE.GENRE_ID
-    WHERE TB_MEMBER.MEMBER_ID = #{memberId}
-        AND TB_MEMBER.STATUS = 'Y'
-    GROUP BY
-        TB_MEMBER.MEMBER_ID
-        , TB_MEMBER.EMAIL
-        , TB_MEMBER.ROLE
-        , TB_MEMBER.MEMBER_NAME
-        , TB_MEMBER.NICKNAME
-        , TB_SOCIAL.PROVIDER
-</select>
+	<select id="findSocialByMemberId" resultType="map">
+		SELECT
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_MEMBER.ROLE
+		, TB_MEMBER.MEMBER_NAME
+		, TB_MEMBER.NICKNAME
+		, TB_SOCIAL.PROVIDER
+		, LISTAGG(TB_GENRE.GENRE_NAME, ', ') WITHIN GROUP (ORDER BY
+		TB_GENRE.GENRE_NAME) AS GENRE_NAMES
+		FROM TB_MEMBER
+		INNER JOIN TB_SOCIAL ON TB_MEMBER.MEMBER_ID = TB_SOCIAL.MEMBER_ID
+		LEFT JOIN TB_MEMBER_GENRE ON TB_MEMBER.MEMBER_ID =
+		TB_MEMBER_GENRE.MEMBER_ID
+		LEFT JOIN TB_GENRE ON TB_MEMBER_GENRE.GENRE_ID = TB_GENRE.GENRE_ID
+		WHERE TB_MEMBER.MEMBER_ID = #{memberId}
+		AND TB_MEMBER.STATUS = 'Y'
+		GROUP BY
+		TB_MEMBER.MEMBER_ID
+		, TB_MEMBER.EMAIL
+		, TB_MEMBER.ROLE
+		, TB_MEMBER.MEMBER_NAME
+		, TB_MEMBER.NICKNAME
+		, TB_SOCIAL.PROVIDER
+	</select>
 
-<select id="findUserByMemberId" resultType="map">
-    SELECT
-        M.MEMBER_ID
-        , M.EMAIL
-        , M.ROLE
-        , M.MEMBER_NAME
-        , M.NICKNAME
-        , L.PASSWORD
-        , S.PROVIDER
-        , LISTAGG(G.GENRE_NAME, ', ') WITHIN GROUP (ORDER BY G.GENRE_NAME) AS GENRE_NAMES
-    FROM TB_MEMBER M
-        LEFT JOIN TB_LOCAL L ON M.MEMBER_ID = L.MEMBER_ID
-        LEFT JOIN TB_SOCIAL S ON M.MEMBER_ID = S.MEMBER_ID
-        LEFT JOIN TB_MEMBER_GENRE MG ON M.MEMBER_ID = MG.MEMBER_ID
-        LEFT JOIN TB_GENRE G ON MG.GENRE_ID = G.GENRE_ID
-    WHERE M.MEMBER_ID = #{memberId}
-        AND M.STATUS = 'Y'
-    GROUP BY
-        M.MEMBER_ID
-        , M.EMAIL
-        , M.ROLE
-        , M.MEMBER_NAME
-        , M.NICKNAME
-        , L.PASSWORD
-        , S.PROVIDER
-</select>
+	<select id="findUserByMemberId" resultType="map">
+		SELECT
+		M.MEMBER_ID
+		, M.EMAIL
+		, M.ROLE
+		, M.MEMBER_NAME
+		, M.NICKNAME
+		, L.PASSWORD
+		, S.PROVIDER
+		, LISTAGG(G.GENRE_NAME, ', ') WITHIN GROUP (ORDER BY G.GENRE_NAME) AS
+		GENRE_NAMES
+		FROM TB_MEMBER M
+		LEFT JOIN TB_LOCAL L ON M.MEMBER_ID = L.MEMBER_ID
+		LEFT JOIN TB_SOCIAL S ON M.MEMBER_ID = S.MEMBER_ID
+		LEFT JOIN TB_MEMBER_GENRE MG ON M.MEMBER_ID = MG.MEMBER_ID
+		LEFT JOIN TB_GENRE G ON MG.GENRE_ID = G.GENRE_ID
+		WHERE M.MEMBER_ID = #{memberId}
+		AND M.STATUS = 'Y'
+		GROUP BY
+		M.MEMBER_ID
+		, M.EMAIL
+		, M.ROLE
+		, M.MEMBER_NAME
+		, M.NICKNAME
+		, L.PASSWORD
+		, S.PROVIDER
+	</select>
+
+	<select id="findAllGenres"
+		resultType="com.kh.replay.member.model.dto.GenreDTO">
+		SELECT
+		GENRE_ID AS genreId,
+		GENRE_NAME AS genreName
+		FROM TB_GENRE
+		ORDER BY GENRE_NAME
+	</select>
 
 
 </mapper>

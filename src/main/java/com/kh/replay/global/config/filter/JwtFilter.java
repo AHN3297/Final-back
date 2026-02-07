@@ -1,11 +1,9 @@
 package com.kh.replay.global.config.filter;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -31,27 +29,32 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
-  
+    /**
+     * JWT 필터 제외 경로
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        // OAuth2 흐름 (Spring Security OAuth2가 처리)
+        // ===== 인증 이전 API =====
+        if (uri.equals("/api/members/login")) return true;
+        if (uri.equals("/api/members/signup")) return true;
+
+        // OAuth2
         if (uri.startsWith("/oauth2/")) return true;
         if (uri.startsWith("/login/oauth2/")) return true;
-        if (uri.startsWith("/login/")) return true;
 
         // 정적 리소스
         if (uri.equals("/favicon.ico")) return true;
-        if (uri.startsWith("/.well-known/")) return true;
         if (uri.equals("/error")) return true;
-        if (uri.startsWith("/css/")) return true;
-        if (uri.startsWith("/js/")) return true;
-        if (uri.startsWith("/images/")) return true;
+        if (uri.startsWith("/css/")
+            || uri.startsWith("/js/")
+            || uri.startsWith("/images/")) return true;
 
-        // API는 모두 필터를 거침 (SecurityFilterChain에서 permitAll 처리)
         return false;
     }
+
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -59,9 +62,21 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String uri = request.getRequestURI();
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        // 토큰이 없으면 그대로 통과
+        boolean requiresAuth =
+                uri.contains("/me") ||
+                uri.contains("/likes") ||
+                uri.contains("/bookmarks");
+
+        // 🔥 인증이 필요한 API인데 토큰이 없으면 즉시 차단
+        if (requiresAuth && (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer "))) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // 토큰이 없는 경우 (permitAll API)
         if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -73,24 +88,24 @@ public class JwtFilter extends OncePerRequestFilter {
             Claims claims = jwtUtil.parseJwt(token);
 
             String memberId = claims.getSubject();
-            String role = claims.get("role", String.class);
-
-            // role 기본값 및 정제
-            if (!StringUtils.hasText(role)) {
-                role = "ROLE_USER";
+            if (!StringUtils.hasText(memberId)) {
+                throw new JwtException("JWT subject(memberId) 없음");
             }
-            role = role.replace("[", "").replace("]", "").trim();
 
-            // memberId로 사용자 정보 조회
-            CustomUserDetails user = (CustomUserDetails) userDetailsService.loadUserByMemberId(memberId);
+            CustomUserDetails user =
+                    (CustomUserDetails) userDetailsService.loadUserByMemberId(memberId);
 
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    user, 
-                    null, 
-                    user.getAuthorities()
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            user.getAuthorities()
+                    );
+
+            authentication.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
             );
 
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (JwtException e) {
@@ -98,11 +113,11 @@ public class JwtFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         } catch (Exception e) {
-            // DB 조회 실패 등
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         filterChain.doFilter(request, response);
-    }}
+    }
+}

@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Update;
 
 import com.kh.replay.auth.oauth.model.dto.AdditionalInfoRequest;
 import com.kh.replay.auth.oauth.model.dto.OAuthUserDTO;
+import com.kh.replay.member.model.dto.GenreDTO;
 import com.kh.replay.member.model.dto.MemberInfoDTO;
 import com.kh.replay.member.model.dto.MemberUpdateRequest;
 
@@ -30,7 +31,7 @@ public interface MemberMapper {
 	@Delete("DELETE FROM TB_MEMBER_GENRE WHERE MEMBER_ID = #{memberId}")
 	void deleteMemberGenres(String memberId);
 	
-	int insertMemberGenres(@Param("memberId") String memberId, @Param("genres") List<Long> genres);
+	int insertMemberGenres(@Param("memberId") String memberId, @Param("genreIds") List<Long> genres);
 
 
 	@Update("UPDATE TB_MEMBER  SET STATUS = 'N' WHERE MEMBER_ID = #{memberId}")
@@ -52,11 +53,13 @@ public interface MemberMapper {
 	boolean existsLocalByEmail(String email);
 
 	String findMemberIdByEmail(String email);
-	
+
 	    Map<String, String> findByMemberId(String memberId);
 	    
 	    
 	    Map<String, String> findUserByMemberId(String memberId);
+
+		List<GenreDTO> findAllGenres();
 	    
 
 

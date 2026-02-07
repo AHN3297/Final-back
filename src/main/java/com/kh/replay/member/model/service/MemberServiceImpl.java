@@ -164,20 +164,29 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public void withdrawMember(LocalDTO local) {
-		String memberId = local.getMemberDto().getMemberId();
+	    String memberId = local.getMemberDto().getMemberId();
 
-		Map<String, String> userInfo = membermapper.loadByMemberEmail(local.getMemberDto().getMemberId());
+	    Map<String, String> userInfo =
+	        membermapper.findByMemberId(memberId);
 
-		String userPassword = userInfo.get("PASSWORD");
+	    if (userInfo == null) {
+	        throw new CustomAuthenticationException("회원 정보를 찾을 수 없습니다.");
+	    }
 
-		if (!passwordEncoder.matches(local.getPassword(), userPassword)) {
-			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
-		}
-		membermapper.withdrawMember(memberId);
+	    String userPassword = userInfo.get("PASSWORD");
 
-		tokenMapper.memberLogout(memberId);
+	    if (userPassword == null) {
+	        throw new CustomAuthenticationException("비밀번호 기반 회원이 아닙니다.");
+	    }
 
+	    if (!passwordEncoder.matches(local.getPassword(), userPassword)) {
+	        throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
+	    }
+
+	    membermapper.withdrawMember(memberId);
+	    tokenMapper.memberLogout(memberId);
 	}
+
 
 	@Override
 	public void withdrawSocial(MemberVO member) {
@@ -194,5 +203,10 @@ public class MemberServiceImpl implements MemberService {
 		tokenMapper.memberLogout(memberId);
 
 	}
+	@Override
+	public List<GenreDTO> findAllGenres() {
+	    return membermapper.findAllGenres();
+	}
+
 
 }

@@ -48,7 +48,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			boolean profileCompleted = existingSocial.getNickname() != null
 					&& !existingSocial.getNickname().equals("TEMP");
 
-			existingSocial.setNewUser(!profileCompleted);
 			existingSocial.setProfileCompleted(profileCompleted);
 			existingSocial.setEmail(email);
 			existingSocial.setName(name);
@@ -56,7 +55,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			return new CustomOAuth2User(existingSocial);
 		}
 
-		// 이메일 중복 체크
 		boolean emailExists = memberMapper.existByEmail(email);
 
 		if (emailExists) {
@@ -66,7 +64,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 				throw new OAuth2AuthenticationException("이미 일반 회원으로 가입된 이메일입니다.");
 			}
 
-			// 다른 소셜 로그인으로 가입된 경우 - 계정 연동
 			String memberId = memberMapper.findMemberIdByEmail(email);
 
 			if (memberId == null) {
@@ -79,7 +76,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			linkUser.setProviderId(providerId);
 			linkUser.setEmail(email);
 			linkUser.setName(name);
-			linkUser.setNewUser(false);
 			linkUser.setProfileCompleted(true); // 이미 가입된 회원이므로 프로필 완료
 
 			socialMapper.insertOAuthUser(linkUser);
@@ -87,7 +83,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 			return new CustomOAuth2User(linkUser);
 		}
 
-		// 완전히 새로운 회원
 		String newMemberId = "#" + providerId;
 
 		OAuthUserDTO newUser = new OAuthUserDTO();
@@ -96,7 +91,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		newUser.setProviderId(providerId);
 		newUser.setEmail(email);
 		newUser.setName(name);
-		newUser.setNewUser(true);
 		newUser.setProfileCompleted(false); // 신규 가입자는 프로필 미완료
 
 		memberMapper.insertOAuthBasicInfo(newUser);

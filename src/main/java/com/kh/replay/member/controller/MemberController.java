@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.member.model.dto.GenreDTO;
 import com.kh.replay.member.model.dto.MemberInfoDTO;
 import com.kh.replay.member.model.dto.MemberUpdateRequest;
 import com.kh.replay.member.model.service.MemberService;
@@ -81,12 +82,20 @@ public class MemberController {
 	@DeleteMapping
 	public ResponseEntity<ResponseData<String>> withdrawMember(@RequestBody LocalDTO local)
 	{
+		log.info("🔥 withdraw request: {}", local);
+
 		memberService.withdrawMember(local);
 		
 		
 				return ResponseData.ok(null, "삭제에 성공하셨습니다.");
 		
 	}
+	@GetMapping("/genres")
+	public ResponseEntity<ResponseData<List<GenreDTO>>> findAllGenres() {
+	    List<GenreDTO> genres = memberService.findAllGenres();
+	    return ResponseData.ok(genres, "장르 전체 조회 성공");
+	}
+
 }
 
 	

@@ -56,8 +56,4 @@ public class MemberDTO {
 
 	private String status;
 
-	private List<Long> genres;
-	
-	private List<String> genreName;
-
 }

@@ -40,52 +40,49 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
 
-        CustomOAuth2User customUser = (CustomOAuth2User) authentication.getPrincipal();
+        CustomOAuth2User customUser =
+                (CustomOAuth2User) authentication.getPrincipal();
 
         String memberId = customUser.getMemberId();
         String email = customUser.getEmail();
         String name = customUser.getName();
 
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        boolean profileCompleted = customUser.isProfileCompleted();
+        boolean needAdditionalInfo = !profileCompleted;
+
+        Collection<? extends GrantedAuthority> authorities =
+                authentication.getAuthorities();
+
         String role = authorities.isEmpty()
                 ? "ROLE_USER"
                 : authorities.iterator().next().getAuthority();
 
-      
-        String accessToken = jwtUtil.getAccessToken(memberId, email, role, name);
-        String refreshTokenValue = jwtUtil.getRefreshToken(memberId);
+        String accessToken =
+                jwtUtil.getAccessToken(memberId, email, role, name);
 
-        try {
-            long expirationMillis = System.currentTimeMillis()
-                    + (1000L * 60 * 60 * 24 * 14);
+        String refreshTokenValue =
+                jwtUtil.getRefreshToken(memberId);
 
-            RefreshToken refreshToken = RefreshToken.builder()
-                    .memberId(memberId)
-                    .token(refreshTokenValue)
-                    .expiration(new Date(expirationMillis)) 
-                    .createdAt(new Date())
-                    .build();
+        RefreshToken refreshToken = RefreshToken.builder()
+                .memberId(memberId)
+                .token(refreshTokenValue)
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14))
+                .createdAt(new Date())
+                .build();
 
-            tokenMapper.insertToken(refreshToken);
+        tokenMapper.insertToken(refreshToken);
 
-        } catch (Exception e) {
-            log.error("리프레시 토큰 저장 실패 memberId={}", memberId, e);
-        }
-
-        String targetPath = customUser.isNewUser()
-                ? "/oauth/step2"
-                : "/main";
-
-        String at = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
-        String rt = URLEncoder.encode(refreshTokenValue, StandardCharsets.UTF_8);
-        String nm = URLEncoder.encode(name == null ? "" : name, StandardCharsets.UTF_8);
-        String em = URLEncoder.encode(email == null ? "" : email, StandardCharsets.UTF_8);
+        String targetPath = "/oauth/callback";
 
         String redirectUrl = frontBaseUrl + targetPath
-                + "?accessToken=" + at
-                + "&refreshToken=" + rt
-                + "&name=" + nm
-                + "&email=" + em;
+                + "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
+                + "&refreshToken=" + URLEncoder.encode(refreshTokenValue, StandardCharsets.UTF_8)
+                + "&memberId=" + URLEncoder.encode(memberId, StandardCharsets.UTF_8)
+                + "&name=" + URLEncoder.encode(name == null ? "" : name, StandardCharsets.UTF_8)
+                + "&email=" + URLEncoder.encode(email == null ? "" : email, StandardCharsets.UTF_8)
+                + "&needAdditionalInfo=" + needAdditionalInfo;
+
+
 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.kh.replay.auth.local.model.dto.LocalDTO;
 import com.kh.replay.member.model.dto.ChangePasswordDTO;
+import com.kh.replay.member.model.dto.GenreDTO;
 import com.kh.replay.member.model.dto.MemberDTO;
 import com.kh.replay.member.model.dto.MemberInfoDTO;
 import com.kh.replay.member.model.dto.MemberUpdateRequest;
@@ -24,6 +25,7 @@ public interface MemberService {
 	void withdrawMember(LocalDTO local);
 	void withdrawSocial(MemberVO member);
 	MemberInfoDTO findAllInfo(String memberId);
+	List<GenreDTO> findAllGenres();
 
 
 	

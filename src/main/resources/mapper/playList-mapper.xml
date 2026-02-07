@@ -39,7 +39,7 @@
 	
 	<select id="findAllMemberPlayLists" resultType="com.kh.replay.playList.model.dto.PlayListDTO">
 	    SELECT 
-	         , PLAYLIST_ID as playListId
+	          PLAYLIST_ID as playListId
 	         , PLAYLIST_NAME as playListName
 	         , MEMBER_ID as memberId
 	         , CREATED_AT as createdAt

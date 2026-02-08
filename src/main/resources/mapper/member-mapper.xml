@@ -57,7 +57,7 @@
 
 	<update id="socialUpdate"
 		parameterType="com.kh.replay.member.model.vo.MemberVO"> UPDATE TB_MEMBER
-		SET JOB = #{job}, GENDER = #{gender}, GENRE = #{genre} , NICKNAME=
+		SET MEMBER_JOB = #{job}, GENDER = #{gender}, GENRE = #{genre} , NICKNAME=
 		#{nickName}, PHONE =#{phone} WHERE MEMBER_ID =#{memberId} </update>
 
 

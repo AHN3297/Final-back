@@ -1,6 +1,5 @@
 package com.kh.replay.chat.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -9,11 +8,13 @@ import org.springframework.stereotype.Controller;
 import com.kh.replay.chat.model.service.ChatService;
 import com.kh.replay.chat.model.vo.ChatVO;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
+@RequiredArgsConstructor
 public class ChatController {
-    
-    @Autowired
-    private ChatService chatService;
+
+    private final ChatService chatService;
 
     @MessageMapping("/chat.send")
     @SendTo("/topic/public")

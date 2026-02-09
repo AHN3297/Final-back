@@ -1,5 +1,8 @@
 package com.kh.replay.auth.local.model.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,24 +31,29 @@ public class LocalServiceImpl implements LocalService {
 		// 암호화된 비밀번호 로컬에 저장
 
 		local.setPassword(encodedPassword);
+
 		MemberVO member = MemberVO.builder().memberId(local.getMemberDto().getMemberId())
 				.email(local.getMemberDto().getEmail()).name(local.getMemberDto().getName())
 				.nickName(local.getMemberDto().getNickName()).gender(local.getMemberDto().getGender())
 				.mbti(local.getMemberDto().getMbti()).phone(local.getMemberDto().getPhone())
-				.genre(local.getMemberDto().getGenre()).role(local.getMemberDto().getRole() !=null ? local.getMemberDto().getRole() : "ROEL_USER").job(local.getMemberDto().getJob())
-				.build();
+				.role(local.getMemberDto().getRole() != null ? local.getMemberDto().getRole() : "ROEL_USER")
+				.job(local.getMemberDto().getJob()).build();
 
 		// 회원 공통 정보 insert
 		int result = localmapper.insertMember(member);
-		
-		log.info("{}" ,result);
-		
+
+		local.getMemberDto().setMemberId(member.getMemberId());
+
 		if (result <= 0) {
 			throw new MemberJoinException("회원가입에 실패했습니다.");
 		}
+		;
 		
-		local.getMemberDto().setMemberId(member.getMemberId());
-		
+		for (Long genreId : local.getGenreIds()) {
+			log.info("{}" , genreId);
+			localmapper.insertOneMemberGenre(local.getMemberDto().getMemberId(), genreId);
+		}
+
 		int result2 = localmapper.signUp(local);
 
 		if (result2 <= 0) {

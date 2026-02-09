@@ -16,7 +16,7 @@ public interface TokenMapper {
 	@Delete("DELETE FROM TB_TOKEN WHERE MEMBER_ID =#{memberId}")
 	void memberLogout(String memberId);
 
-	@Insert("INSERT INTO TB_TOKEN (TOKEN_ID,TOKEN,EXPRITATION,CREATED_AT,MEMBER_ID)VALUES(SEQ_TOKEN_ID.NEXTVAL,#{token},#{expritaion},#{createdAt},#{memberId})")
+	@Insert("INSERT INTO TB_TOKEN (TOKEN_ID,TOKEN,EXPIRATION,CREATED_AT,MEMBER_ID)VALUES(SEQ_TOKEN_ID.NEXTVAL,#{token},#{expiration},#{createdAt},#{memberId})")
 	void insertToken(RefreshToken refreshToken);
 
 

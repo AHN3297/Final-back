@@ -1,9 +1,12 @@
 package com.kh.replay.global.config;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -19,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -27,49 +31,59 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtUtil jwtUtil;
     private final TokenMapper tokenMapper;
 
+    @Value("${front.base-url:http://localhost:5173}")
+    private String frontBaseUrl;
+
     @Override
     public void onAuthenticationSuccess(
             HttpServletRequest request,
             HttpServletResponse response,
             Authentication authentication) throws IOException, ServletException {
-        
-        CustomOAuth2User customUser = (CustomOAuth2User) authentication.getPrincipal();
+
+        CustomOAuth2User customUser =
+                (CustomOAuth2User) authentication.getPrincipal();
 
         String memberId = customUser.getMemberId();
         String email = customUser.getEmail();
         String name = customUser.getName();
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+        boolean profileCompleted = customUser.isProfileCompleted();
+        boolean needAdditionalInfo = !profileCompleted;
+
+        Collection<? extends GrantedAuthority> authorities =
+                authentication.getAuthorities();
+
         String role = authorities.isEmpty()
-                    ? "ROLE_USER"
-                    : authorities.iterator().next().getAuthority();
+                ? "ROLE_USER"
+                : authorities.iterator().next().getAuthority();
 
-        // JWT 생성 (memberId, email, role)
-        String token = jwtUtil.getAccessToken(memberId, email, role,name);
-        try {
-        	
-        long expirationMillis = System.currentTimeMillis() + (1000 * 60 * 60 * 24);
-        //토큰에 저장
-       RefreshToken refreshToken = RefreshToken.builder()
-        										   .memberId(memberId)
-        										   .token(token)
-        										   .expiration(new Date(expirationMillis))
-        										   .createdAt(new Date())
-        										   .build();
-       
-       	tokenMapper.insertToken(refreshToken);
-       
-        }catch(Exception e) {
-        	log.error("토큰 저장  실패 {} ",memberId);
-        }
-        // 리다이렉트 경로 설정
-        String redirectTo = customUser.isNewUser() 
-            ? "api/oauth/social/addsocialInfo"     // 신규 회원 → 추가 정보 입력 페이지
-            : "http://localhost:5173/main";        // 기존 회원 → 메인 페이지
+        String accessToken =
+                jwtUtil.getAccessToken(memberId, email, role, name);
 
-        
-        String redirectUrl = "http://localhost:5173/oauth-callback?token=" + token + "&redirectTo=" + redirectTo;
-        getRedirectStrategy().sendRedirect(
-        		request, response, redirectUrl
-        );
+        String refreshTokenValue =
+                jwtUtil.getRefreshToken(memberId);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .memberId(memberId)
+                .token(refreshTokenValue)
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14))
+                .createdAt(new Date())
+                .build();
+
+        tokenMapper.insertToken(refreshToken);
+
+        String targetPath = "/oauth/callback";
+
+        String redirectUrl = frontBaseUrl + targetPath
+                + "?accessToken=" + URLEncoder.encode(accessToken, StandardCharsets.UTF_8)
+                + "&refreshToken=" + URLEncoder.encode(refreshTokenValue, StandardCharsets.UTF_8)
+                + "&memberId=" + URLEncoder.encode(memberId, StandardCharsets.UTF_8)
+                + "&name=" + URLEncoder.encode(name == null ? "" : name, StandardCharsets.UTF_8)
+                + "&email=" + URLEncoder.encode(email == null ? "" : email, StandardCharsets.UTF_8)
+                + "&needAdditionalInfo=" + needAdditionalInfo;
+
+
+
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

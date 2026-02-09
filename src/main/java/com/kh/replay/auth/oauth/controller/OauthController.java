@@ -31,9 +31,9 @@ public class OauthController {
 	@PutMapping("/complete")
 	public ResponseEntity<ResponseData<AdditionalInfoRequest>> addsocialInfo(
 			@RequestBody AdditionalInfoRequest request, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization){
+			
 				String token = authorization.substring(7); 
 		        Claims claims = jwtUtil.parseJwt(token);
-		        
 		        String memberId = claims.getSubject();
 		        String email = claims.get("email", String.class);
 		        String name = claims.get("name", String.class); 
@@ -44,8 +44,10 @@ public class OauthController {
 		        request.setName(name);
 		//멤버 테이블에 나머지 정보 저장
 		membermapper.updateCompleteMember(request);
-		        
+		    log.info("{}",request);    
+		    
 		return ResponseData.created(request, "회원가입이 성공하셨습니다.");
+		
 	}
 	
 	@PostMapping("/logout")

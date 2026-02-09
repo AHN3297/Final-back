@@ -35,9 +35,6 @@ import lombok.Value;
 		    public String getProviderId() {
 		        return oauthUser.getProviderId();
 		    } 
-		    public boolean isNewUser() {
-		        return oauthUser.isNewUser();
-		    }
 
 		
 		    @Override
@@ -55,6 +52,10 @@ import lombok.Value;
 			public String getName() {
 				return oauthUser.getName();
 			}
+			public boolean isProfileCompleted() {
+			    return oauthUser.isProfileCompleted();
+			}
+
 
 	}
 

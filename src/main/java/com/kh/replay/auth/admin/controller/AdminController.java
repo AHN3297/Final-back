@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.replay.auth.admin.model.dto.DashboardSummaryDTO;
 import com.kh.replay.auth.admin.model.dto.MemberDetailDTO;
 import com.kh.replay.auth.admin.model.dto.MemberStatusRatio;
+import com.kh.replay.auth.admin.model.dto.ReportDetailDTO;
 import com.kh.replay.auth.admin.model.service.AdminService;
 import com.kh.replay.global.common.ResponseData;
 import com.kh.replay.member.model.dto.MemberDTO;
@@ -91,7 +92,7 @@ public class AdminController {
 	@GetMapping("/report")
 	public ResponseEntity<ResponseData<Map<String,Object>>> findReportList(@RequestParam(name="page",defaultValue ="1") int page ,
 																		 @RequestParam(name="size",defaultValue= "10")int size,
-																		 @RequestParam(name="keywordr",required = false)String keyword){
+																		 @RequestParam(name="keyword",required = false)String keyword){
 		
 		Map<String,Object> response = adminService.findReportList(page,size,keyword);
 		
@@ -104,7 +105,29 @@ public class AdminController {
 
 
 }
-
+	@GetMapping("/reportDetail")
+	public ResponseEntity<ResponseData<ReportDetailDTO>> findReportDetail(@RequestParam(name="reportNo") Long reportNo){
+		
+		ReportDetailDTO reportDetail =adminService.findReportDetail(reportNo);
+		
+		
+		return ResponseData.ok(reportDetail,"신고 상세 조회 성공");
+	}
+	@PatchMapping("/report/statusChange")
+	public ResponseEntity<ResponseData<String>> reportStatusChange(@RequestBody ReportDetailDTO reportDetail ){
+		
+		
+		adminService.ChangeStatus(reportDetail);
+		
+		
+		
+		
+		
+		
+		return ResponseData.ok(null,"신고 수정에 성공하셨습니다.");
+	}
+	
+	
 
 
 }

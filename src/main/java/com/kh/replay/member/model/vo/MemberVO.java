@@ -13,7 +13,6 @@ private String name;
 private String nickName;
 private String phone;
 private String gender;
-private String genre;
 private String job;
 private String mbti;
 private Date createdAt;

@@ -211,7 +211,7 @@
 	           PLAYLIST_SONG_NO = #{playlistSongNo}
 	</update>
 	
-		<delete id="deletePlaylistTracks">
+	<delete id="deletePlaylistTracks">
 	    DELETE 
 	      FROM 
 	           TB_PLAYLIST_SONG_LIST
@@ -219,6 +219,6 @@
 	           PLAYLIST_ID = #{playListId}
 	       AND 
 	           SONG_ID = #{songId}
-		</delete>
+	</delete>
 	
 </mapper>

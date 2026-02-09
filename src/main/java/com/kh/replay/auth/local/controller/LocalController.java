@@ -24,7 +24,7 @@ public class LocalController {
 	
 	@PostMapping("/signUp")
 	public ResponseEntity<ResponseData<String>> signUp(@Valid @RequestBody LocalDTO local){
-		 
+	
 		localService.signUp(local);
 		
 		return ResponseData.created(null, "회원가입에 성공했습니다.");

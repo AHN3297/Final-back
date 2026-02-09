@@ -14,59 +14,89 @@ import com.kh.replay.global.exception.OAuth2AuthenticationException;
 import com.kh.replay.member.model.dao.MemberMapper;
 
 import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
-public class CustomOAuth2UserService extends DefaultOAuth2UserService{
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
 	private final SocialMapper socialMapper;
-	private final MemberMapper membermapper;
-	
+	private final MemberMapper memberMapper;
+
 	@Override
-	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException{
-		 OAuth2User oAuth2User = super.loadUser(userRequest);
+	public OAuth2User loadUser(OAuth2UserRequest userRequest) {
+		OAuth2User oAuth2User = super.loadUser(userRequest);
 
-	        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-	        OAuth2Res oAuth2Response = switch (registrationId) {
-	            case "google" -> new GoogleRes(oAuth2User.getAttributes());
-	            default -> throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
-	        };
+		// provider 판별
+		String registrationId = userRequest.getClientRegistration().getRegistrationId();
+		OAuth2Res oAuth2Response = switch (registrationId) {
+		case "google" -> new GoogleRes(oAuth2User.getAttributes());
+		default -> throw new OAuth2AuthenticationException("지원하지 않는 OAuth 제공자입니다.");
+		};
 
-	       String memberId = "#"+oAuth2Response.getProviderId();
-	       String email = oAuth2Response.getEmail();
-	       
-	       boolean isLocalUser = membermapper.existByEmail(email);
-	       if(isLocalUser) {
-	    	   throw new OAuth2AuthenticationException("이미 일반 회원으로 가입된 이메일 입니다.");
-	       }
-	       
-	        // 2) OAuth2 응답 기반 DTO 생성
-	        OAuthUserDTO oauthUser = new OAuthUserDTO(
-	        	    memberId,
-	        	    oAuth2Response.getProvier(),
-	        	    oAuth2Response.getProviderId(),
-	        	    null,  // createdAt
-	        	    oAuth2Response.getEmail(),
-	        	    oAuth2Response.getName(),
-	        	    false  // isNewUser
-	        	);
-	        //제공자와 제공자 ID로 유저 조회 한다
-	        OAuthUserDTO existingUser = socialMapper.findByProviderAndProviderId(oauthUser);
-	        if(existingUser !=null) {
-	        	existingUser.setNewUser(false);
-	        	existingUser.setEmail(oAuth2Response.getEmail());
-	        	existingUser.setName(oAuth2Response.getName());
-	        	return new CustomOAuth2User(existingUser);
-	        }
-	        //멤버테이블에 EMAIL과 NAME+ 임시값
-	        membermapper.insertOAuthBasicInfo(oauthUser);
-	        // 신규회원 social테이블에 추가
-	        socialMapper.insertOAuthUser(oauthUser);
-	        oauthUser.setNewUser(true);
-	        
-			return new CustomOAuth2User(oauthUser);
-	
-	
-	
+		String provider = oAuth2Response.getProvier();
+		String providerId = oAuth2Response.getProviderId();
+		String email = oAuth2Response.getEmail();
+		String name = oAuth2Response.getName();
+
+		OAuthUserDTO probe = new OAuthUserDTO();
+		probe.setProvider(provider);
+		probe.setProviderId(providerId);
+
+		OAuthUserDTO existingSocial = socialMapper.findByProviderAndProviderId(probe);
+
+		if (existingSocial != null) {
+			boolean profileCompleted = existingSocial.getNickname() != null
+					&& !existingSocial.getNickname().equals("TEMP");
+
+			existingSocial.setProfileCompleted(profileCompleted);
+			existingSocial.setEmail(email);
+			existingSocial.setName(name);
+
+			return new CustomOAuth2User(existingSocial);
+		}
+
+		boolean emailExists = memberMapper.existByEmail(email);
+
+		if (emailExists) {
+			boolean isLocal = memberMapper.existsLocalByEmail(email);
+
+			if (isLocal) {
+				throw new OAuth2AuthenticationException("이미 일반 회원으로 가입된 이메일입니다.");
+			}
+
+			String memberId = memberMapper.findMemberIdByEmail(email);
+
+			if (memberId == null) {
+				throw new OAuth2AuthenticationException("회원 정보가 일치하지 않습니다.");
+			}
+
+			OAuthUserDTO linkUser = new OAuthUserDTO();
+			linkUser.setMemberId(memberId);
+			linkUser.setProvider(provider);
+			linkUser.setProviderId(providerId);
+			linkUser.setEmail(email);
+			linkUser.setName(name);
+			linkUser.setProfileCompleted(true); // 이미 가입된 회원이므로 프로필 완료
+
+			socialMapper.insertOAuthUser(linkUser);
+
+			return new CustomOAuth2User(linkUser);
+		}
+
+		String newMemberId = "#" + providerId;
+
+		OAuthUserDTO newUser = new OAuthUserDTO();
+		newUser.setMemberId(newMemberId);
+		newUser.setProvider(provider);
+		newUser.setProviderId(providerId);
+		newUser.setEmail(email);
+		newUser.setName(name);
+		newUser.setProfileCompleted(false); // 신규 가입자는 프로필 미완료
+
+		memberMapper.insertOAuthBasicInfo(newUser);
+		socialMapper.insertOAuthUser(newUser);
+
+		return new CustomOAuth2User(newUser);
 	}
-	
 
 }

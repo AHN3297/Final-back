@@ -93,9 +93,6 @@ public class MusicServiceImpl implements MusicService {
 
         ItunesVO.ItunesItem item = rawData.getResults().get(0);
 
-        // 2. 가사 조회 (LyricsClient 호출)
-        String lyrics = lyricsClient.lyrics(item.getArtistName(), item.getTrackName());
-
         // 3. DTO 조립
         return MusicDTO.builder()
                 .trackId(item.getTrackId())
@@ -108,9 +105,38 @@ public class MusicServiceImpl implements MusicService {
                 .releaseDate(item.getReleaseDate())
                 .genreName(item.getPrimaryGenreName())
                 .duration(item.getDuration())
-                .lyrics(lyrics)
+                .lyrics(null)
                 .build();
     }
+    
+    @Override
+    public String getLyricsOnly(String artistName, String title) {
+        try {
+            // 아티스트나 곡명이 비어있는지 사전 체크 (Validation)
+            if (artistName == null || title == null) return "정보가 부족하여 가사를 찾을 수 없습니다.";
+            
+            String lyrics = lyricsClient.lyrics(artistName, title);
+            
+            // 검색 결과가 없을 경우에 대한 대응
+            return (lyrics != null && !lyrics.isEmpty()) ? lyrics : "등록된 가사가 없습니다.";
+            
+        } catch (Exception e) {
+            return "가사를 불러오는 중 오류가 발생했습니다.";
+        }
+    }
+    
+    @Override
+    public String getLyricsByTrackId(Long trackId) {
+        // 1. trackId로 iTunes에서 곡 정보를 먼저 조회 (상세 정보 가져오는 로직 재사용)
+        ItunesVO rawData = itunesClient.findById(String.valueOf(trackId));
+        if (rawData == null || rawData.getResults().isEmpty()) return "곡 정보를 찾을 수 없습니다.";
+        
+        ItunesVO.ItunesItem item = rawData.getResults().get(0);
+        
+        // 2. 알아낸 가수명과 곡명으로 기존의 가사 크롤링 로직 호출
+        return getLyricsOnly(item.getArtistName(), item.getTrackName());
+    }
+    
     @Override
     public ArtistDTO artistDetail(Long artistId) {
         // 1. Client를 통해 데이터 수신 (RestTemplate은 Client 안에서만 돔)
@@ -199,7 +225,7 @@ public class MusicServiceImpl implements MusicService {
     @Override
     public List<MusicDTO> getTopMusic() {
         // findAllSearch의 반환 타입이 ItunesVO(결과 리스트를 품은 객체)인 경우
-        ItunesVO response = itunesClient.findAllSearch("K-Pop", "song", 5); 
+        ItunesVO response = itunesClient.findAllSearch("K-Pop", "song", 100); 
 
         if (response == null || response.getResults() == null) {
             return Collections.emptyList();

@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class MemberServiceImpl implements MemberService {
+	
 	private final MemberMapper membermapper;
 	private final UserDetailsServiceImpl user;
 	private final AuthenticationManager authenticationManager;
@@ -49,7 +50,6 @@ public class MemberServiceImpl implements MemberService {
 
 		Authentication auth = null;
 		try {
-
 			auth = authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(local.getMemberDto().getEmail(), local.getPassword()));
 
@@ -62,7 +62,6 @@ public class MemberServiceImpl implements MemberService {
 		String role = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).findFirst().orElse("");
 
 		// 토큰 발급
-
 		Map<String, String> loginResponse = tokenService.generateToken(user.getUsername(), role);
 
 		loginResponse.put("memberId", user.getUsername());
@@ -96,97 +95,89 @@ public class MemberServiceImpl implements MemberService {
 		Map<String, String> changeRequest = Map.of("memberId", username, "newPassword", newPassword);
 		
 		membermapper.changePassword(changeRequest);
-		
 	}
 
 	@Override
 	public void memberLogout(LocalDTO local) {
-
 		tokenMapper.memberLogout(local.getMemberDto().getMemberId());
-		
-
 	}
 
 	@Override
 	public MemberInfoDTO findAllInfo(String memberId) {
-	    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-	    CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
+		String userMemberId = user.getUsername();
+		
+		log.info("userMemberId : {}", userMemberId);
+		log.info("memberId : {}", memberId);
 
-	    if (!memberId.equals(user.getUsername())) {
-	        throw new CustomAuthenticationException("사용자 정보가 일치하지 않습니다.");
-	    }
+		if (!memberId.equals(userMemberId)) {
+			throw new CustomAuthenticationException("사용자 정보가 일치하지 않습니다.");
+		}
 
-	    List<MemberInfoDTO> rows = membermapper.findAllInfo(memberId);
+		List<MemberInfoDTO> rows = membermapper.findAllInfo(memberId);
 
-	    if (rows == null || rows.isEmpty()) {
-	        throw new CustomAuthenticationException("회원 정보를 찾을 수 없습니다.");
-	    }
+		if (rows == null || rows.isEmpty()) {
+			throw new CustomAuthenticationException("회원 정보를 찾을 수 없습니다.");
+		}
 
-	
-	    MemberInfoDTO result = rows.get(0);
+		MemberInfoDTO result = rows.get(0);
 
-	   
-	    List<GenreDTO> genres =
-	    	    rows.stream()
-	    	        .flatMap(r -> {
-	    	            List<GenreDTO> g = r.getGenreDto();
-	    	            return g == null ? Stream.empty() : g.stream();
-	    	        })
-	    	        .filter(genre -> genre.getGenreId() != null)
-	    	        .toList();
+		List<GenreDTO> genres = rows.stream()
+				.flatMap(r -> {
+					List<GenreDTO> g = r.getGenreDto();
+					return g == null ? Stream.empty() : g.stream();
+				})
+				.filter(genre -> genre.getGenreId() != null)
+				.toList();
 
-	    	result.setGenreDto(genres.isEmpty() ? null : genres);
-			return result;
-
+		result.setGenreDto(genres.isEmpty() ? null : genres);
+		
+		return result;
 	}
-
-
 
 	@Transactional
 	@Override
 	public List<MemberInfoDTO> changeInfo(MemberUpdateRequest request) {
-	    membermapper.changeInfo(request);
-	    
-	    if (request.getGenres() != null) {
-	        membermapper.deleteMemberGenres(request.getMemberId());
-	        
-	        if (!request.getGenres().isEmpty()) {
-	            membermapper.insertMemberGenres(
-	                request.getMemberId(),
-	                request.getGenres()
-	            );
-	        }
-	    }
-	    
-	    return membermapper.findAllInfo(request.getMemberId());
+		membermapper.changeInfo(request);
+		
+		if (request.getGenres() != null) {
+			membermapper.deleteMemberGenres(request.getMemberId());
+			
+			if (!request.getGenres().isEmpty()) {
+				membermapper.insertMemberGenres(
+					request.getMemberId(),
+					request.getGenres()
+				);
+			}
+		}
+		
+		return membermapper.findAllInfo(request.getMemberId());
 	}
-
 
 	@Override
 	public void withdrawMember(LocalDTO local) {
-	    String memberId = local.getMemberDto().getMemberId();
+		String memberId = local.getMemberDto().getMemberId();
 
-	    Map<String, String> userInfo =
-	        membermapper.findByMemberId(memberId);
+		Map<String, String> userInfo = membermapper.findByMemberId(memberId);
 
-	    if (userInfo == null) {
-	        throw new CustomAuthenticationException("회원 정보를 찾을 수 없습니다.");
-	    }
+		if (userInfo == null) {
+			throw new CustomAuthenticationException("회원 정보를 찾을 수 없습니다.");
+		}
 
-	    String userPassword = userInfo.get("PASSWORD");
+		String userPassword = userInfo.get("PASSWORD");
 
-	    if (userPassword == null) {
-	        throw new CustomAuthenticationException("비밀번호 기반 회원이 아닙니다.");
-	    }
+		if (userPassword == null) {
+			throw new CustomAuthenticationException("비밀번호 기반 회원이 아닙니다.");
+		}
 
-	    if (!passwordEncoder.matches(local.getPassword(), userPassword)) {
-	        throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
-	    }
+		if (!passwordEncoder.matches(local.getPassword(), userPassword)) {
+			throw new CustomAuthenticationException("비밀번호가 일치하지 않습니다.");
+		}
 
-	    membermapper.withdrawMember(memberId);
-	    tokenMapper.memberLogout(memberId);
+		membermapper.withdrawMember(memberId);
+		tokenMapper.memberLogout(memberId);
 	}
-
 
 	@Override
 	public void withdrawSocial(MemberVO member) {
@@ -201,12 +192,10 @@ public class MemberServiceImpl implements MemberService {
 
 		membermapper.withdrawSocial(memberId);
 		tokenMapper.memberLogout(memberId);
-
 	}
+	
 	@Override
 	public List<GenreDTO> findAllGenres() {
-	    return membermapper.findAllGenres();
+		return membermapper.findAllGenres();
 	}
-
-
 }

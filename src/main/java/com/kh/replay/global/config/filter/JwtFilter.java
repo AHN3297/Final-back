@@ -36,24 +36,31 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
 
-        // ===== 인증 이전 API =====
+        // 인증 이전 API
         if (uri.equals("/api/members/login")) return true;
-        if (uri.equals("/api/members/signup")) return true;
+        if (uri.equals("/api/auth/login")) return true;
+        if (uri.equals("/members/login")) return true;
+        if (uri.equals("/login")) return true;
+        if (uri.equals("/api/members/signup") || uri.startsWith("/api/members/signup")) return true;
 
         // OAuth2
         if (uri.startsWith("/oauth2/")) return true;
         if (uri.startsWith("/login/oauth2/")) return true;
+        if (uri.equals("/oauth-callback")) return true;
+
+        // WebSocket
+        if (uri.startsWith("/ws-chat")) return true;
 
         // 정적 리소스
         if (uri.equals("/favicon.ico")) return true;
         if (uri.equals("/error")) return true;
-        if (uri.startsWith("/css/")
-            || uri.startsWith("/js/")
-            || uri.startsWith("/images/")) return true;
+        if (uri.startsWith("/css/") || uri.startsWith("/js/") || uri.startsWith("/images/")) return true;
+
+        // 테스트 경로
+        if (uri.startsWith("/test/")) return true;
 
         return false;
     }
-
 
     @Override
     protected void doFilterInternal(
@@ -70,7 +77,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 uri.contains("/likes") ||
                 uri.contains("/bookmarks");
 
-        // 🔥 인증이 필요한 API인데 토큰이 없으면 즉시 차단
+        // 인증이 필요한 API인데 토큰이 없으면 즉시 차단
         if (requiresAuth && (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer "))) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;

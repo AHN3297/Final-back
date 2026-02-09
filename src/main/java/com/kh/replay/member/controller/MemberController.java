@@ -1,6 +1,5 @@
 package com.kh.replay.member.controller;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -32,72 +31,60 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class MemberController {
+	
 	private final MemberService memberService;
 	
 	@PostMapping("/login")
-	public ResponseEntity<ResponseData<Map<String,String>>> memberlogin(@RequestBody LocalDTO local) {
-		Map<String,String> loginResponse = memberService.memberLogin(local);
+	public ResponseEntity<ResponseData<Map<String, String>>> memberlogin(@RequestBody LocalDTO local) {
+		Map<String, String> loginResponse = memberService.memberLogin(local);
 		log.info("{}", local);
-		
 		
 		return ResponseData.ok(loginResponse, "로그인에 성공하셨습니다.");
 	}
-
-	@PostMapping("/logout")
-	public ResponseEntity<ResponseData<String>> memberlogout(@Valid @RequestBody LocalDTO local ) {
-		
-		memberService.memberLogout(local);
 	
-		
-		
+	@PostMapping("/logout")
+	public ResponseEntity<ResponseData<String>> memberlogout(@Valid @RequestBody LocalDTO local) {
+		memberService.memberLogout(local);
 		
 		return ResponseData.ok(null, "로그아웃 되었습니다.");
 	}
 	
-	
 	@PutMapping
-	public ResponseEntity<ResponseData<ChangePasswordDTO>> changePassword(@RequestBody ChangePasswordDTO password){
-		log.info(" ChangePasswordDTO : {} " , password);
+	public ResponseEntity<ResponseData<ChangePasswordDTO>> changePassword(@RequestBody ChangePasswordDTO password) {
+		log.info("ChangePasswordDTO : {}", password);
 		memberService.changePassword(password);
-		log.info("{}",password);
+		log.info("{}", password);
 		
 		return ResponseData.created(password, "비밀번호가 변경되었습니다.");
 	}
 	
 	@GetMapping
 	public ResponseEntity<ResponseData<MemberInfoDTO>> findAllInfo(
-	        @RequestParam(name="memberId") String memberId) {
-
-	    MemberInfoDTO memberInfo = memberService.findAllInfo(memberId);
-	    return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
+			@RequestParam(name = "memberId") String memberId) {
+		log.info("회원아이디 조회{}", memberId);
+		MemberInfoDTO memberInfo = memberService.findAllInfo(memberId);
+		
+		return ResponseData.ok(memberInfo, "조회에 성공하셨습니다.");
 	}
+	
 	@PatchMapping
-	public ResponseEntity<ResponseData<List<MemberInfoDTO>>> changeInfo(@RequestBody MemberUpdateRequest request
-																		){
-		List<MemberInfoDTO> result =memberService.changeInfo(request);
+	public ResponseEntity<ResponseData<List<MemberInfoDTO>>> changeInfo(@RequestBody MemberUpdateRequest request) {
+		List<MemberInfoDTO> result = memberService.changeInfo(request);
 		
-		return ResponseData.ok(result,"회원정보 수정에 성공하셨습니다.");
-		
+		return ResponseData.ok(result, "회원정보 수정에 성공하셨습니다.");
 	}
+	
 	@DeleteMapping
-	public ResponseEntity<ResponseData<String>> withdrawMember(@RequestBody LocalDTO local)
-	{
+	public ResponseEntity<ResponseData<String>> withdrawMember(@RequestBody LocalDTO local) {
 		log.info("🔥 withdraw request: {}", local);
-
 		memberService.withdrawMember(local);
 		
-		
-				return ResponseData.ok(null, "삭제에 성공하셨습니다.");
-		
+		return ResponseData.ok(null, "삭제에 성공하셨습니다.");
 	}
+	
 	@GetMapping("/genres")
 	public ResponseEntity<ResponseData<List<GenreDTO>>> findAllGenres() {
-	    List<GenreDTO> genres = memberService.findAllGenres();
-	    return ResponseData.ok(genres, "장르 전체 조회 성공");
+		List<GenreDTO> genres = memberService.findAllGenres();
+		return ResponseData.ok(genres, "장르 전체 조회 성공");
 	}
-
 }
-
-	
-
-

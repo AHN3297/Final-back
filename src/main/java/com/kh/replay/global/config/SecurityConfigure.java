@@ -72,7 +72,7 @@ public class SecurityConfigure {
     @Order(2)
     public SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
         return http
-            .securityMatcher("/api/**")
+            .securityMatcher("/api/**", "/ws-chat/**")
             .formLogin(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
@@ -83,29 +83,38 @@ public class SecurityConfigure {
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(requests -> {
 
+                // === WebSocket ===
+                requests.requestMatchers("/ws-chat/**").permitAll();
+
                 // === 공개 API ===
                 requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp").permitAll();
                 requests.requestMatchers(HttpMethod.POST, "/api/members/login").permitAll();
                 requests.requestMatchers("/api/universes/**").permitAll();
                 requests.requestMatchers("/api/search").permitAll();
+                requests.requestMatchers("/api/oauth-callback").permitAll();
                 requests.requestMatchers(HttpMethod.GET, "/api/shortforms/**").permitAll();
                 requests.requestMatchers(HttpMethod.GET, "/api/music/**").permitAll();
                 requests.requestMatchers(HttpMethod.GET, "/api/artist/**").permitAll();
+                requests.requestMatchers(HttpMethod.GET, "/api/news").permitAll();
 
                 // === 관리자 ===
                 requests.requestMatchers("/api/auth/admin/**").hasRole("ADMIN");
 
                 // === 인증 필요 ===
+                // 회원 관련
                 requests.requestMatchers(HttpMethod.GET, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 
+                // OAuth 및 즐겨찾기
                 requests.requestMatchers("/api/oauth/**").authenticated();
+                requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").authenticated();
                 requests.requestMatchers("/api/favorite/**").authenticated();
                 requests.requestMatchers("/api/member/playList/**").authenticated();
 
+                // 숏폼 작성/수정/삭제
                 requests.requestMatchers(HttpMethod.POST, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.PUT, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.PATCH, "/api/shortforms/**").authenticated();

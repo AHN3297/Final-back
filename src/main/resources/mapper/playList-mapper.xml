@@ -29,7 +29,7 @@
 	         , UPDATED_AT
 	           ) 
 	    VALUES (
-	         , #{playListId}
+	           #{playListId}
 	         , #{playListName}
 	         , #{memberId}
 	         , SYSDATE
@@ -39,18 +39,23 @@
 	
 	<select id="findAllMemberPlayLists" resultType="com.kh.replay.playList.model.dto.PlayListDTO">
 	    SELECT 
-	          PLAYLIST_ID as playListId
-	         , PLAYLIST_NAME as playListName
-	         , MEMBER_ID as memberId
-	         , CREATED_AT as createdAt
-	         , UPDATED_AT as updatedAt 
+	           P.PLAYLIST_ID as playListId
+	         , P.PLAYLIST_NAME as playListName
+	         , P.MEMBER_ID as memberId
+	         , CASE WHEN M.PLAYLIST_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS isMain
+	         , P.CREATED_AT as createdAt
+	         , P.UPDATED_AT as updatedAt 
 	      FROM 
-	           TB_PLAYLIST
+	           TB_PLAYLIST P
+	      LEFT JOIN 
+	           TB_MAIN_PLAYLIST M ON P.PLAYLIST_ID = M.PLAYLIST_ID 
+	                             AND P.MEMBER_ID = M.MEMBER_ID
 	     WHERE 
-	           MEMBER_ID = #{memberId}
+	           P.MEMBER_ID = #{memberId}
 	     ORDER 
 	        BY 
-	           CREATED_AT DESC
+	           isMain DESC,
+	           P.CREATED_AT DESC
 	</select>
 	
 	<delete id="deleteMainPlayList">
@@ -169,7 +174,8 @@
 	
 	<select id="selectPlaylistTracks" resultType="com.kh.replay.playList.model.vo.PlayListTrackVO">
 	    SELECT 
-	           T.SONG_NO
+	    	   L.PLAYLIST_SONG_NO AS playlistSongNo
+	         , T.SONG_NO
 	         , T.TRACK_ID
 	         , T.ARTIST_ID
 	         , T.TITLE
@@ -199,13 +205,13 @@
 	    UPDATE 
 	           TB_PLAYLIST_SONG_LIST
 	       SET 
-	           TRACK_ORDER = #{item.trackOrder},
+	           TRACK_ORDER = #{trackOrder},
 	           UPDATE_AT = SYSDATE
 	     WHERE 
-	           PLAYLIST_SONG_NO = #{item.playlistSongNo}
+	           PLAYLIST_SONG_NO = #{playlistSongNo}
 	</update>
 	
-		<delete id="deletePlaylistTracks">
+	<delete id="deletePlaylistTracks">
 	    DELETE 
 	      FROM 
 	           TB_PLAYLIST_SONG_LIST
@@ -213,6 +219,6 @@
 	           PLAYLIST_ID = #{playListId}
 	       AND 
 	           SONG_ID = #{songId}
-		</delete>
+	</delete>
 	
 </mapper>

@@ -35,8 +35,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfigure {
 
-    @Value("${instance.url}")
-    private String instance;
+    @Value("${front.base-url}")
+    private String frontBaseUrl;
 
     private final JwtFilter jwtFilter;
     private final OAuth2LoginSuccessHandler oAuth2SuccessHandler;
@@ -134,7 +134,7 @@ public class SecurityConfigure {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(instance));
+        configuration.setAllowedOrigins(List.of(frontBaseUrl, "http://localhost:5173"));
         configuration.setAllowedMethods(
             Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
         );

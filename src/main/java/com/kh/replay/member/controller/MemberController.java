@@ -37,7 +37,6 @@ public class MemberController {
 	@PostMapping("/login")
 	public ResponseEntity<ResponseData<Map<String, String>>> memberlogin(@RequestBody LocalDTO local) {
 		Map<String, String> loginResponse = memberService.memberLogin(local);
-		log.info("{}", local);
 		
 		return ResponseData.ok(loginResponse, "로그인에 성공하셨습니다.");
 	}
@@ -51,9 +50,7 @@ public class MemberController {
 	
 	@PutMapping
 	public ResponseEntity<ResponseData<ChangePasswordDTO>> changePassword(@RequestBody ChangePasswordDTO password) {
-		log.info("ChangePasswordDTO : {}", password);
 		memberService.changePassword(password);
-		log.info("{}", password);
 		
 		return ResponseData.created(password, "비밀번호가 변경되었습니다.");
 	}
@@ -76,7 +73,6 @@ public class MemberController {
 	
 	@DeleteMapping
 	public ResponseEntity<ResponseData<String>> withdrawMember(@RequestBody LocalDTO local) {
-		log.info("🔥 withdraw request: {}", local);
 		memberService.withdrawMember(local);
 		
 		return ResponseData.ok(null, "삭제에 성공하셨습니다.");

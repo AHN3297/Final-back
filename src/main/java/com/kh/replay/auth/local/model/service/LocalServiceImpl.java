@@ -36,7 +36,7 @@ public class LocalServiceImpl implements LocalService {
 				.email(local.getMemberDto().getEmail()).name(local.getMemberDto().getName())
 				.nickName(local.getMemberDto().getNickName()).gender(local.getMemberDto().getGender())
 				.mbti(local.getMemberDto().getMbti()).phone(local.getMemberDto().getPhone())
-				.role(local.getMemberDto().getRole() != null ? local.getMemberDto().getRole() : "ROEL_USER")
+				.role(local.getMemberDto().getRole() != null ? local.getMemberDto().getRole() : "ROLE_USER")
 				.job(local.getMemberDto().getJob()).build();
 
 		// 회원 공통 정보 insert

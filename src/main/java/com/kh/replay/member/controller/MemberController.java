@@ -76,7 +76,6 @@ public class MemberController {
 	
 	@DeleteMapping
 	public ResponseEntity<ResponseData<String>> withdrawMember(@RequestBody LocalDTO local) {
-		log.info("🔥 withdraw request: {}", local);
 		memberService.withdrawMember(local);
 		
 		return ResponseData.ok(null, "삭제에 성공하셨습니다.");
@@ -87,4 +86,12 @@ public class MemberController {
 		List<GenreDTO> genres = memberService.findAllGenres();
 		return ResponseData.ok(genres, "장르 전체 조회 성공");
 	}
+	@PostMapping("/complete")
+	public ResponseEntity<ResponseData<Void>> completeLocalMember(
+	        @RequestBody MemberUpdateRequest request
+	) {
+	    memberService.completeLocalMember(request);
+	    return ResponseData.ok(null, "회원가입 추가 정보 입력 완료");
+	}
+
 }

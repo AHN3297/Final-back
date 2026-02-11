@@ -26,6 +26,7 @@ public interface MemberService {
 	void withdrawSocial(MemberVO member);
 	MemberInfoDTO findAllInfo(String memberId);
 	List<GenreDTO> findAllGenres();
+	void completeLocalMember(MemberUpdateRequest request);
 
 
 	

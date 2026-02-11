@@ -62,4 +62,6 @@ public interface MemberMapper {
 	Map<String, String> findUserByMemberId(String memberId);
 	
 	List<GenreDTO> findAllGenres();
+
+	int updateComplete(MemberUpdateRequest request);
 }

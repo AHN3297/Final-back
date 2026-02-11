@@ -1,0 +1,33 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="com.kh.replay.chat.model.dao.ChatMapper">
+
+    <insert id="insertChat" parameterType="com.kh.replay.chat.model.vo.ChatVO">
+        INSERT INTO CHAT_MESSAGE (
+            CHAT_NO, MEMBER_ID, CHAT_CONTENT, CREATE_DATE
+        ) VALUES (
+            SEQ_CHAT_NO.NEXTVAL, #{memberId}, #{chatContent}, SYSDATE
+        )
+    </insert>
+
+    <select id="selectRecentChats" resultType="com.kh.replay.chat.model.vo.ChatVO">
+        SELECT 
+            c.CHAT_NO,
+            c.MEMBER_ID, 
+            c.CHAT_CONTENT, 
+            c.CREATE_DATE, 
+            m.MEMBER_NICKNAME as nickname
+        FROM CHAT_MESSAGE c
+        JOIN TB_MEMBER m ON c.MEMBER_ID = m.MEMBER_ID
+        WHERE c.CREATE_DATE >= SYSDATE - 3
+        ORDER BY c.CREATE_DATE ASC
+    </select>
+
+    <delete id="deleteOldChats">
+        <![CDATA[
+        DELETE FROM CHAT_MESSAGE WHERE CREATE_DATE < SYSDATE - 3
+        ]]>
+    </delete>
+
+</mapper>

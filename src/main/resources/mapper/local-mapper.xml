@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.replay.auth.local.model.dao.LocalMapper">
+	<insert id="insertMember"
+		parameterType="com.kh.replay.member.model.vo.MemberVO">
+		INSERT INTO TB_MEMBER
+		(MEMBER_ID,
+		MBTI,
+		MEMBER_JOB,
+		GENDER,
+		MEMBER_NAME,
+		NICKNAME,
+		PHONE,
+		EMAIL,
+		ROLE
+		)
+		VALUES(
+		#{memberId},
+		#{mbti},
+		#{job},
+		#{gender},
+		#{name},
+		#{nickName},
+		#{phone},
+		#{email},
+		#{role}
+		)
+	</insert>
+	<insert id="signUp"
+		parameterType="com.kh.replay.auth.local.model.dto.LocalDTO">
+		INSERT INTO TB_LOCAL
+		(MEMBER_ID,PASSWORD)
+		VALUES
+		(#{memberDto.memberId},#{password})
+	</insert>
+	
+	
+</mapper>

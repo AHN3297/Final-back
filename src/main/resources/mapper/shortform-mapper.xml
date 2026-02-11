@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.shortform.model.dao.ShortformMapper">
+
+    <resultMap id="shortformResultMap" type="com.kh.replay.shortform.model.dto.ShortformDTO">
+        <id     property="shortFormId"    column="SHORT_FORM_ID"/>
+        <result property="shortFormTitle" column="SHORT_FORM_TITLE"/>
+        <result property="videoUrl"       column="VIDEO_URL"/>
+        <result property="thumbnailUrl"   column="THUMBNAIL_URL"/>
+        <result property="caption"        column="CAPTION"/>
+        <result property="duration"       column="DURATION"/>
+        <result property="memberId"       column="MEMBER_ID"/>
+        <result property="nickName"       column="NICKNAME"/>
+        <result property="status"         column="STATUS"/>
+        <result property="like"           column="LIKE_COUNT"/>
+        <result property="createdAt"      column="CREATED_AT"/>
+    </resultMap>
+
+    <sql id="commonColumns">
+          S.SHORT_FORM_ID
+        , S.SHORT_FORM_TITLE
+        , S.VIDEO_URL
+        , S.THUMBNAIL_URL
+        , S.CAPTION
+        , S.DURATION
+        , S.MEMBER_ID
+        , M.NICKNAME
+        , (SELECT COUNT(1) FROM TB_FAV_SHORT_FORM F WHERE F.SHORTS_ID = S.SHORT_FORM_ID) AS LIKE_COUNT
+        , S.CREATED_AT
+    </sql>
+
+    <sql id="cursorAndSort">
+        <choose>
+            <when test="sort == 'latest'">
+                <if test="lastShortFormId != null">
+                   AND S.SHORT_FORM_ID &lt; #{lastShortFormId}
+                </if>
+            </when>
+            
+            <when test="sort == 'popular'">
+                <if test="lastLikeCount != null and lastShortFormId != null">
+                   AND (
+                           (SELECT COUNT(1) FROM TB_FAV_SHORT_FORM F WHERE F.SHORTS_ID = S.SHORT_FORM_ID) &lt; #{lastLikeCount}
+                        OR (
+                               (SELECT COUNT(1) FROM TB_FAV_SHORT_FORM F WHERE F.SHORTS_ID = S.SHORT_FORM_ID) = #{lastLikeCount}
+                           AND S.SHORT_FORM_ID &lt; #{lastShortFormId}
+                           )
+                       )
+                </if>
+            </when>
+        </choose>
+        
+        ORDER BY
+        <choose>
+            <when test="sort == 'popular'">
+                  LIKE_COUNT DESC
+                , S.SHORT_FORM_ID DESC
+            </when>
+            <otherwise>
+                  S.SHORT_FORM_ID DESC
+            </otherwise>
+        </choose>
+        
+        FETCH NEXT #{limit} ROWS ONLY
+    </sql>
+
+    <select id="findAllShortform" parameterType="map" resultMap="shortformResultMap">
+        SELECT
+            <include refid="commonColumns"/>
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER     M ON S.MEMBER_ID = M.MEMBER_ID
+         WHERE S.STATUS = 'Y'
+         <include refid="cursorAndSort"/>
+    </select>
+
+    <select id="findByKeyword" parameterType="map" resultMap="shortformResultMap">
+        SELECT
+            <include refid="commonColumns"/>
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER     M ON S.MEMBER_ID = M.MEMBER_ID
+         WHERE S.STATUS = 'Y'
+        
+        <if test='keyword != null and keyword != ""'>
+           AND
+            <choose>
+                <when test='condition == "title"'>
+                    S.SHORT_FORM_TITLE LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test='condition == "nickname"'>
+                    M.NICKNAME LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test='condition == "caption"'>
+                    S.CAPTION LIKE '%' || #{keyword} || '%'
+                </when>
+                <when test='condition == "all"'>
+                    (   S.SHORT_FORM_TITLE LIKE '%' || #{keyword} || '%' 
+                     OR M.NICKNAME         LIKE '%' || #{keyword} || '%'
+                     OR S.CAPTION          LIKE '%' || #{keyword} || '%'
+                    )
+                </when>
+            </choose>
+        </if>
+
+        <include refid="cursorAndSort"/>
+    </select>
+
+    <select id="findByShortFormId" parameterType="long" resultMap="shortformResultMap">
+        SELECT
+              S.SHORT_FORM_ID
+            , S.SHORT_FORM_TITLE
+            , S.VIDEO_URL
+            , S.THUMBNAIL_URL
+            , S.CAPTION
+            , S.DURATION
+            , S.MEMBER_ID
+            , M.NICKNAME
+            , S.STATUS
+            , (SELECT COUNT(1) FROM TB_FAV_SHORT_FORM F WHERE F.SHORTS_ID = S.SHORT_FORM_ID) AS LIKE_COUNT
+            , S.CREATED_AT
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER     M ON S.MEMBER_ID = M.MEMBER_ID
+         WHERE S.SHORT_FORM_ID = #{shortFormId}
+    </select>
+
+    <insert id="insertShortform" parameterType="com.kh.replay.shortform.model.dto.ShortformDTO">
+        <selectKey keyProperty="shortFormId" resultType="long" order="BEFORE">
+            SELECT SEQ_SHORT_FORM_ID.NEXTVAL FROM DUAL
+        </selectKey>
+
+        INSERT INTO TB_SHORT_FORM (
+              SHORT_FORM_ID
+            , SHORT_FORM_TITLE
+            , VIDEO_URL
+            , THUMBNAIL_URL
+            , CAPTION
+            , DURATION
+            , MEMBER_ID
+            , STATUS
+            , CREATED_AT
+            , UPDATED_AT
+        ) VALUES (
+              #{shortFormId}
+            , #{shortFormTitle}
+            , #{videoUrl}
+            , #{thumbnailUrl}
+            , #{caption}
+            , #{duration}
+            , #{memberId}
+            , 'Y'
+            , SYSDATE
+            , SYSDATE
+        )
+    </insert>
+
+    <update id="updateShortform" parameterType="com.kh.replay.shortform.model.dto.ShortformDTO">
+        UPDATE TB_SHORT_FORM
+           <set>
+               <if test="shortFormTitle != null"> SHORT_FORM_TITLE = #{shortFormTitle}, </if>
+               <if test="caption        != null"> CAPTION          = #{caption},        </if>
+               <if test="status         != null"> STATUS           = #{status},         </if>
+               UPDATED_AT = SYSDATE
+           </set>
+         WHERE SHORT_FORM_ID = #{shortFormId}
+    </update>
+
+    <update id="deleteShortform" parameterType="long">
+        UPDATE TB_SHORT_FORM
+           SET STATUS     = 'N'
+             , UPDATED_AT = SYSDATE
+         WHERE SHORT_FORM_ID = #{shortFormId}
+    </update>
+
+    <select id="findLikedShortforms" parameterType="map" resultMap="shortformResultMap">
+        SELECT
+            <include refid="commonColumns"/>
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER M ON S.MEMBER_ID = M.MEMBER_ID
+          JOIN TB_FAV_SHORT_FORM L ON S.SHORT_FORM_ID = L.SHORTS_ID
+         WHERE L.MEMBER_ID = #{memberId}
+           AND S.STATUS = 'Y'
+         <if test="lastShortFormId != null">
+           AND L.LIKE_ID &lt; (
+               SELECT LIKE_ID FROM TB_FAV_SHORT_FORM
+                WHERE SHORTS_ID = #{lastShortFormId} AND MEMBER_ID = #{memberId}
+           )
+         </if>
+         ORDER BY L.LIKE_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="findMyShortforms" parameterType="map" resultMap="shortformResultMap">
+        SELECT
+            <include refid="commonColumns"/>
+          FROM TB_SHORT_FORM S
+          JOIN TB_MEMBER M ON S.MEMBER_ID = M.MEMBER_ID
+         WHERE S.MEMBER_ID = #{memberId}
+           AND S.STATUS = 'Y'
+         <if test="lastShortFormId != null">
+           AND S.SHORT_FORM_ID &lt; #{lastShortFormId}
+         </if>
+         ORDER BY S.SHORT_FORM_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+</mapper>

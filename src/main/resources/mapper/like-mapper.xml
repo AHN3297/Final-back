@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.global.like.model.dao.LikeMapper">
+
+    <!-- ===================== 유니버스 좋아요 ===================== -->
+    <select id="checkLike" resultType="int" parameterType="map">
+        SELECT 
+		       COUNT(1) 
+          FROM 
+		       TB_UNIVERSE_LIKED 
+         WHERE 
+		       UNIVERSE_ID = #{universeId} 
+           AND 
+		       MEMBER_ID = #{memberId}
+    </select>
+    
+    <insert id="insertLike" parameterType="map">
+        INSERT 
+		  INTO 
+		       TB_UNIVERSE_LIKED (UNIVERSE_ID, MEMBER_ID) 
+        VALUES 
+		       (#{universeId}, #{memberId})
+    </insert>
+    
+    <delete id="deleteLike" parameterType="map">
+        DELETE 
+		  FROM 
+		       TB_UNIVERSE_LIKED 
+         WHERE 
+		       UNIVERSE_ID = #{universeId} 
+           AND 
+		       MEMBER_ID = #{memberId}
+    </delete>
+    
+    <select id="countUniverseLikes" resultType="int">
+        SELECT 
+		       COUNT(1) 
+          FROM 
+		       TB_UNIVERSE_LIKED 
+         WHERE 
+		       UNIVERSE_ID = #{universeId}
+    </select>
+    
+    <select id="findSingerNoByApiId" resultType="Integer">
+        SELECT 
+               SINGER_NO 
+          FROM 
+               TB_API_SINGER 
+         WHERE 
+               API_SINGER_ID = #{apiSingerId}
+    </select>
+
+    <insert id="insertArtistApiInfo" useGeneratedKeys="true" keyProperty="singerNo" keyColumn="SINGER_NO">
+        INSERT 
+          INTO 
+               TB_API_SINGER 
+               (
+               SINGER_NO
+             , API_SINGER_NAME
+             , SINGER_GENRE
+             , SINGER_IMG_URL
+             , API_SINGER_ID
+               )
+        VALUES (
+               SEQ_SINGER_NO.NEXTVAL
+             , #{apiSingerName}
+             , #{singerGenre}
+             , #{singerImgUrl}
+             , #{apiSingerId}
+               )
+    </insert>
+
+    <select id="checkArtistLikeExists" resultType="_int">
+        SELECT 
+               COUNT(*) 
+          FROM 
+               TB_FAV_SINGER 
+         WHERE 
+               MEMBER_ID = #{memberId} 
+           AND 
+               SINGER_NO = #{singerNo}
+    </select>
+
+    <insert id="insertFavoriteArtist">
+        INSERT 
+          INTO 
+               TB_FAV_SINGER 
+               (
+               FAVORITE_SINGER_NO
+             , MEMBER_ID
+             , SINGER_NO
+               )
+        VALUES 
+               (
+               SEQ_FAVORITE_SINGER_NO.NEXTVAL
+             , #{memberId}
+             , #{singerNo}
+               )
+    </insert>
+
+    <delete id="deleteArtistLike">
+        DELETE 
+          FROM 
+               TB_FAV_SINGER
+         WHERE 
+               MEMBER_ID = #{memberId} 
+           AND 
+               SINGER_NO = #{singerNo}
+    </delete>
+    
+    <select id="selectFavoriteArtists" resultType="com.kh.replay.global.like.model.vo.LikeArtistVO">
+	    SELECT 
+	           A.SINGER_NO
+	         , A.API_SINGER_ID
+	         , A.API_SINGER_NAME
+	         , A.SINGER_GENRE
+	         , A.SINGER_IMG_URL
+	      FROM
+	           TB_FAV_SINGER F
+	      JOIN 
+	           TB_API_SINGER A 
+	        ON 
+	           F.SINGER_NO = A.SINGER_NO
+	     WHERE 
+	           F.MEMBER_ID = #{memberId}
+	     ORDER 
+	        BY 
+	           F.FAVORITE_SINGER_NO 
+	      DESC 
+	</select>
+	
+	<insert id="insertApiSong" useGeneratedKeys="true" keyProperty="songNo" keyColumn="SONG_NO">
+	    <selectKey keyProperty="songNo" resultType="long" order="BEFORE">
+	        SELECT 
+	               SEQ_SONG_NO.NEXTVAL 
+	          FROM 
+	               DUAL
+	    </selectKey>
+	    INSERT 
+	      INTO 
+	           TB_API_SONG 
+	           (
+	           SONG_NO
+	         , TRACK_ID
+	         , ARTIST_ID
+	         , TITLE
+	         , ARTIST_NAME
+	         , ALBUM
+	         , GENRE_NAME
+	         , DURATION
+	         , RELEASE_DATE
+	         , COVERIMG_URL
+	         , PREVIEW_URL
+	           ) 
+	    VALUES (
+	           #{songNo}
+	         , #{trackId}
+	         , #{artistId}
+	         , #{title}
+	         , #{artistName}
+	         , #{album}
+	         , #{genreName}
+	         , #{duration}
+	         , #{releaseDate}
+	         , #{coverImgUrl}
+	         , #{previewUrl}
+	    )
+	</insert>
+	
+	<select id="selectSongNoByApiId" resultType="java.lang.Long">
+	    SELECT 
+	           SONG_NO 
+	      FROM 
+	           TB_API_SONG 
+	     WHERE 
+	           TRACK_ID = #{trackId}
+	</select>
+	
+	<select id="checkSongLikeExists" resultType="_int">
+	    SELECT 
+	           COUNT(*)
+	      FROM 
+	           TB_FAVORITE_SONG
+	     WHERE 
+	           MEMBER_ID = #{memberId}
+	       AND 
+	           SONG_NO = #{songNo}
+	</select>
+		
+	<insert id="insertFavoriteSong">
+	    INSERT 
+	      INTO 
+	           TB_FAVORITE_SONG 
+	           (
+	           FAVORITE_SONG_NO
+	           , MEMBER_ID
+	           , SONG_NO
+	           , TRACK_ORDER
+	           ) 
+	           VALUES 
+	           (
+	        	 SEQ_FAVORITE_SONG_NO.NEXTVAL
+	           , #{memberId}
+	           , #{songNo}
+	           , (
+	             SELECT 
+	                    NVL(MAX(TRACK_ORDER), 0) + 1 
+	               FROM 
+	                    TB_FAVORITE_SONG 
+	              WHERE 
+	                    MEMBER_ID = #{memberId}
+	             )
+	          )
+	</insert>
+	
+	<select id="selectFavoriteTracks" resultType="LikeTrackVO">
+	    SELECT 
+	           A.SONG_NO
+	         , A.TRACK_ID
+	         , A.ARTIST_ID
+	         , A.TITLE
+	         , A.ARTIST_NAME
+	         , A.ALBUM
+	         , A.GENRE_NAME
+	         , A.DURATION
+	         , A.RELEASE_DATE
+	         , A.COVERIMG_URL
+	         , A.PREVIEW_URL
+	         , F.TRACK_ORDER
+	      FROM 
+	           TB_FAVORITE_SONG F
+	      JOIN 
+	           TB_API_SONG A 
+	        ON 
+	           F.SONG_NO = A.SONG_NO
+	     WHERE 
+	           F.MEMBER_ID = #{memberId}
+	     ORDER 
+	        BY 
+	           F.TRACK_ORDER ASC
+	</select>
+	
+	<delete id="deleteFavoriteSong">
+	    DELETE 
+	      FROM 
+	           TB_FAVORITE_SONG 
+	     WHERE 
+	           MEMBER_ID = #{memberId} 
+	       AND 
+	           SONG_NO = #{songNo}
+	</delete>
+	
+	<update id="updateTrackOrder">
+	    UPDATE 
+	           TB_FAVORITE_SONG 
+	       SET 
+	           TRACK_ORDER = #{newOrder}
+	     WHERE 
+	           MEMBER_ID = #{memberId} 
+	       AND 
+	           SONG_NO = #{songNo}
+	</update>
+	
+    
+    <select id="findGenreIdByName"
+    		resultType="long">
+    	SELECT
+    	       GENRE_ID
+    	  FROM
+    	       TB_GENRE
+    	 WHERE
+    	       GENRE_NAME = #{genreName}		
+    </select>
+    
+    <select id="existsMemberGenre"
+    		resultType="int">
+    	SELECT
+    	       COUNT(*)
+    	  FROM
+    	       TB_MEMBER_GENRE
+    	 WHERE
+    	       MEMBER_ID = #{memberId}
+    	   AND
+    	       GENRE_ID = #{genreId}
+    </select>
+    
+    <insert id="insertMemberGenre"
+    		parameterType="com.kh.replay.global.like.model.vo.LikeGenreVO">
+    	<selectKey keyProperty="memberGenreNo" resultType="long" order="BEFORE">
+			SELECT 
+			       SEQ_MEMBER_GENRE_NO.NEXTVAL 
+			  FROM 
+			       DUAL  
+		</selectKey>
+    	INSERT
+    	  INTO
+    	       TB_MEMBER_GENRE
+    	       (
+    	       MEMBER_GENRE_NO
+    	     , MEMBER_ID
+    	     , GENRE_ID  
+    	       )
+    	VALUES
+    		   (
+    		   #{memberGenreNo}
+    		 , #{memberId}
+    		 , #{genreId}  
+    		   )
+    </insert>
+
+
+    <!-- ===================== 숏폼 좋아요 ===================== -->
+    <select id="checkShortformLike" resultType="int" parameterType="map">
+        SELECT 
+		       COUNT(1) 
+          FROM 
+		       TB_FAV_SHORT_FORM 
+         WHERE 
+		       SHORTS_ID = #{shortFormId} 
+           AND 
+		       MEMBER_ID = #{memberId}
+    </select>
+    
+    <insert id="insertShortformLike" parameterType="map">
+        INSERT 
+		  INTO 
+		       TB_FAV_SHORT_FORM (LIKE_ID, SHORTS_ID, MEMBER_ID, CREATED_AT) 
+        VALUES 
+		       (SEQ_LIKE_ID.NEXTVAL, #{shortFormId}, #{memberId}, SYSDATE)
+    </insert>
+    
+    <delete id="deleteShortformLike" parameterType="map">
+        DELETE  
+		  FROM 
+		       TB_FAV_SHORT_FORM 
+         WHERE 
+		       SHORTS_ID = #{shortFormId} 
+           AND 
+		       MEMBER_ID = #{memberId}
+    </delete>
+    
+    <select id="countShortformLikes" resultType="int">
+        SELECT 
+		       COUNT(1) 
+          FROM 
+		       TB_FAV_SHORT_FORM 
+         WHERE 
+		       SHORTS_ID = #{shortFormId}
+    </select>
+
+</mapper>

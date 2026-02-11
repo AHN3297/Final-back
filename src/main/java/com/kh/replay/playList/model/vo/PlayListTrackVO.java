@@ -1,0 +1,27 @@
+package com.kh.replay.playList.model.vo;
+
+import java.util.Date;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PlayListTrackVO {
+	private Long playlistSongNo;
+	private Long songNo;
+	private Long trackId;       // TRACK_ID 
+    private Long artistId;      // ARTIST_ID 
+    private String title;       // TITLE
+    private String artistName;  // ARTIST_NAME
+    private String album;       // ALBUM
+    private String genreName;   // GENRE_NAME
+    private String coverImgUrl; // COVERIMG_URL
+    private String previewUrl;  // PREVIEW_URL
+    private String releaseDate; // RELEASE_DATE
+    private String duration;    // DURATION
+}

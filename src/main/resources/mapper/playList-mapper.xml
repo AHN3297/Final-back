@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kh.replay.playList.model.dao.PlayListMapper">
+	
+	<select id="checkPlayListOwnership" resultType="_int">
+        SELECT 
+               COUNT(*)
+          FROM 
+               TB_PLAYLIST
+         WHERE 
+               PLAYLIST_ID = #{playListId}
+           AND 
+               MEMBER_ID = #{memberId}
+    </select>
+	
+	<insert id="createPlayList">
+	    <selectKey keyProperty="playListId" resultType="int" order="BEFORE">
+	        SELECT SEQ_PLAYLIST_ID.NEXTVAL FROM DUAL
+	    </selectKey>
+	
+	    INSERT 
+	      INTO 
+	           TB_PLAYLIST 
+	           (
+	           PLAYLIST_ID 
+	         , PLAYLIST_NAME 
+	         , MEMBER_ID 
+	         , CREATED_AT 
+	         , UPDATED_AT
+	           ) 
+	    VALUES (
+	           #{playListId}
+	         , #{playListName}
+	         , #{memberId}
+	         , SYSDATE
+	         , SYSDATE
+	           )
+	</insert>
+	
+	<select id="findAllMemberPlayLists" resultType="com.kh.replay.playList.model.dto.PlayListDTO">
+	    SELECT
+	           P.PLAYLIST_ID as playListId
+	         , P.PLAYLIST_NAME as playListName
+	         , P.MEMBER_ID as memberId
+	         , CASE WHEN M.PLAYLIST_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS isMain
+	         , P.CREATED_AT as createdAt
+	         , P.UPDATED_AT as updatedAt
+	         , (SELECT COUNT(*) FROM TB_PLAYLIST_SONG_LIST S WHERE S.PLAYLIST_ID = P.PLAYLIST_ID) as songCount
+	      FROM
+	           TB_PLAYLIST P
+	      LEFT JOIN
+	           TB_MAIN_PLAYLIST M ON P.PLAYLIST_ID = M.PLAYLIST_ID
+	                             AND P.MEMBER_ID = M.MEMBER_ID
+	     WHERE
+	           P.MEMBER_ID = #{memberId}
+	     ORDER
+	        BY
+	           isMain DESC,
+	           P.CREATED_AT DESC
+	</select>
+	
+	<delete id="deleteMainPlayList">
+		DELETE 
+		  FROM 
+		       TB_MAIN_PLAYLIST 
+    	 WHERE 
+    	       MEMBER_ID = #{memberId}
+	</delete>
+	
+	<insert id="createMainPlayList">
+		INSERT 
+		  INTO 
+		       TB_MAIN_PLAYLIST 
+		       (
+		       MEMBER_ID
+		     , PLAYLIST_ID
+		       )
+	    VALUES (
+	           #{memberId}
+	         , #{playListId}
+		       )
+	</insert>
+	
+	<update id="updatePlayListName">  
+	    UPDATE 
+	    	   TB_PLAYLIST
+	       SET 
+	           PLAYLIST_NAME = #{playListName}
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           MEMBER_ID = #{memberId}  
+	</update>
+	
+	<delete id="deletePlayList">
+	    DELETE 
+	      FROM 
+	           TB_PLAYLIST
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           MEMBER_ID = #{memberId}
+	</delete>
+	
+	<insert id="createTrack">
+	    <selectKey keyProperty="songNo" resultType="long" order="BEFORE">
+	        SELECT SEQ_SONG_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	
+	    INSERT 
+	      INTO 
+	           TB_PLAYLIST_TRACK 
+	           (
+	             SONG_NO
+	           , ARTIST_ID 
+	           , TRACK_ID 
+	           , ALBUM 
+	           , DURATION 
+	           , PREVIEW_URL 
+	           , RELEASE_DATE 
+	           , COVERIMG_URL 
+	           , TITLE
+	           , ARTIST_NAME
+	           , GENRE_NAME
+	           ) 
+	    VALUES (
+	             #{songNo} 
+	           , #{artistId}
+	           , #{trackId}
+	           , #{album}
+	           , #{duration}
+	           , #{previewUrl}
+	           , #{releaseDate}
+	           , #{coverImgUrl}
+	           , #{title}
+	           , #{artistName}
+	           , #{genreName}
+	           )
+	</insert>
+	
+	<insert id="insertPlaylistSong">
+	    INSERT 
+	      INTO 
+	           TB_PLAYLIST_SONG_LIST 
+	           (
+	           PLAYLIST_SONG_NO
+	         , PLAYLIST_ID
+	         , SONG_ID
+	         , TRACK_ORDER
+	           ) 
+	   VALUES  
+	           (
+	           SEQ_PL_SONG_NO.NEXTVAL
+	         , #{playListId}
+	         , #{trackId}    
+	         , #{nextOrder}  
+	           )
+	</insert>
+	
+	<select id="getNextTrackOrder" resultType="_int">
+	    SELECT 
+	           NVL(MAX(TRACK_ORDER), 0) + 1
+	      FROM 
+	           TB_PLAYLIST_SONG_LIST
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	</select>
+	
+	<select id="getNewSongNo" resultType="long">
+	    SELECT 
+	           SEQ_SONG_NO.NEXTVAL 
+	      FROM 
+	           DUAL
+	</select>
+	
+	<select id="selectPlaylistTracks" resultType="com.kh.replay.playList.model.vo.PlayListTrackVO">
+	    SELECT 
+	    	   L.PLAYLIST_SONG_NO AS playlistSongNo
+	         , T.SONG_NO
+	         , T.TRACK_ID
+	         , T.ARTIST_ID
+	         , T.TITLE
+	         , T.ARTIST_NAME
+	         , T.ALBUM
+	         , T.DURATION
+	         , T.COVERIMG_URL
+	         , T.PREVIEW_URL
+	         , T.GENRE_NAME  
+	         , T.RELEASE_DATE
+	         , L.TRACK_ORDER
+	      FROM 
+	           TB_PLAYLIST_SONG_LIST L
+	      JOIN 
+	           TB_PLAYLIST P ON L.PLAYLIST_ID = P.PLAYLIST_ID
+	      JOIN 
+	           TB_PLAYLIST_TRACK T ON L.SONG_ID = T.SONG_NO
+	     WHERE 
+	           L.PLAYLIST_ID = #{playListId}
+	       AND 
+	           P.MEMBER_ID = #{memberId}
+	     ORDER BY 
+	           L.TRACK_ORDER ASC
+	</select>
+	
+	<update id="updateTrackOrder">
+	    UPDATE 
+	           TB_PLAYLIST_SONG_LIST
+	       SET 
+	           TRACK_ORDER = #{trackOrder},
+	           UPDATE_AT = SYSDATE
+	     WHERE 
+	           PLAYLIST_SONG_NO = #{playlistSongNo}
+	</update>
+	
+	<delete id="deletePlaylistTracks">
+	    DELETE 
+	      FROM 
+	           TB_PLAYLIST_SONG_LIST
+	     WHERE 
+	           PLAYLIST_ID = #{playListId}
+	       AND 
+	           SONG_ID = #{songId}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kh.replay.universe.model.dao.UniverseMapper">
+
+    <resultMap id="universeResultMap" type="com.kh.replay.universe.model.dto.UniverseDTO">
+        <id property="universeId" column="UNIVERSE_ID"/>
+        <result property="memberId" column="MEMBER_ID"/>
+        <result property="nickName" column="NICKNAME"/> <result property="title" column="TITLE"/>
+        <result property="layoutData" column="LAYOUT_DATA"/>
+        <result property="themeCode" column="THEME_CODE"/>
+        <result property="thumbnailUrl" column="THUMBNAIL_URL"/>
+        <result property="status" column="STATUS"/>
+        <result property="likeCount" column="LIKE_COUNT"/>
+        <result property="createdAt" column="CREATED_AT"/>
+    </resultMap>
+
+    <sql id="baseCondition">
+        WHERE STATUS = 'Y'
+    </sql>
+
+    <select id="findAllUniverse" parameterType="map" resultMap="universeResultMap">
+        SELECT
+               U.UNIVERSE_ID,
+               U.MEMBER_ID,
+               M.NICKNAME,
+               U.TITLE,
+               U.THUMBNAIL_URL,
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
+          FROM
+               TB_UNIVERSE U
+          JOIN
+               TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
+         WHERE
+               U.STATUS = 'Y'
+
+         <if test="lastUniverseId != null">
+             <choose>
+                 <when test='sort == "popular"'>
+                     AND (
+                         (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) &lt; #{lastLikeCount}
+                         OR (
+                             (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) = #{lastLikeCount}
+                             AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+                         )
+                     )
+                 </when>
+                 <otherwise>
+                     AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+                 </otherwise>
+             </choose>
+         </if>
+
+         <choose>
+             <when test='sort == "popular"'>
+                 ORDER BY LIKE_COUNT DESC, U.UNIVERSE_ID DESC
+             </when>
+             <otherwise>
+                 ORDER BY U.UNIVERSE_ID DESC
+             </otherwise>
+         </choose>
+
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="findByKeyword" parameterType="map" resultMap="universeResultMap">
+        SELECT
+               U.UNIVERSE_ID,
+               U.MEMBER_ID,
+               M.NICKNAME,
+               U.TITLE,
+               U.THUMBNAIL_URL,
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
+          FROM
+               TB_UNIVERSE U
+          JOIN
+               TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
+         WHERE
+               U.STATUS = 'Y'
+
+           <if test='keyword != null and keyword != ""'>
+               <choose>
+                   <when test='condition == "title"'>
+                       AND U.TITLE LIKE '%' || #{keyword} || '%'
+                   </when>
+                   <when test='condition == "nickname"'>
+                       AND M.NICKNAME LIKE '%' || #{keyword} || '%'
+                   </when>
+                   <when test='condition == "memberId"'>
+                       AND U.MEMBER_ID LIKE '%' || #{keyword} || '%'
+                   </when>
+                   <when test='condition == "hashtag"'>
+                        AND U.UNIVERSE_ID IN (
+                            SELECT TH.UNIVERSE_ID
+                            FROM TB_TAG_HISTORY TH
+                            JOIN TB_TAG T ON TH.TAG_ID = T.TAG_ID
+                            WHERE T.TAG_NAME LIKE '%' || #{keyword} || '%'
+                        )
+                   </when>
+                   <when test='condition == "all"'>
+                       AND (
+                           U.TITLE LIKE '%' || #{keyword} || '%'
+                           OR M.NICKNAME LIKE '%' || #{keyword} || '%'
+                       )
+                   </when>
+               </choose>
+           </if>
+
+           <if test="lastUniverseId != null">
+               <choose>
+                   <when test='sort == "popular"'>
+                       AND (
+                           (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) &lt; #{lastLikeCount}
+                           OR (
+                               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) = #{lastLikeCount}
+                               AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+                           )
+                       )
+                   </when>
+                   <otherwise>
+                       AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+                   </otherwise>
+               </choose>
+           </if>
+
+           <choose>
+               <when test='sort == "popular"'>
+                   ORDER BY LIKE_COUNT DESC, U.UNIVERSE_ID DESC
+               </when>
+               <otherwise>
+                   ORDER BY U.UNIVERSE_ID DESC
+               </otherwise>
+           </choose>
+
+           FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="findByUniverseId" resultMap="universeResultMap">
+        SELECT * FROM TB_UNIVERSE 
+         WHERE UNIVERSE_ID = #{universeId}
+           AND STATUS = 'Y'
+    </select>
+
+    <insert id="insertUniverse">
+        <selectKey keyProperty="universeId" resultType="long" order="BEFORE">
+            SELECT SEQ_UNIVERSE_ID.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO TB_UNIVERSE (
+            UNIVERSE_ID, TITLE, LAYOUT_DATA, THEME_CODE, MEMBER_ID, THUMBNAIL_URL, STATUS, CREATED_AT, UPDATED_AT
+        ) VALUES (
+            #{universeId}, #{title}, #{layoutData}, #{themeCode}, #{memberId}, #{thumbnailUrl}, 'Y', SYSDATE, SYSDATE
+        )
+    </insert>
+
+    <update id="updateUniverse">
+        UPDATE TB_UNIVERSE
+           SET TITLE = #{title},
+               LAYOUT_DATA = #{layoutData},
+               THEME_CODE = #{themeCode},
+               STATUS = #{status},
+               UPDATED_AT = SYSDATE
+         WHERE UNIVERSE_ID = #{universeId}
+    </update>
+
+    <update id="deleteUniverse">
+        UPDATE TB_UNIVERSE
+           SET STATUS = 'N'
+         WHERE UNIVERSE_ID = #{universeId}
+    </update>
+
+    <select id="findBookmarkedUniverses" parameterType="map" resultMap="universeResultMap">
+        SELECT
+               U.UNIVERSE_ID,
+               U.MEMBER_ID,
+               M.NICKNAME,
+               U.TITLE,
+               U.THUMBNAIL_URL,
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L WHERE L.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
+          FROM
+               TB_UNIVERSE U
+          JOIN
+               TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
+          JOIN
+               TB_FAV_UNIVERSE F ON U.UNIVERSE_ID = F.UNIVERSE_ID
+         WHERE
+               F.MEMBER_ID = #{memberId}
+           AND U.STATUS = 'Y'
+         <if test="lastUniverseId != null">
+           AND F.FAV_UNIVERSE_NO &lt; (
+               SELECT FAV_UNIVERSE_NO FROM TB_FAV_UNIVERSE
+                WHERE UNIVERSE_ID = #{lastUniverseId} AND MEMBER_ID = #{memberId}
+           )
+         </if>
+         ORDER BY F.FAV_UNIVERSE_NO DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+    <select id="findLikedUniverses" parameterType="map" resultMap="universeResultMap">
+        SELECT
+               U.UNIVERSE_ID,
+               U.MEMBER_ID,
+               M.NICKNAME,
+               U.TITLE,
+               U.THUMBNAIL_URL,
+               (SELECT COUNT(1) FROM TB_UNIVERSE_LIKED L2 WHERE L2.UNIVERSE_ID = U.UNIVERSE_ID) AS LIKE_COUNT,
+               U.CREATED_AT
+          FROM
+               TB_UNIVERSE U
+          JOIN
+               TB_MEMBER M ON U.MEMBER_ID = M.MEMBER_ID
+          JOIN
+               TB_UNIVERSE_LIKED L ON U.UNIVERSE_ID = L.UNIVERSE_ID
+         WHERE
+               L.MEMBER_ID = #{memberId}
+           AND U.STATUS = 'Y'
+         <if test="lastUniverseId != null">
+           AND U.UNIVERSE_ID &lt; #{lastUniverseId}
+         </if>
+         ORDER BY U.UNIVERSE_ID DESC
+         FETCH NEXT #{limit} ROWS ONLY
+    </select>
+
+</mapper>

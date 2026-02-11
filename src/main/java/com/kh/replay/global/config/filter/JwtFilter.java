@@ -39,6 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
         // 인증 이전 API
         if (uri.equals("/api/members/login")) return true;
         if (uri.equals("/api/auth/login")) return true;
+        if (uri.equals("/api/auth/signUp")) return true;
+        if (uri.equals("/api/members/genres")) return true;
         if (uri.equals("/members/login")) return true;
         if (uri.equals("/login")) return true;
         if (uri.equals("/api/members/signup") || uri.startsWith("/api/members/signup")) return true;

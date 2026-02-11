@@ -16,12 +16,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 public class PlayListDTO {
-	
+
 	private int playListId;
-	private String playListName; 	// requestBody
+	private String playListName;
 	private Date createdAt;
 	private String memberId;
 	private Date updateAt;
 	private String isMain;
+	private int songCount;
 
 }

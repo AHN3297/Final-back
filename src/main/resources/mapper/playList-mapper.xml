@@ -38,22 +38,23 @@
 	</insert>
 	
 	<select id="findAllMemberPlayLists" resultType="com.kh.replay.playList.model.dto.PlayListDTO">
-	    SELECT 
+	    SELECT
 	           P.PLAYLIST_ID as playListId
 	         , P.PLAYLIST_NAME as playListName
 	         , P.MEMBER_ID as memberId
 	         , CASE WHEN M.PLAYLIST_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS isMain
 	         , P.CREATED_AT as createdAt
-	         , P.UPDATED_AT as updatedAt 
-	      FROM 
+	         , P.UPDATED_AT as updatedAt
+	         , (SELECT COUNT(*) FROM TB_PLAYLIST_SONG_LIST S WHERE S.PLAYLIST_ID = P.PLAYLIST_ID) as songCount
+	      FROM
 	           TB_PLAYLIST P
-	      LEFT JOIN 
-	           TB_MAIN_PLAYLIST M ON P.PLAYLIST_ID = M.PLAYLIST_ID 
+	      LEFT JOIN
+	           TB_MAIN_PLAYLIST M ON P.PLAYLIST_ID = M.PLAYLIST_ID
 	                             AND P.MEMBER_ID = M.MEMBER_ID
-	     WHERE 
+	     WHERE
 	           P.MEMBER_ID = #{memberId}
-	     ORDER 
-	        BY 
+	     ORDER
+	        BY
 	           isMain DESC,
 	           P.CREATED_AT DESC
 	</select>

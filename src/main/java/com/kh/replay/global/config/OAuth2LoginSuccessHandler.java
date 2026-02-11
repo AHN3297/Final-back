@@ -31,7 +31,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtUtil jwtUtil;
     private final TokenMapper tokenMapper;
 
-    @Value("${front.base-url:http://localhost:5173}")
+    @Value("${front.base-url}")
     private String frontBaseUrl;
 
     @Override

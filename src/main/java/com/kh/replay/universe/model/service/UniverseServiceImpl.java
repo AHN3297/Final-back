@@ -80,7 +80,7 @@ public class UniverseServiceImpl implements UniverseService {
 
 	@Override
 	public void createUniverse(UniverseCreateRequest request, MultipartFile file, String userId) {
-		String imageUrl = null;
+		String imageUrl = "https://via.placeholder.com/300?text=Universe";
 
 		if (file != null && !file.isEmpty()) {
 			try {
@@ -180,7 +180,7 @@ public class UniverseServiceImpl implements UniverseService {
 			nextLastUniverseId = lastItem.getUniverseId();
 
 			if ("popular".equals(sort)) {
-				nextLastLikeCount = lastItem.getLike();
+				nextLastLikeCount = lastItem.getLikeCount();
 			}
 		}
 

@@ -97,6 +97,8 @@ public class SecurityConfigure {
                 requests.requestMatchers(HttpMethod.GET, "/api/artist/**").permitAll();
                 requests.requestMatchers(HttpMethod.GET, "/api/news").permitAll();
                 requests.requestMatchers(HttpMethod.GET, "/api/members/genres").permitAll();
+                requests.requestMatchers(HttpMethod.GET, "/api/admin/notices").permitAll();
+                requests.requestMatchers(HttpMethod.GET, "/api/admin/notices/*").permitAll();
 
                 // === 관리자 ===
                 requests.requestMatchers("/api/auth/admin/**").hasRole("ADMIN");

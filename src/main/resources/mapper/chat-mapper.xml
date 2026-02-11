@@ -13,12 +13,13 @@
 
     <select id="selectRecentChats" resultType="com.kh.replay.chat.model.vo.ChatVO">
         SELECT 
-            c.CHAT_NO, 
+            c.CHAT_NO,
+            c.MEMBER_ID, 
             c.CHAT_CONTENT, 
             c.CREATE_DATE, 
             m.MEMBER_NICKNAME as nickname
         FROM CHAT_MESSAGE c
-        JOIN MEMBER m ON c.MEMBER_ID = m.MEMBER_ID
+        JOIN TB_MEMBER m ON c.MEMBER_ID = m.MEMBER_ID
         WHERE c.CREATE_DATE >= SYSDATE - 3
         ORDER BY c.CREATE_DATE ASC
     </select>

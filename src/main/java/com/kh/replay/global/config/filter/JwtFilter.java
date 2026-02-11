@@ -52,13 +52,22 @@ public class JwtFilter extends OncePerRequestFilter {
         if (HttpMethod.OPTIONS.matches(method)) {
             return true;
         }
-
         // 화이트리스트
         for (String path : WHITELIST) {
             if (uri.startsWith(path)) {
                 return true;
             }
         }
+
+        // 인증 이전 API
+        if (uri.equals("/api/members/login")) return true;
+        if (uri.equals("/api/auth/login")) return true;
+        if (uri.equals("/api/auth/signUp")) return true;
+        if (uri.equals("/api/members/genres")) return true;
+        if (uri.equals("/members/login")) return true;
+        if (uri.equals("/login")) return true;
+        if (uri.equals("/api/members/signup") || uri.startsWith("/api/members/signup")) return true;
+
 
         // OAuth2
         if (uri.startsWith("/oauth2/") || uri.startsWith("/login/oauth2/")) {

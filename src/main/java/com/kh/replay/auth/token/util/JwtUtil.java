@@ -26,7 +26,6 @@ public class JwtUtil {
     
     @PostConstruct
     public void init() {
-        log.info("{}", secretKey);
         byte[] arr = Base64.getDecoder().decode(secretKey);
         this.key = Keys.hmacShaKeyFor(arr);
     }

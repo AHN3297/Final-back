@@ -108,8 +108,6 @@ public class MemberServiceImpl implements MemberService {
 		CustomUserDetails user = (CustomUserDetails) auth.getPrincipal();
 		String userMemberId = user.getUsername();
 		
-		log.info("userMemberId : {}", userMemberId);
-		log.info("memberId : {}", memberId);
 
 		if (!memberId.equals(userMemberId)) {
 			throw new CustomAuthenticationException("사용자 정보가 일치하지 않습니다.");

@@ -11,8 +11,8 @@
         <result property="themeCode" column="THEME_CODE"/>
         <result property="thumbnailUrl" column="THUMBNAIL_URL"/>
         <result property="status" column="STATUS"/>
-        <result property="like" column="LIKE_COUNT"/>
-        <result property="createAt" column="CREATED_AT"/>
+        <result property="likeCount" column="LIKE_COUNT"/>
+        <result property="createdAt" column="CREATED_AT"/>
     </resultMap>
 
     <sql id="baseCondition">

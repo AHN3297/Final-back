@@ -50,7 +50,6 @@ public class LocalServiceImpl implements LocalService {
 		;
 		
 		for (Long genreId : local.getGenreIds()) {
-			log.info("{}" , genreId);
 			localmapper.insertOneMemberGenre(local.getMemberDto().getMemberId(), genreId);
 		}
 

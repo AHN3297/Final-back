@@ -21,16 +21,16 @@ public class UniverseDTO {
 	private String layoutData;
 	private String themeCode;
 	private String status;
-	private String thumbnailUrl; //썸내일 
+	private String thumbnailUrl;  
 	
-	private String memberId; //맴버태그
-	private String nickName; //별명
+	private String memberId; 
+	private String nickName; 
 	
-	private long like; //좋아요 
-	private long bookmark; // 북마크
+	private long likeCount;  
+	private long bookmarkCount; 
 	
 	private String mainPlaylist;
 	 
-	private LocalDateTime createAt;
+	private LocalDateTime createdAt;
 
 }

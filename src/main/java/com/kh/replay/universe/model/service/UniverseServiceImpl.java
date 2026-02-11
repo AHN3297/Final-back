@@ -180,7 +180,7 @@ public class UniverseServiceImpl implements UniverseService {
 			nextLastUniverseId = lastItem.getUniverseId();
 
 			if ("popular".equals(sort)) {
-				nextLastLikeCount = lastItem.getLike();
+				nextLastLikeCount = lastItem.getLikeCount();
 			}
 		}
 

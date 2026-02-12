@@ -1,8 +1,10 @@
 package com.kh.replay.global.config.filter;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -30,11 +32,32 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsServiceImpl userDetailsService;
 
     /**
-     * JWT 필터 제외 경로
+     * 🔓 JWT 필터 완전 제외 경로
      */
+    private static final List<String> WHITELIST = List.of(
+        "/api/members/login",
+        "/api/members/signup",
+        "/api/members/complete",
+        "/api/auth/login",
+        "/api/auth/signUp",
+        "/oauth-callback"
+    );
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
+        String method = request.getMethod();
+
+        // OPTIONS 무조건 통과
+        if (HttpMethod.OPTIONS.matches(method)) {
+            return true;
+        }
+        // 화이트리스트
+        for (String path : WHITELIST) {
+            if (uri.startsWith(path)) {
+                return true;
+            }
+        }
 
         // 인증 이전 API
         if (uri.equals("/api/members/login")) return true;
@@ -45,21 +68,25 @@ public class JwtFilter extends OncePerRequestFilter {
         if (uri.equals("/login")) return true;
         if (uri.equals("/api/members/signup") || uri.startsWith("/api/members/signup")) return true;
 
+
         // OAuth2
-        if (uri.startsWith("/oauth2/")) return true;
-        if (uri.startsWith("/login/oauth2/")) return true;
-        if (uri.equals("/oauth-callback")) return true;
+        if (uri.startsWith("/oauth2/") || uri.startsWith("/login/oauth2/")) {
+            return true;
+        }
 
         // WebSocket
-        if (uri.startsWith("/ws-chat")) return true;
+        if (uri.startsWith("/ws-chat")) {
+            return true;
+        }
 
         // 정적 리소스
-        if (uri.equals("/favicon.ico")) return true;
-        if (uri.equals("/error")) return true;
-        if (uri.startsWith("/css/") || uri.startsWith("/js/") || uri.startsWith("/images/")) return true;
-
-        // 테스트 경로
-        if (uri.startsWith("/test/")) return true;
+        if (uri.equals("/favicon.ico") ||
+            uri.equals("/error") ||
+            uri.startsWith("/css/") ||
+            uri.startsWith("/js/") ||
+            uri.startsWith("/images/")) {
+            return true;
+        }
 
         return false;
     }
@@ -71,21 +98,9 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String uri = request.getRequestURI();
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        boolean requiresAuth =
-                uri.contains("/me") ||
-                uri.contains("/likes") ||
-                uri.contains("/bookmarks");
-
-        // 인증이 필요한 API인데 토큰이 없으면 즉시 차단
-        if (requiresAuth && (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer "))) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        // 토큰이 없는 경우 (permitAll API)
+        // 🔐 토큰 없으면 그냥 통과 (Security 쪽에서 판단)
         if (!StringUtils.hasText(authorization) || !authorization.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -102,17 +117,17 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             CustomUserDetails user =
-                    (CustomUserDetails) userDetailsService.loadUserByMemberId(memberId);
+                (CustomUserDetails) userDetailsService.loadUserByMemberId(memberId);
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            user,
-                            null,
-                            user.getAuthorities()
-                    );
+                new UsernamePasswordAuthenticationToken(
+                    user,
+                    null,
+                    user.getAuthorities()
+                );
 
             authentication.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
+                new WebAuthenticationDetailsSource().buildDetails(request)
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

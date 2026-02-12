@@ -139,13 +139,13 @@ public class MemberServiceImpl implements MemberService {
 	public List<MemberInfoDTO> changeInfo(MemberUpdateRequest request) {
 		membermapper.changeInfo(request);
 		
-		if (request.getGenres() != null) {
+		if (request.getGenreIds() != null) {
 			membermapper.deleteMemberGenres(request.getMemberId());
 			
-			if (!request.getGenres().isEmpty()) {
+			if (!request.getGenreIds().isEmpty()) {
 				membermapper.insertMemberGenres(
 					request.getMemberId(),
-					request.getGenres()
+					request.getGenreIds()
 				);
 			}
 		}
@@ -196,4 +196,33 @@ public class MemberServiceImpl implements MemberService {
 	public List<GenreDTO> findAllGenres() {
 		return membermapper.findAllGenres();
 	}
+
+	@Override
+	@Transactional
+	public void completeLocalMember(MemberUpdateRequest request) {
+
+	    if (request.getMemberId() == null || request.getMemberId().isBlank()) {
+	        throw new IllegalArgumentException("memberId는 필수입니다.");
+	    }
+
+	    int updated = membermapper.updateComplete(request);
+
+	    if (updated == 0) {
+	        throw new IllegalStateException(
+	            "회원 정보 업데이트 실패: memberId가 없거나 STATUS가 'Y'가 아닙니다. memberId=" 
+	            + request.getMemberId()
+	        );
+	    }
+
+	    if (request.getGenreIds() != null && !request.getGenreIds().isEmpty()) {
+	        membermapper.deleteMemberGenres(request.getMemberId());
+	        membermapper.insertMemberGenres(
+	            request.getMemberId(),
+	            request.getGenreIds()
+	        );
+	    }
+	}
+
+
+
 }

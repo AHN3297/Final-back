@@ -12,7 +12,7 @@ public class MemberUpdateRequest {
     private String mbti;
     private String job;
     private String gender;
-    private List<Long> genres;
+    private List<Long> genreIds;
 }
 
 

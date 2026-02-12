@@ -83,4 +83,12 @@ public class MemberController {
 		List<GenreDTO> genres = memberService.findAllGenres();
 		return ResponseData.ok(genres, "장르 전체 조회 성공");
 	}
+	@PostMapping("/complete")
+	public ResponseEntity<ResponseData<Void>> completeLocalMember(
+	        @RequestBody MemberUpdateRequest request
+	) {
+	    memberService.completeLocalMember(request);
+	    return ResponseData.ok(null, "회원가입 추가 정보 입력 완료");
+	}
+
 }

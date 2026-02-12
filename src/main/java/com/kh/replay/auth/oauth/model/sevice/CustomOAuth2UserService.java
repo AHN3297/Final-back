@@ -45,8 +45,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		OAuthUserDTO existingSocial = socialMapper.findByProviderAndProviderId(probe);
 
 		if (existingSocial != null) {
-			boolean profileCompleted = existingSocial.getNickname() != null
-					&& !existingSocial.getNickname().equals("TEMP");
+			boolean profileCompleted = existingSocial.getNickName() != null
+					&& !existingSocial.getNickName().equals("TEMP");
 
 			existingSocial.setProfileCompleted(profileCompleted);
 			existingSocial.setEmail(email);

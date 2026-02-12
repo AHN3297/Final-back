@@ -269,6 +269,19 @@
 		FROM TB_GENRE
 		ORDER BY GENRE_NAME
 	</select>
+<update id="updateComplete"
+        parameterType="com.kh.replay.member.model.dto.MemberUpdateRequest">
+    UPDATE TB_MEMBER
+    SET
+        NICKNAME = #{nickName},
+        PHONE = #{phone},
+        MBTI = #{mbti},
+        MEMBER_JOB = #{job},
+        GENDER = #{gender},
+        UPDATED_AT = SYSDATE
+    WHERE MEMBER_ID = #{memberId}
+      AND STATUS = 'Y'
+</update>
 
 
 </mapper>

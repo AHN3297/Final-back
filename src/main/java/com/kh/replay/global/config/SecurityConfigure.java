@@ -14,6 +14,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -44,7 +45,7 @@ public class SecurityConfigure {
 
     /**
      * ===============================
-     * OAuth2 로그인 전용 체인
+     * OAuth2 로그인 체인
      * ===============================
      */
     @Bean
@@ -59,13 +60,15 @@ public class SecurityConfigure {
                 .userInfoEndpoint(userInfo -> userInfo.userService(oAuth2UserService))
                 .successHandler(oAuth2SuccessHandler)
             )
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .sessionManagement(sm ->
+                sm.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            )
             .build();
     }
 
     /**
      * ===============================
-     * API (JWT) 전용 체인
+     * API (JWT) 체인
      * ===============================
      */
     @Bean
@@ -76,19 +79,27 @@ public class SecurityConfigure {
             .formLogin(AbstractHttpConfigurer::disable)
             .csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
-            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(sm ->
+                sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .exceptionHandling(ex ->
-                ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                ex.authenticationEntryPoint(
+                    new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)
+                )
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(requests -> {
 
+                // ✅ CORS Preflight 반드시 허용
+                requests.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+
                 // === WebSocket ===
                 requests.requestMatchers("/ws-chat/**").permitAll();
 
-                // === 공개 API ===
+                // === 공개 API (JWT ❌) ===
                 requests.requestMatchers(HttpMethod.POST, "/api/auth/signUp").permitAll();
                 requests.requestMatchers(HttpMethod.POST, "/api/members/login").permitAll();
+                requests.requestMatchers(HttpMethod.POST, "/api/members/complete").permitAll();
                 requests.requestMatchers("/api/universes/**").permitAll();
                 requests.requestMatchers("/api/search").permitAll();
                 requests.requestMatchers("/api/oauth-callback").permitAll();
@@ -103,21 +114,17 @@ public class SecurityConfigure {
                 // === 관리자 ===
                 requests.requestMatchers("/api/auth/admin/**").hasRole("ADMIN");
 
-                // === 인증 필요 ===
-                // 회원 관련
+                // === 인증 필요 (JWT ✅) ===
                 requests.requestMatchers(HttpMethod.GET, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.PATCH, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.PUT, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.DELETE, "/api/members").authenticated();
                 requests.requestMatchers(HttpMethod.POST, "/api/members/logout").authenticated();
 
-                // OAuth 및 즐겨찾기
                 requests.requestMatchers("/api/oauth/**").authenticated();
-                requests.requestMatchers(HttpMethod.PUT, "/api/oauth/social/**").authenticated();
                 requests.requestMatchers("/api/favorite/**").authenticated();
                 requests.requestMatchers("/api/member/playList/**").authenticated();
 
-                // 숏폼 작성/수정/삭제
                 requests.requestMatchers(HttpMethod.POST, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.PUT, "/api/shortforms/**").authenticated();
                 requests.requestMatchers(HttpMethod.PATCH, "/api/shortforms/**").authenticated();
@@ -159,7 +166,8 @@ public class SecurityConfigure {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authConfig) throws Exception {
+        AuthenticationConfiguration authConfig
+    ) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 }
